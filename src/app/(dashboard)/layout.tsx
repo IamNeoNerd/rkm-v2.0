@@ -2,6 +2,7 @@ import { Sidebar } from "@/components/layout/Sidebar"
 import { MobileNav } from "@/components/layout/MobileNav"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { CommandPalette } from "@/components/CommandPalette"
+import { NotificationBell } from "@/components/NotificationBell"
 
 export default function DashboardLayout({
     children,
@@ -22,11 +23,15 @@ export default function DashboardLayout({
                         <MobileNav />
                         <span className="font-semibold text-lg text-indigo-600">RK Institute ERP</span>
                     </div>
-                    <CommandPalette />
+                    <div className="flex items-center gap-2">
+                        <NotificationBell />
+                        <CommandPalette />
+                    </div>
                 </header>
 
                 {/* Header: Desktop - Just command palette */}
-                <header className="hidden lg:flex sticky top-0 z-20 h-14 items-center justify-end border-b bg-white px-6">
+                <header className="hidden lg:flex sticky top-0 z-20 h-14 items-center justify-end border-b bg-white px-6 gap-3">
+                    <NotificationBell />
                     <CommandPalette />
                 </header>
 

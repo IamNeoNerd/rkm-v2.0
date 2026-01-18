@@ -6,9 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Calendar, Check, Star } from "lucide-react";
+import { Plus, Calendar, Star, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { SessionTransitionDialog } from "./session-transition-dialog";
 
 interface AcademicSession {
     id: number;
@@ -22,6 +23,7 @@ export default function SessionsSettingsPage() {
     const [sessions, setSessions] = useState<AcademicSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [transitionDialogOpen, setTransitionDialogOpen] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         startDate: "",
@@ -88,71 +90,91 @@ export default function SessionsSettingsPage() {
                     <p className="text-gray-600 mt-1">Manage academic years and session periods</p>
                 </div>
 
-                <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                    <DialogTrigger asChild>
-                        <Button className="flex items-center gap-2">
-                            <Plus className="h-4 w-4" />
-                            <span className="hidden sm:inline">Add Session</span>
-                            <span className="sm:hidden">Add</span>
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>Add Academic Session</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Label htmlFor="name">Session Name</Label>
-                                <Input
-                                    id="name"
-                                    value={formData.name}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                                    placeholder="e.g., 2025-26"
-                                    required
-                                />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => setTransitionDialogOpen(true)}
+                        className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50"
+                    >
+                        <RefreshCw className="h-4 w-4" />
+                        <span className="hidden sm:inline">Start New Year</span>
+                        <span className="sm:hidden">Transition</span>
+                    </Button>
+
+                    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                        <DialogTrigger asChild>
+                            <Button className="flex items-center gap-2">
+                                <Plus className="h-4 w-4" />
+                                <span className="hidden sm:inline">Add Session</span>
+                                <span className="sm:hidden">Add</span>
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                                <DialogTitle>Add Academic Session</DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
-                                    <Label htmlFor="startDate">Start Date</Label>
+                                    <Label htmlFor="name">Session Name</Label>
                                     <Input
-                                        id="startDate"
-                                        type="date"
-                                        value={formData.startDate}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                                        id="name"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                                        placeholder="e.g., 2025-26"
                                         required
                                     />
                                 </div>
-                                <div>
-                                    <Label htmlFor="endDate">End Date</Label>
-                                    <Input
-                                        id="endDate"
-                                        type="date"
-                                        value={formData.endDate}
-                                        onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
-                                        required
-                                    />
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <Label htmlFor="startDate">Start Date</Label>
+                                        <Input
+                                            id="startDate"
+                                            type="date"
+                                            value={formData.startDate}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, startDate: e.target.value }))}
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <Label htmlFor="endDate">End Date</Label>
+                                        <Input
+                                            id="endDate"
+                                            type="date"
+                                            value={formData.endDate}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, endDate: e.target.value }))}
+                                            required
+                                        />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="checkbox"
-                                    id="isCurrent"
-                                    checked={formData.isCurrent}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, isCurrent: e.target.checked }))}
-                                    className="h-4 w-4 rounded border-gray-300"
-                                />
-                                <Label htmlFor="isCurrent" className="font-normal">Set as current session</Label>
-                            </div>
-                            <div className="flex justify-end gap-2">
-                                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit">Create</Button>
-                            </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                                <div className="flex items-center gap-2">
+                                    <input
+                                        type="checkbox"
+                                        id="isCurrent"
+                                        checked={formData.isCurrent}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, isCurrent: e.target.checked }))}
+                                        className="h-4 w-4 rounded border-gray-300"
+                                    />
+                                    <Label htmlFor="isCurrent" className="font-normal">Set as current session</Label>
+                                </div>
+                                <div className="flex justify-end gap-2">
+                                    <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
+                                        Cancel
+                                    </Button>
+                                    <Button type="submit">Create</Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
+
+            <SessionTransitionDialog
+                open={transitionDialogOpen}
+                onOpenChange={setTransitionDialogOpen}
+                sessions={sessions}
+                currentSession={sessions.find(s => s.isCurrent) || null}
+                onTransitionComplete={loadSessions}
+            />
 
             {sessions.length === 0 ? (
                 <div className="bg-white rounded-lg shadow p-8 text-center">
