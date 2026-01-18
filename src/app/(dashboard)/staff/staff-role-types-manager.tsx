@@ -27,7 +27,11 @@ export function StaffRoleTypesManager() {
     }, []);
 
     useEffect(() => {
-        loadRoleTypes();
+        // Use setTimeout to avoid cascading renders
+        const timer = setTimeout(() => {
+            loadRoleTypes();
+        }, 0);
+        return () => clearTimeout(timer);
     }, [loadRoleTypes]);
 
     const handleAddRoleType = async () => {

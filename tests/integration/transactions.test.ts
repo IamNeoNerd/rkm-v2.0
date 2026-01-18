@@ -66,18 +66,25 @@ describe('Database Transaction Integration', () => {
             joiningDate: new Date()
         });
 
+
         expect(res.success).toBe(true);
         if (!res.success) throw new Error("Admission failed");
+
+        // Type guard: check properties exist
+        if (!('familyId' in res) || !('studentId' in res)) {
+            throw new Error("Expected familyId and studentId in success result");
+        }
+
         expect(res.familyId).toBeDefined();
 
         // Verify DB records exist
         const family = await db.query.families.findFirst({
-            where: eq(families.id, res.familyId as number)
+            where: eq(families.id, res.familyId)
         });
         expect(family).toBeDefined();
 
         const student = await db.query.students.findFirst({
-            where: eq(students.id, res.studentId as number)
+            where: eq(students.id, res.studentId)
         });
         expect(student).toBeDefined();
     });
@@ -196,7 +203,7 @@ describe('Database Transaction Integration', () => {
                 if (errorCall) {
                     console.error("Internal Error Details:", errorCall);
                 }
-                throw new Error("Transition failed: " + (res as any).error);
+                throw new Error("Transition failed: " + ('error' in res ? res.error : 'Unknown error'));
             }
             expect(res.success).toBe(true);
 

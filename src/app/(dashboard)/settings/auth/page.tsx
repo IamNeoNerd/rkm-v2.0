@@ -38,6 +38,7 @@ export default function AuthSettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
 
     const form = useForm<AuthFormValues>({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         resolver: zodResolver(authFormSchema) as any,
         defaultValues: {
             googleEnabled: true,

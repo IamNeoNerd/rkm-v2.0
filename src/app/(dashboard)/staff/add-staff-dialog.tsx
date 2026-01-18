@@ -44,7 +44,11 @@ export function AddStaffDialog() {
 
     useEffect(() => {
         if (open) {
-            loadRoleTypes();
+            // Use setTimeout to avoid cascading renders
+            const timer = setTimeout(() => {
+                loadRoleTypes();
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [open, loadRoleTypes]);
 

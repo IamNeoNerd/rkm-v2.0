@@ -130,42 +130,6 @@ D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\sessions\session-transition
   100:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
   120:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
 
-D:\RKM\rk-institute-erp\src\app\(dashboard)\staff\add-staff-dialog.tsx
-  47:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-D:\RKM\rk-institute-erp\src\app\(dashboard)\staff\add-staff-dialog.tsx:47:13
-  45 |     useEffect(() => {
-  46 |         if (open) {
-> 47 |             loadRoleTypes();
-     |             ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  48 |         }
-  49 |     }, [open, loadRoleTypes]);
-  50 |  react-hooks/set-state-in-effect
-
-D:\RKM\rk-institute-erp\src\app\(dashboard)\staff\staff-role-types-manager.tsx
-  30:9  error  Error: Calling setState synchronously within an effect can trigger cascading renders
-
-Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
-* Update external systems with the latest state from React.
-* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
-
-Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
-
-D:\RKM\rk-institute-erp\src\app\(dashboard)\staff\staff-role-types-manager.tsx:30:9
-  28 |
-  29 |     useEffect(() => {
-> 30 |         loadRoleTypes();
-     |         ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
-  31 |     }, [loadRoleTypes]);
-  32 |
-  33 |     const handleAddRoleType = async () => {  react-hooks/set-state-in-effect
-
 D:\RKM\rk-institute-erp\src\app\(dashboard)\student\[id]\page.tsx
    3:10  warning  'useState' is defined but never used      @typescript-eslint/no-unused-vars
    4:36  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
@@ -227,8 +191,7 @@ D:\RKM\rk-institute-erp\tests\e2e\utils\devices.ts
   7:16  warning  'BrowserContext' is defined but never used  @typescript-eslint/no-unused-vars
 
 D:\RKM\rk-institute-erp\tests\integration\transactions.test.ts
-   41:14  warning  'count' is defined but never used         @typescript-eslint/no-unused-vars
-  199:65  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  41:14  warning  'count' is defined but never used  @typescript-eslint/no-unused-vars
 
-Γ£û 101 problems (4 errors, 97 warnings)
+Γ£û 98 problems (1 error, 97 warnings)
 
