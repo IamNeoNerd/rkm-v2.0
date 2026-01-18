@@ -56,6 +56,9 @@ export enum AuditAction {
     SETTINGS_UPDATE = 'settings.update',
     SESSION_CREATE = 'session.create',
     SESSION_ACTIVATE = 'session.activate',
+    FEE_STRUCTURE_CREATE = 'fee_structure.create',
+    FEE_STRUCTURE_UPDATE = 'fee_structure.update',
+    FEE_STRUCTURE_DELETE = 'fee_structure.delete',
 
     // System actions
     SYSTEM_ERROR = 'system.error',

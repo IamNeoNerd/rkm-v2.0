@@ -15,13 +15,14 @@ export interface CreateSessionData {
     name: string;
     startDate: string;
     endDate: string;
+    isCurrent?: boolean;
 }
 
 export async function createSession(data: CreateSessionData) {
     try {
         await requireRole(['super-admin', 'admin']);
 
-        const { name, startDate, endDate } = data;
+        const { name, startDate, endDate, isCurrent } = data;
 
         // Validate dates
         const start = new Date(startDate);
@@ -41,17 +42,24 @@ export async function createSession(data: CreateSessionData) {
             return { success: false, error: `Session "${name}" already exists` };
         }
 
-        const [newSession] = await db
-            .insert(academicSessions)
-            .values({
-                name,
-                startDate,
-                endDate,
-                isCurrent: false,
-            })
-            .returning();
+        const newSession = await db.transaction(async (tx) => {
+            if (isCurrent) {
+                await tx.update(academicSessions).set({ isCurrent: false });
+            }
 
-        await audit(AuditAction.SESSION_CREATE, { name, startDate, endDate }, 'session', newSession.id);
+            const [inserted] = await tx
+                .insert(academicSessions)
+                .values({
+                    name,
+                    startDate,
+                    endDate,
+                    isCurrent: !!isCurrent,
+                })
+                .returning();
+            return inserted;
+        });
+
+        await audit(AuditAction.SESSION_CREATE, { name, startDate, endDate, isCurrent }, 'session', newSession.id);
         logger.info(`Session created: ${name}`);
 
         safeRevalidatePath('/settings/sessions');
@@ -68,7 +76,7 @@ export async function createSession(data: CreateSessionData) {
 
 export async function getAllSessions() {
     try {
-        await requireAuth();
+        await requireRole(['admin', 'super-admin']);
 
         const sessions = await db
             .select()
@@ -78,6 +86,9 @@ export async function getAllSessions() {
         return { success: true, sessions };
 
     } catch (error) {
+        if (error instanceof AuthorizationError) {
+            return { success: false, sessions: [], error: error.message };
+        }
         logger.error('Failed to fetch sessions', error);
         return { success: false, sessions: [], error: "Failed to fetch sessions" };
     }
@@ -362,9 +373,9 @@ export async function transitionToNewSession(
 // Fee Structure Management
 // ============================================
 
-export async function getSessionFeeStructures(sessionId?: number) {
+export async function getFeeStructures(sessionId?: number) {
     try {
-        await requireAuth();
+        await requireRole(['admin', 'super-admin']);
 
         let query = db.select().from(feeStructures);
 
@@ -373,28 +384,38 @@ export async function getSessionFeeStructures(sessionId?: number) {
         }
 
         const structures = await query.orderBy(feeStructures.className);
-        return { success: true, structures };
+        return { success: true, feeStructures: structures };
 
     } catch (error) {
+        if (error instanceof AuthorizationError) {
+            return { success: false, feeStructures: [], error: error.message };
+        }
         logger.error('Failed to fetch fee structures', error);
-        return { success: false, structures: [], error: "Failed to fetch fee structures" };
+        return { success: false, feeStructures: [], error: "Failed to fetch fee structures" };
     }
 }
 
 export async function updateFeeStructure(
-    structureId: number,
-    data: { monthlyFee?: number; admissionFee?: number; isActive?: boolean }
+    id: number,
+    data: { className?: string; monthlyFee?: number; admissionFee?: number; isActive?: boolean }
 ) {
     try {
         await requireRole(['super-admin', 'admin']);
 
-        await db
+        const [updated] = await db
             .update(feeStructures)
-            .set({ ...data, updatedAt: new Date() })
-            .where(eq(feeStructures.id, structureId));
+            .set({
+                ...data,
+                className: data.className?.trim(),
+                updatedAt: new Date()
+            })
+            .where(eq(feeStructures.id, id))
+            .returning();
+
+        await audit(AuditAction.FEE_STRUCTURE_UPDATE, { id, ...data }, 'fee_structure', id);
 
         safeRevalidatePath('/settings/fees');
-        return { success: true };
+        return { success: true, feeStructure: updated };
 
     } catch (error) {
         if (error instanceof AuthorizationError) {
@@ -406,7 +427,7 @@ export async function updateFeeStructure(
 }
 
 export async function createFeeStructure(data: {
-    sessionId: number;
+    sessionId?: number | null;
     className: string;
     monthlyFee: number;
     admissionFee: number;
@@ -418,12 +439,15 @@ export async function createFeeStructure(data: {
             .insert(feeStructures)
             .values({
                 ...data,
+                className: data.className.trim(),
                 isActive: true,
             })
             .returning();
 
+        await audit(AuditAction.FEE_STRUCTURE_CREATE, { className: data.className, monthlyFee: data.monthlyFee }, 'fee_structure', structure.id);
+
         safeRevalidatePath('/settings/fees');
-        return { success: true, structure };
+        return { success: true, feeStructure: structure };
 
     } catch (error) {
         if (error instanceof AuthorizationError) {
@@ -431,6 +455,25 @@ export async function createFeeStructure(data: {
         }
         logger.error('Failed to create fee structure', error);
         return { success: false, error: "Failed to create fee structure" };
+    }
+}
+
+export async function deleteFeeStructure(id: number) {
+    try {
+        await requireRole(["super-admin"]);
+
+        await db.delete(feeStructures).where(eq(feeStructures.id, id));
+
+        await audit(AuditAction.FEE_STRUCTURE_DELETE, { id }, 'fee_structure', id);
+
+        safeRevalidatePath('/settings/fees');
+        return { success: true };
+    } catch (error) {
+        if (error instanceof AuthorizationError) {
+            return { success: false, error: error.message };
+        }
+        logger.error('Failed to delete fee structure', error);
+        return { success: false, error: "Failed to delete fee structure" };
     }
 }
 

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
+import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
 // Action category icons and colors
 const actionConfig: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
@@ -118,24 +119,12 @@ export default function AuditLogsClient() {
     };
 
     return (
-        <div className="p-6 max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-6">
-                <div>
-                    <Link href="/settings">
-                        <Button variant="ghost" className="mb-2">
-                            <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Settings
-                        </Button>
-                    </Link>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                        <div className="p-2 bg-indigo-100 rounded-lg">
-                            <History className="h-7 w-7 text-indigo-600" />
-                        </div>
-                        Audit Logs
-                    </h1>
-                    <p className="text-gray-600 mt-1">Track all system activities and user actions</p>
-                </div>
+        <SettingsPageLayout
+            title="Audit Logs"
+            description="Track all system activities and user actions"
+            icon={History}
+        >
+            <div className="flex justify-end mb-6">
                 <Button onClick={() => fetchLogs()} variant="outline" disabled={loading}>
                     <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
                     Refresh
@@ -336,6 +325,6 @@ export default function AuditLogsClient() {
                     </div>
                 )}
             </div>
-        </div>
+        </SettingsPageLayout>
     );
 }

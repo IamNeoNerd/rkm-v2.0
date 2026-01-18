@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getAcademicSessions, createAcademicSession, setCurrentSession } from "@/actions/settings";
+import { getAllSessions as getAcademicSessions, createSession as createAcademicSession, activateSession as setCurrentSession } from "@/actions/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { Plus, Calendar, Star, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { SessionTransitionDialog } from "./session-transition-dialog";
+import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
 interface AcademicSession {
     id: number;
@@ -80,16 +81,13 @@ export default function SessionsSettingsPage() {
     }
 
     return (
-        <div className="p-4 sm:p-6 max-w-4xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                        <Calendar className="h-7 w-7 text-purple-600" />
-                        Academic Sessions
-                    </h1>
-                    <p className="text-gray-600 mt-1">Manage academic years and session periods</p>
-                </div>
-
+        <SettingsPageLayout
+            title="Academic Sessions"
+            description="Manage academic years and session periods"
+            icon={Calendar}
+            maxWidth="lg"
+        >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">
                 <div className="flex items-center gap-2">
                     <Button
                         variant="outline"
@@ -219,6 +217,6 @@ export default function SessionsSettingsPage() {
                     ))}
                 </div>
             )}
-        </div>
+        </SettingsPageLayout>
     );
 }

@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getFeeStructures, createFeeStructure, updateFeeStructure, deleteFeeStructure } from "@/actions/settings";
+import { getFeeStructures, createFeeStructure, updateFeeStructure, deleteFeeStructure } from "@/actions/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, IndianRupee, GraduationCap } from "lucide-react";
 import { toast } from "sonner";
+import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
 interface FeeStructure {
     id: number;
@@ -105,16 +106,13 @@ export default function FeesSettingsPage() {
     }
 
     return (
-        <div className="p-4 sm:p-6 max-w-4xl mx-auto">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-                <div>
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-2">
-                        <IndianRupee className="h-7 w-7 text-indigo-600" />
-                        Fee Structure
-                    </h1>
-                    <p className="text-gray-600 mt-1">Configure class-wise monthly and admission fees</p>
-                </div>
-
+        <SettingsPageLayout
+            title="Fee Structure"
+            description="Configure class-wise monthly and admission fees"
+            icon={IndianRupee}
+            maxWidth="lg"
+        >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">
                 <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
                     <DialogTrigger asChild>
                         <Button className="flex items-center gap-2">
@@ -230,6 +228,6 @@ export default function FeesSettingsPage() {
                     </div>
                 </div>
             )}
-        </div>
+        </SettingsPageLayout>
     );
 }

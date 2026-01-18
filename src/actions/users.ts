@@ -2,9 +2,10 @@
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq, ne } from "drizzle-orm";
+import { eq, ne, sql } from "drizzle-orm";
+import { audit, AuditAction } from "@/lib/logger";
 import { auth } from "@/auth";
-import { revalidatePath } from "next/cache";
+import { safeRevalidatePath } from "@/lib/server-utils";
 
 export async function getUsers() {
     const session = await auth();
@@ -33,7 +34,9 @@ export async function verifyUser(userId: string) {
         .set({ isVerified: true })
         .where(eq(users.id, userId));
 
-    revalidatePath("/settings/users");
+    await audit(AuditAction.USER_UPDATE, { userId, verified: true }, 'user', userId);
+
+    safeRevalidatePath("/settings/users");
     return { success: true };
 }
 
@@ -48,17 +51,25 @@ export async function updateUserRole(userId: string, newRole: string) {
         throw new Error("Invalid role");
     }
 
-    // Prevent self-demotion if necessary (optional safeguard)
+    // Prevent self-demotion if they are the only super-admin
     if (userId === session.user.id && newRole !== "super-admin") {
-        // Allow it for now if they really want to, but maybe warn?
-        // Let's just allow it, but usually standard practice is to prevent self-lockout.
+        const superAdmins = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(eq(users.role, "super-admin"));
+
+        if (Number(superAdmins[0]?.count || 0) <= 1) {
+            throw new Error("Cannot demote yourself. At least one super-admin must exist.");
+        }
     }
 
     await db.update(users)
         .set({ role: newRole })
         .where(eq(users.id, userId));
 
-    revalidatePath("/settings/users");
+    await audit(AuditAction.USER_UPDATE, { userId, newRole }, 'user', userId);
+
+    safeRevalidatePath("/settings/users");
     return { success: true };
 }
 
@@ -72,8 +83,23 @@ export async function deleteUser(userId: string) {
         throw new Error("Cannot delete yourself");
     }
 
+    // Prevent deleting the last super-admin
+    const [userToDelete] = await db.select({ role: users.role }).from(users).where(eq(users.id, userId)).limit(1);
+    if (userToDelete?.role === "super-admin") {
+        const superAdmins = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(users)
+            .where(eq(users.role, "super-admin"));
+
+        if (Number(superAdmins[0]?.count || 0) <= 1) {
+            throw new Error("Cannot delete the last super-admin.");
+        }
+    }
+
     await db.delete(users).where(eq(users.id, userId));
 
-    revalidatePath("/settings/users");
+    await audit(AuditAction.USER_DELETE, { userId }, 'user', userId);
+
+    safeRevalidatePath("/settings/users");
     return { success: true };
 }

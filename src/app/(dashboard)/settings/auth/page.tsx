@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
 import { Loader2, Save } from "lucide-react";
 import { getAuthSettings, updateAuthSettings, AuthSettings } from "@/actions/auth-settings";
+import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,10 +25,10 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const authFormSchema = z.object({
-    googleEnabled: z.boolean().default(true),
+    googleEnabled: z.boolean(),
     googleDomains: z.string().optional(),
-    autoVerifyStaff: z.boolean().default(true),
-    credentialsEnabled: z.boolean().default(true),
+    autoVerifyStaff: z.boolean(),
+    credentialsEnabled: z.boolean(),
 });
 
 type AuthFormValues = z.infer<typeof authFormSchema>;
@@ -70,7 +71,7 @@ export default function AuthSettingsPage() {
         loadSettings();
     }, [form]);
 
-    async function onSubmit(data: AuthFormValues) {
+    const onSubmit: SubmitHandler<AuthFormValues> = async (data) => {
         setIsSaving(true);
         try {
             const settings: AuthSettings = {
@@ -106,15 +107,12 @@ export default function AuthSettingsPage() {
     }
 
     return (
-        <div className="space-y-6 max-w-4xl mx-auto p-6">
-            <div>
-                <h3 className="text-lg font-medium">Authentication Settings</h3>
-                <p className="text-sm text-muted-foreground">
-                    Configure how users log in and access the system.
-                </p>
-            </div>
-            <Separator />
-
+        <SettingsPageLayout
+            title="Authentication Settings"
+            description="Configure how users log in and access the system."
+            icon={Save}
+            maxWidth="lg"
+        >
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
 
@@ -224,6 +222,6 @@ export default function AuthSettingsPage() {
                     </div>
                 </form>
             </Form>
-        </div>
+        </SettingsPageLayout>
     );
 }
