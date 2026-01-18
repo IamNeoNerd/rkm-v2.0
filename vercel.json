@@ -6,19 +6,6 @@
     "regions": [
         "bom1"
     ],
-    "env": {
-        "DATABASE_URL": "@database_url",
-        "AUTH_SECRET": "@auth_secret",
-        "GOOGLE_CLIENT_ID": "@google_client_id",
-        "GOOGLE_CLIENT_SECRET": "@google_client_secret"
-    },
-    "build": {
-        "env": {
-            "DATABASE_URL": "@database_url",
-            "AUTH_SECRET": "@auth_secret",
-            "NEXTAUTH_URL": "@nextauth_url"
-        }
-    },
     "git": {
         "deploymentEnabled": {
             "main": true
