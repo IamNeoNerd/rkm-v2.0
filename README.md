@@ -67,8 +67,10 @@ Open [http://localhost:3000](http://localhost:3000)
 | `npm run dev` | Start development server |
 | `npm run build` | Production build |
 | `npm run start` | Start production server |
-| `npm run test` | Run tests (watch mode) |
-| `npm run test:run` | Run tests once |
+| `npm run test` | Run unit tests (watch mode) |
+| `npm run test:run` | Run unit tests once |
+| `npm run test:e2e` | Run E2E tests (Playwright) |
+| `npm run test:e2e:ui` | Playwright interactive UI |
 | `npm run lint` | Run ESLint |
 
 ## 🏗️ Project Structure
@@ -111,7 +113,10 @@ src/
 - **Fee Collection** - Payment processing with receipt generation
 - **Academic Batches** - Class scheduling with conflict detection
 - **Staff Management** - Teacher and admin management
-- **Financial Reports** - Transaction history, dues reports
+- **Financial Reports** - P&L dashboard, transaction history, dues reports
+- **Session Transition** - Academic year rollover with student promotion
+- **Notifications** - In-app notification system
+- **Audit Logging** - Complete activity trail
 - **Role-Based Access** - Secure authorization on all actions
 
 ## 🔍 API Endpoints
