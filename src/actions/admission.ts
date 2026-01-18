@@ -127,6 +127,7 @@ export async function getAllStudents(options?: {
                 familyId: students.familyId,
                 fatherName: families.fatherName,
                 phone: families.phone,
+                balance: families.balance,
             })
             .from(students)
             .leftJoin(families, eq(students.familyId, families.id));

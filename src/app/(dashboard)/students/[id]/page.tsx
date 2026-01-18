@@ -4,6 +4,7 @@ import { Users, Phone, GraduationCap, Home, ArrowLeft, Receipt, Calendar, Credit
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
+import { StudentQuickActions } from "./StudentQuickActions";
 
 export default async function StudentDetailPage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
@@ -161,8 +162,8 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                                             <p className="text-xs text-gray-500">{record.batchName}</p>
                                         </div>
                                         <span className={`px-2 py-1 text-xs font-semibold rounded ${record.status === 'Present' ? 'bg-green-100 text-green-800' :
-                                                record.status === 'Absent' ? 'bg-red-100 text-red-800' :
-                                                    'bg-yellow-100 text-yellow-800'
+                                            record.status === 'Absent' ? 'bg-red-100 text-red-800' :
+                                                'bg-yellow-100 text-yellow-800'
                                             }`}>
                                             {record.status}
                                         </span>
@@ -257,20 +258,12 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                 {/* Quick Actions */}
                 <div className="border-t pt-6 mt-6">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">Quick Actions</h2>
-                    <div className="flex flex-wrap gap-3">
-                        <Link href={`/academics`}>
-                            <Button variant="outline">
-                                <GraduationCap className="h-4 w-4 mr-2" />
-                                Enroll in Batch
-                            </Button>
-                        </Link>
-                        <Link href={`/fees?familyId=${student.familyId}`}>
-                            <Button variant="outline">
-                                <Receipt className="h-4 w-4 mr-2" />
-                                Collect Fee
-                            </Button>
-                        </Link>
-                    </div>
+                    <StudentQuickActions
+                        studentName={student.name}
+                        familyId={student.familyId}
+                        fatherName={student.fatherName || "Family"}
+                        balance={balance}
+                    />
                 </div>
             </div>
         </div>

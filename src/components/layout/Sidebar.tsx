@@ -1,8 +1,25 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Users, GraduationCap, Settings, LogOut, Receipt, UserPlus, UserCog, FileText, History, UsersRound, Calendar } from "lucide-react"
+import {
+    LayoutDashboard,
+    Users,
+    GraduationCap,
+    Settings,
+    LogOut,
+    Receipt,
+    UserPlus,
+    UserCog,
+    FileText,
+    History,
+    UsersRound,
+    Calendar,
+    ChevronDown,
+    IndianRupee,
+    TrendingUp
+} from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 
 import { cn } from "@/lib/utils"
@@ -13,6 +30,7 @@ interface SidebarNavItem {
     href: string;
     icon: any;
     role?: string;
+    children?: SidebarNavItem[];
 }
 
 const sidebarNavItems: SidebarNavItem[] = [
@@ -32,11 +50,6 @@ const sidebarNavItems: SidebarNavItem[] = [
         icon: Users,
     },
     {
-        title: "Staff",
-        href: "/staff",
-        icon: UserCog,
-    },
-    {
         title: "Academics",
         href: "/academics",
         icon: GraduationCap,
@@ -47,24 +60,41 @@ const sidebarNavItems: SidebarNavItem[] = [
         icon: Calendar,
     },
     {
-        title: "Fee Collection",
+        title: "Billing",
         href: "/fees",
-        icon: Receipt,
+        icon: IndianRupee,
+        children: [
+            {
+                title: "Collect Fee",
+                href: "/fees",
+                icon: Receipt,
+            },
+            {
+                title: "Bulk Collect",
+                href: "/fees/bulk",
+                icon: UsersRound,
+            },
+            {
+                title: "Transactions",
+                href: "/reports/transactions",
+                icon: History,
+            },
+            {
+                title: "Dues Report",
+                href: "/reports/dues",
+                icon: FileText,
+            },
+            {
+                title: "Finance Report",
+                href: "/reports/finance",
+                icon: TrendingUp,
+            },
+        ]
     },
     {
-        title: "Bulk Collect",
-        href: "/fees/bulk",
-        icon: UsersRound,
-    },
-    {
-        title: "Transactions",
-        href: "/reports/transactions",
-        icon: History,
-    },
-    {
-        title: "Dues Report",
-        href: "/reports/dues",
-        icon: FileText,
+        title: "Staff",
+        href: "/staff",
+        icon: UserCog,
     },
     {
         title: "Settings",
@@ -81,10 +111,85 @@ export function Sidebar({ className }: SidebarProps) {
     const { data: session } = useSession()
     const userRole = session?.user?.role || "user"
 
+    // Track which groups are expanded
+    const [expandedGroups, setExpandedGroups] = useState<string[]>(["Billing"])
+
+    const toggleGroup = (title: string) => {
+        setExpandedGroups(prev =>
+            prev.includes(title)
+                ? prev.filter(t => t !== title)
+                : [...prev, title]
+        )
+    }
+
     const filteredItems = sidebarNavItems.filter(item => {
         if (item.role && item.role !== userRole) return false
         return true
     })
+
+    const renderNavItem = (item: SidebarNavItem, isChild = false) => {
+        const hasChildren = item.children && item.children.length > 0
+        const isExpanded = expandedGroups.includes(item.title)
+        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+        const isChildActive = hasChildren && item.children?.some(
+            child => pathname === child.href || (child.href !== '/' && pathname.startsWith(child.href))
+        )
+
+        if (hasChildren) {
+            return (
+                <div key={item.title}>
+                    <button
+                        onClick={() => toggleGroup(item.title)}
+                        className={cn(
+                            "w-full flex items-center justify-between h-11 px-4 mb-1 rounded-md text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200",
+                            (isChildActive) && "bg-slate-800 text-white"
+                        )}
+                    >
+                        <div className="flex items-center">
+                            <item.icon className={cn("mr-3 h-5 w-5", isChildActive ? "text-indigo-400" : "text-slate-400")} />
+                            {item.title}
+                        </div>
+                        <ChevronDown className={cn(
+                            "h-4 w-4 transition-transform duration-200",
+                            isExpanded ? "rotate-180" : ""
+                        )} />
+                    </button>
+
+                    {/* Submenu */}
+                    <div className={cn(
+                        "overflow-hidden transition-all duration-200",
+                        isExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+                    )}>
+                        <div className="pl-4 space-y-1 py-1">
+                            {item.children?.map(child => renderNavItem(child, true))}
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+
+        return (
+            <Button
+                key={item.href}
+                variant="ghost"
+                className={cn(
+                    "w-full justify-start h-10 px-4 mb-1 text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200",
+                    isChild && "h-9 text-sm",
+                    isActive && "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md font-medium"
+                )}
+                asChild
+            >
+                <Link href={item.href}>
+                    <item.icon className={cn(
+                        "mr-3",
+                        isChild ? "h-4 w-4" : "h-5 w-5",
+                        isActive ? "text-white" : "text-slate-400"
+                    )} />
+                    {item.title}
+                </Link>
+            </Button>
+        )
+    }
 
     return (
         <div className={cn("flex flex-col h-full bg-slate-900 text-white", className)}>
@@ -99,25 +204,7 @@ export function Sidebar({ className }: SidebarProps) {
 
             <div className="flex-1 overflow-y-auto py-6 px-4">
                 <nav className="space-y-1">
-                    {filteredItems.map((item) => {
-                        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                        return (
-                            <Button
-                                key={item.href}
-                                variant="ghost"
-                                className={cn(
-                                    "w-full justify-start h-11 px-4 mb-1 text-slate-300 hover:text-white hover:bg-slate-800 transition-all duration-200",
-                                    isActive && "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md font-medium"
-                                )}
-                                asChild
-                            >
-                                <Link href={item.href}>
-                                    <item.icon className={cn("mr-3 h-5 w-5", isActive ? "text-white" : "text-slate-400 group-hover:text-white")} />
-                                    {item.title}
-                                </Link>
-                            </Button>
-                        )
-                    })}
+                    {filteredItems.map((item) => renderNavItem(item))}
                 </nav>
             </div>
 

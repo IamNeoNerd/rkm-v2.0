@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Users, Phone, GraduationCap, Filter, X } from "lucide-react";
+import { Users, Phone, GraduationCap, Filter, X, IndianRupee } from "lucide-react";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
 
 type Student = {
     id: number;
@@ -13,6 +14,8 @@ type Student = {
     fatherName: string | null;
     phone: string | null;
     isActive: boolean;
+    familyId?: number;
+    balance?: number;
 };
 
 interface StudentsTableProps {
@@ -23,6 +26,10 @@ export function StudentsTable({ students }: StudentsTableProps) {
     const [searchTerm, setSearchTerm] = useState("");
     const [classFilter, setClassFilter] = useState<string>("all");
     const [statusFilter, setStatusFilter] = useState<string>("all");
+
+    // Payment dialog state
+    const [paymentOpen, setPaymentOpen] = useState(false);
+    const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
     // Get unique classes for filter dropdown
     const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
@@ -50,6 +57,11 @@ export function StudentsTable({ students }: StudentsTableProps) {
         setSearchTerm("");
         setClassFilter("all");
         setStatusFilter("all");
+    };
+
+    const handlePayClick = (student: Student) => {
+        setSelectedStudent(student);
+        setPaymentOpen(true);
     };
 
     return (
@@ -163,6 +175,9 @@ export function StudentsTable({ students }: StudentsTableProps) {
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                     Status
                                 </th>
+                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    Actions
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -200,12 +215,39 @@ export function StudentsTable({ students }: StudentsTableProps) {
                                             {student.isActive ? "Active" : "Inactive"}
                                         </span>
                                     </td>
+                                    <td className="px-6 py-4 whitespace-nowrap text-center">
+                                        <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
+                                            onClick={() => handlePayClick(student)}
+                                        >
+                                            <IndianRupee className="h-3 w-3 mr-1" />
+                                            Pay
+                                        </Button>
+                                    </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
             )}
+
+            {/* Quick Payment Dialog */}
+            {selectedStudent && (
+                <QuickPaymentDialog
+                    open={paymentOpen}
+                    onClose={() => {
+                        setPaymentOpen(false);
+                        setSelectedStudent(null);
+                    }}
+                    familyId={selectedStudent.familyId || 0}
+                    familyName={selectedStudent.fatherName || "Family"}
+                    studentName={selectedStudent.name}
+                    currentDue={selectedStudent.balance ? Math.abs(selectedStudent.balance) : 0}
+                />
+            )}
         </>
     );
 }
+
