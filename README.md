@@ -1,141 +1,132 @@
 # RK Institute ERP
 
-A comprehensive tuition management system built with Next.js 16, featuring student admission, fee collection, academic batch management, and financial reporting.
+> [!NOTE]
+> **Status**: 🛠️ Active Development | 🧪 Comprehensive QA Verified (v1.1)
+
+A professional tuition management system built with Next.js 15, designed for high-performance student admission, multi-modal fee collection, and intelligent academic scheduling.
+
+---
+
+## 📚 Documentation
+
+For detailed guides and verification steps, refer to:
+
+- 📖 **[User Manual](docs/user-manual.md)**: Interactive guide with visual workflows, screenshots, and step-by-step module instructions.
+- ✅ **[QA Checklist](docs/qa-checklist.md)**: Comprehensive 50-point report covering authentication, billing, academics, and responsive testing.
+
+---
+
+## 🗺️ Application Map
+
+Visualize how core modules interact:
+
+```mermaid
+graph TD
+    A[Auth / Google Sign-In] --> B[Dashboard]
+    B --> C[Student Admission]
+    B --> D[Academics & Batches]
+    B --> E[Billing & Payments]
+    
+    C --> F[Family Records]
+    D --> G[Batch Enrollment]
+    E --> H[Transaction Ledger]
+    
+    F --> I[Student Profiles]
+    G --> J[Attendance Tracking]
+    H --> K[Dues & Finance Reports]
+    
+    I --> L[Mobile Responsive Views]
+    K --> L
+```
+
+---
 
 ## 🚀 Tech Stack
 
-- **Framework:** Next.js 16 (App Router)
+- **Framework:** Next.js 15 (App Router, Server Actions)
 - **Database:** PostgreSQL (Neon Serverless)
 - **ORM:** Drizzle ORM
-- **Auth:** NextAuth.js v5
-- **UI:** Tailwind CSS + shadcn/ui
-- **Testing:** Vitest
+- **Auth:** NextAuth.js v5 (Credentials & Google OAuth)
+- **UI Architecture:** Tailwind CSS + Radix UI + shadcn/ui
+- **Validation:** Zod (Type-safe schemas)
+- **Testing:** Vitest (Unit) + Playwright (E2E & Responsive)
 
-## 📋 Prerequisites
+---
 
-- Node.js 20+
-- PostgreSQL database (or Neon account)
-- Google OAuth credentials (optional)
+## 🏗️ Project Structure
 
-## ⚡ Quick Start
+```text
+.
+├── docs/                   # User Manual, QA Checklist, and Screenshots
+├── scripts/                # Utility scripts (seeding, indexing, migrations)
+├── tests/
+│   ├── unit/               # Vitest unit tests for business logic
+│   └── e2e/                # Playwright E2E and Responsive tests
+├── src/
+│   ├── app/                # Next.js App Router (Pages & API)
+│   ├── actions/            # Server Actions (Business Logic Layer)
+│   │   ├── admission.ts     # Family & Student creation
+│   │   ├── billing.ts       # Payment processing & balance logic
+│   │   └── academics.ts     # Batch management
+│   ├── components/         # React Components (UI & Logic)
+│   ├── db/                 # Drizzle Schema & Connection
+│   └── lib/                # Shared utilities & validations
+```
 
-### 1. Clone and Install
+---
 
+## 📋 Quick Start
+
+### 1. Installation
 ```bash
 git clone <repository-url>
 cd rk-institute-erp
 npm install
 ```
 
-### 2. Environment Setup
-
-Create a `.env` file:
-
+### 2. Environment Configuration
+Create a `.env` file from `.env.example` (if available) or use:
 ```env
-DATABASE_URL=postgresql://user:password@host/database?sslmode=require
-AUTH_SECRET=your-auth-secret-min-32-chars
+DATABASE_URL=postgresql://...
+AUTH_SECRET=...
 NEXTAUTH_URL=http://localhost:3000
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
-### 3. Database Setup
-
+### 3. Database & Dev
 ```bash
-# Push schema to database
-npx drizzle-kit push
-
-# (Optional) Add performance indexes
-npx tsx scripts/add-indexes.ts
-
-# (Optional) Create super admin
-npx tsx scripts/create-superadmin.ts
+npx drizzle-kit push      # Sync schema
+npm run dev               # Start server
 ```
 
-### 4. Run Development Server
+---
 
+## 🧪 Testing Strategy
+
+We follow a two-tier testing approach:
+
+### Unit Testing (Vitest)
+Tests core business logic such as pro-rata calculations and date handling.
 ```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000)
-
-## 📦 Available Scripts
-
-| Script | Description |
-|--------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run test` | Run unit tests (watch mode) |
-| `npm run test:run` | Run unit tests once |
-| `npm run test:e2e` | Run E2E tests (Playwright) |
-| `npm run test:e2e:ui` | Playwright interactive UI |
-| `npm run lint` | Run ESLint |
-
-## 🏗️ Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── (dashboard)/        # Protected dashboard routes
-│   ├── api/                # API routes
-│   └── login/              # Auth pages
-├── actions/                # Server Actions
-│   ├── admission.ts        # Student admission
-│   ├── billing.ts          # Fee processing
-│   ├── academics.ts        # Batch management
-│   └── staff.ts            # Staff management
-├── components/             # React components
-│   ├── ui/                 # shadcn/ui primitives
-│   ├── dashboard/          # Dashboard widgets
-│   └── layout/             # Layout components
-├── db/                     # Database
-│   ├── index.ts            # DB connection
-│   └── schema.ts           # Drizzle schema
-└── lib/                    # Utilities
-    ├── auth-guard.ts       # Authorization
-    ├── billing.ts          # Fee calculations
-    └── scheduling.ts       # Time conflict detection
-```
-
-## 🔐 User Roles
-
-| Role | Permissions |
-|------|-------------|
-| `super_admin` | Full access, user management |
-| `admin` | Staff, academics, billing |
-| `user` | Fee collection, admissions |
-
-## 📊 Key Features
-
-- **Admission Management** - Student registration with family linking
-- **Fee Collection** - Payment processing with receipt generation
-- **Academic Batches** - Class scheduling with conflict detection
-- **Staff Management** - Teacher and admin management
-- **Financial Reports** - P&L dashboard, transaction history, dues reports
-- **Session Transition** - Academic year rollover with student promotion
-- **Notifications** - In-app notification system
-- **Audit Logging** - Complete activity trail
-- **Role-Based Access** - Secure authorization on all actions
-
-## 🔍 API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `GET /api/health` | Health check for monitoring |
-| `POST /api/auth/*` | NextAuth.js authentication |
-
-## 🧪 Testing
-
-```bash
-# Run all tests
 npm run test:run
-
-# Run with coverage
-npm run test:coverage
 ```
 
-## 📄 License
+### E2E & Responsive Testing (Playwright)
+Validates user flows across Chrome, Tablet (iPad), and Mobile (Pixel/iPhone) viewports.
+```bash
+npm run test:e2e
+```
 
-Private - RK Institute
+---
+
+## 🔐 User Roles & Permissions
+
+- **Super Admin**: System configuration, audit logs, and high-level overrides.
+- **Admin**: Staff management, academics, and financial oversight.
+- **Staff**: Daily operations (Admissions, Attendance, Fee Collection).
+
+---
+
+## 📜 License & Contribution
+
+- **License**: Private - RK Institute
+- **Workflow**: Follow the [Development Standard](.agent/workflows/development-standard.md) for branching and PRs.
