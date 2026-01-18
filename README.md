@@ -85,18 +85,73 @@ npm install
 ```
 
 ### 2. Environment Configuration
-Create a `.env` file from `.env.example` (if available) or use:
+Create a `.env` file from `.env.example`:
+```bash
+copy .env.example .env
+# Fill in your actual values
+```
+
+Required variables:
 ```env
 DATABASE_URL=postgresql://...
-AUTH_SECRET=...
+AUTH_SECRET=... # openssl rand -base64 32
 NEXTAUTH_URL=http://localhost:3000
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
 ```
 
 ### 3. Database & Dev
 ```bash
-npx drizzle-kit push      # Sync schema
+npm run db:push           # Sync schema
+npm run db:seed           # Seed realistic data (optional)
 npm run dev               # Start server
 ```
+
+---
+
+## 🚀 CI/CD Deployment
+
+**Automated deployment pipeline configured with Vercel + GitHub Actions + Neon DB**
+
+### Features
+- ✅ Automatic production deployments on push to `main`
+- ✅ Preview deployments for all pull requests
+- ✅ Automated testing (lint, unit tests, type-check, E2E)
+- ✅ Database migrations run automatically before build
+- ✅ One-click rollback capability
+- ✅ Mumbai (India) region optimized
+
+### Quick Deploy
+
+```bash
+# Test locally first
+npm run build
+
+# Deploy to production
+git add .
+git commit -m "feat: your feature"
+git push origin main
+```
+
+**Timeline:** ~5-8 minutes (GitHub Actions CI + Vercel deployment)
+
+### Documentation
+
+| Guide | Purpose |
+|-------|---------|
+| **[Setup Summary](docs/CICD-SETUP-SUMMARY.md)** | Quick start + configuration checklist |
+| **[Deployment Guide](docs/deployment-guide.md)** | Detailed setup instructions |
+| **[Environment Variables](docs/environment-variables.md)** | All env vars explained |
+| **[Deployment Workflow](.agent/workflows/deployment.md)** | Daily workflow reference |
+
+### First-Time Setup
+
+1. **Configure Vercel** environment variables (Production + Preview)
+2. **Add GitHub Secrets** for CI/CD (`DATABASE_URL`, `AUTH_SECRET`)
+3. **Update Google OAuth** redirect URIs
+4. **Test deployment** with a commit
+
+See [CICD-SETUP-SUMMARY.md](docs/CICD-SETUP-SUMMARY.md) for complete instructions.
 
 ---
 

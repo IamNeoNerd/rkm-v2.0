@@ -40,21 +40,47 @@ export default defineConfig({
         video: 'on-first-retry',
     },
 
-    /* Configure projects for major browsers */
+    /* Configure projects for Chrome with responsive viewports */
     projects: [
+        // Desktop Chrome
         {
-            name: 'chromium',
+            name: 'Desktop Chrome',
             use: { ...devices['Desktop Chrome'] },
         },
-        // Uncomment to test in other browsers:
-        // {
-        //   name: 'firefox',
-        //   use: { ...devices['Desktop Firefox'] },
-        // },
-        // {
-        //   name: 'webkit',
-        //   use: { ...devices['Desktop Safari'] },
-        // },
+        // Mobile viewports (Chrome-based)
+        {
+            name: 'Mobile Chrome',
+            use: { ...devices['Pixel 5'] },
+        },
+        {
+            name: 'Mobile Chrome Small',
+            use: {
+                ...devices['iPhone SE'],
+                // Override to use Chromium
+                browserName: 'chromium',
+            },
+        },
+        // Tablet viewports (Chrome-based)
+        {
+            name: 'Tablet Chrome',
+            use: {
+                browserName: 'chromium',
+                viewport: { width: 768, height: 1024 },
+                deviceScaleFactor: 2,
+                isMobile: false,
+                hasTouch: true,
+            },
+        },
+        {
+            name: 'Tablet Chrome Large',
+            use: {
+                browserName: 'chromium',
+                viewport: { width: 1024, height: 1366 },
+                deviceScaleFactor: 2,
+                isMobile: false,
+                hasTouch: true,
+            },
+        },
     ],
 
     /* Run your local dev server before starting the tests */
