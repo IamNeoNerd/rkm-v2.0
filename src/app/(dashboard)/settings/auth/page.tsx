@@ -38,7 +38,7 @@ export default function AuthSettingsPage() {
     const [isSaving, setIsSaving] = useState(false);
 
     const form = useForm<AuthFormValues>({
-        resolver: zodResolver(authFormSchema),
+        resolver: zodResolver(authFormSchema) as any,
         defaultValues: {
             googleEnabled: true,
             googleDomains: "",
