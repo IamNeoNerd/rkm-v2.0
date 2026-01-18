@@ -6,7 +6,7 @@ export function safeRevalidatePath(path: string) {
         revalidatePath(path);
     } catch (error) {
         // Suppress error in test/script environments
-        if ((error as any).message?.includes("store missing")) {
+        if (error instanceof Error && error.message?.includes("store missing")) {
             return;
         }
         throw error;

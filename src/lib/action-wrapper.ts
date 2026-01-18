@@ -100,8 +100,8 @@ export function wrapAction<TInput, TOutput>(
 
             // Audit log if configured
             if (auditAction) {
-                const entityId = (input as any)?.id || (result as any)?.id;
-                await audit(auditAction, { input, duration }, entityType, entityId);
+                const entityId = (input as { id?: string | number })?.id || (result as { id?: string | number })?.id;
+                await audit(auditAction, { input, duration }, entityType, entityId?.toString());
             }
 
             return createSuccessResponse(result);

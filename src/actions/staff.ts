@@ -7,7 +7,7 @@ import { eq, desc, sql } from "drizzle-orm";
 import { safeRevalidatePath } from "@/lib/server-utils";
 import { requireRole, AuthorizationError } from "@/lib/auth-guard";
 
-export type StaffRole = "ADMIN" | "TEACHER" | "RECEPTIONIST";
+export type StaffRole = "ADMIN" | "TEACHER" | "RECEPTIONIST" | "STAFF";
 
 export async function getAllStaff(options?: {
     page?: number;
@@ -68,6 +68,7 @@ export async function createStaff(data: {
     phone: string;
     email?: string;
     role: StaffRole;
+    roleType?: string; // For custom roles like Sweeper, Peon, Cook, MTS
     baseSalary: number;
 }) {
     try {
@@ -97,6 +98,7 @@ export async function createStaff(data: {
             phone: sanitizedData.phone,
             email: sanitizedData.email,
             role: sanitizedData.role,
+            roleType: data.roleType?.trim() || null,
             baseSalary: sanitizedData.baseSalary,
             isActive: true
         }).returning();
@@ -178,6 +180,7 @@ export async function updateStaff(
         phone?: string;
         email?: string;
         role?: StaffRole;
+        roleType?: string | null;
         baseSalary?: number;
     }
 ) {
@@ -191,6 +194,7 @@ export async function updateStaff(
         if (data.phone !== undefined) updateData.phone = data.phone.trim();
         if (data.email !== undefined) updateData.email = data.email?.trim() || null;
         if (data.role !== undefined) updateData.role = data.role;
+        if (data.roleType !== undefined) updateData.roleType = data.roleType?.trim() || null;
         if (data.baseSalary !== undefined) updateData.baseSalary = data.baseSalary;
         updateData.updatedAt = new Date();
 

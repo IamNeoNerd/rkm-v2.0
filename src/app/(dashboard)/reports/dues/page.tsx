@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getDuesAgingReport } from "@/actions/reports";
 import { AlertTriangle, Clock, TrendingDown, Users, Download, Phone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -33,11 +33,7 @@ export default function DuesAgingReportPage() {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState<AgingBucket | 'all'>('all');
 
-    useEffect(() => {
-        loadReport();
-    }, []);
-
-    async function loadReport() {
+    const loadReport = useCallback(async () => {
         const result = await getDuesAgingReport();
         if (result.success) {
             setReport(result.report || []);
@@ -45,7 +41,14 @@ export default function DuesAgingReportPage() {
             setTotalDue(result.totalDue || 0);
         }
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            await loadReport();
+        };
+        init();
+    }, [loadReport]);
 
     const filteredReport = filter === 'all'
         ? report

@@ -15,7 +15,7 @@ type Student = {
     phone: string | null;
     isActive: boolean;
     familyId?: number;
-    balance?: number;
+    balance?: number | null;
 };
 
 interface StudentsTableProps {

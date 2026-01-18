@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Receipt, Search, DollarSign, Clock, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -58,10 +58,7 @@ export default function FeesPage() {
 
     // Debounced search
     useEffect(() => {
-        if (searchQuery.length < 2) {
-            setSearchResults([]);
-            return;
-        }
+        if (searchQuery.length < 2) return;
 
         const timer = setTimeout(async () => {
             setIsSearching(true);
@@ -138,18 +135,18 @@ export default function FeesPage() {
         setIsProcessing(false);
     };
 
-    const loadTransactions = async () => {
+    const loadTransactions = useCallback(async () => {
         setLoadingTransactions(true);
         const result = await getRecentTransactions(20);
         if (result.transactions) {
             setTransactions(result.transactions as Transaction[]);
         }
         setLoadingTransactions(false);
-    };
+    }, []);
 
     useEffect(() => {
         loadTransactions();
-    }, []);
+    }, [loadTransactions]);
 
     return (
         <div className="p-4 sm:p-6 max-w-7xl mx-auto">
@@ -192,7 +189,11 @@ export default function FeesPage() {
                                 placeholder="Type to search..."
                                 value={searchQuery}
                                 onChange={(e) => {
-                                    setSearchQuery(e.target.value);
+                                    const val = e.target.value;
+                                    setSearchQuery(val);
+                                    if (val.length < 2) {
+                                        setSearchResults([]);
+                                    }
                                     setSelectedFamily(null);
                                 }}
                                 onFocus={() => searchResults.length > 0 && setShowResults(true)}

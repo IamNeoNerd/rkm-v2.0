@@ -152,45 +152,51 @@ export async function processPayment(data: { familyId: string; amount: number; m
         const { generateReceiptNumber } = await import('@/lib/receipt-generator');
         const receiptNumber = await generateReceiptNumber();
 
-        // Step A: Insert transaction with audit trail
-        await db.insert(transactions).values({
-            type: 'CREDIT',
-            category: 'FEE',
-            amount: amount,
-            familyId: familyIdInt,
-            description: `Payment via ${mode}`,
-            isVoid: false,
-            performedBy: session.user.id as string || null,
-            receiptNumber: receiptNumber,
-            paymentMode: mode,
+        const result = await db.transaction(async (tx) => {
+            // Step A: Insert transaction with audit trail
+            await tx.insert(transactions).values({
+                type: 'CREDIT',
+                category: 'FEE',
+                amount: amount,
+                familyId: familyIdInt,
+                description: `Payment via ${mode}`,
+                isVoid: false,
+                performedBy: session.user.id as string || null,
+                receiptNumber: receiptNumber,
+                paymentMode: mode,
+            });
+
+            // Step B: Update family balance
+            await tx
+                .update(families)
+                .set({
+                    balance: sql`${families.balance} + ${amount}`,
+                    updatedAt: new Date(),
+                })
+                .where(eq(families.id, familyIdInt));
+
+            // Fetch new balance to return
+            const [updatedFamily] = await tx
+                .select({ balance: families.balance })
+                .from(families)
+                .where(eq(families.id, familyIdInt))
+                .limit(1);
+
+            return {
+                newBalance: updatedFamily?.balance || 0,
+                receiptNumber: receiptNumber
+            };
         });
 
-        // Step B: Update family balance
-        await db
-            .update(families)
-            .set({
-                balance: sql`${families.balance} + ${amount}`,
-                updatedAt: new Date(),
-            })
-            .where(eq(families.id, familyIdInt));
-
-        // Fetch new balance to return
-        const updatedFamily = await db
-            .select({ balance: families.balance })
-            .from(families)
-            .where(eq(families.id, familyIdInt))
-            .limit(1);
-
-        const result = {
+        const finalResult = {
             success: true,
-            newBalance: updatedFamily[0]?.balance || 0,
-            receiptNumber: receiptNumber
+            ...result
         };
 
         // Audit log the payment
         await audit(
             AuditAction.PAYMENT_RECEIVE,
-            { amount, mode, receiptNumber, newBalance: result.newBalance },
+            { amount, mode, receiptNumber, newBalance: finalResult.newBalance },
             'family',
             familyIdInt
         );
@@ -202,7 +208,7 @@ export async function processPayment(data: { familyId: string; amount: number; m
         safeRevalidatePath('/');
         safeRevalidatePath('/reports/transactions');
 
-        return result;
+        return finalResult;
 
     } catch (error: unknown) {
         if (error instanceof AuthorizationError) {

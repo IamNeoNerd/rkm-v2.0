@@ -37,7 +37,7 @@ const MOCK_STUDENT = {
     ]
 }
 
-export default function StudentProfilePage({ params }: { params: { id: string } }) {
+export default function StudentProfilePage({ params: _params }: { params: { id: string } }) {
     // Unwrapping params is not strictly needed for this mock implementation but good practice in Next 15+
     // mocked anyway
 
@@ -83,7 +83,7 @@ export default function StudentProfilePage({ params }: { params: { id: string } 
                             </CardHeader>
                             <CardContent className="grid gap-4 md:grid-cols-2">
                                 <div className="space-y-1">
-                                    <span className="text-sm font-medium text-slate-500">Father's Name</span>
+                                    <span className="text-sm font-medium text-slate-500">Father&apos;s Name</span>
                                     <p className="font-medium">{MOCK_STUDENT.fatherName}</p>
                                 </div>
                                 <div className="space-y-1">

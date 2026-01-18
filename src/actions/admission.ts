@@ -35,62 +35,60 @@ export async function processAdmission(data: AdmissionData) {
             initialPayment: data.initialPayment,
         };
 
-        // 1. Check or Create Family
-        let familyId: number;
-        const existingFamily = await db.query.families.findFirst({
-            where: eq(families.phone, sanitizedData.phone),
+        const result = await db.transaction(async (tx) => {
+            // 1. Check or Create Family
+            let familyId: number;
+            const existingFamily = await tx.query.families.findFirst({
+                where: eq(families.phone, sanitizedData.phone),
+            });
+
+            if (existingFamily) {
+                familyId = existingFamily.id;
+            } else {
+                const [newFamily] = await tx.insert(families).values({
+                    fatherName: sanitizedData.fatherName,
+                    phone: sanitizedData.phone,
+                    balance: 0,
+                }).returning({ id: families.id });
+                familyId = newFamily.id;
+            }
+
+            // 2. Billing Calculation Verification
+            const billingCalc = calculateJoiningFee(sanitizedData.joiningDate, sanitizedData.monthlyFee);
+
+            // 3. Create Student
+            const [newStudent] = await tx.insert(students).values({
+                familyId,
+                name: sanitizedData.studentName,
+                class: sanitizedData.studentClass,
+                isActive: true,
+            }).returning({ id: students.id });
+
+            // 4. Create Transaction (Initial Debit/Demand)
+            const amountToBill = sanitizedData.initialPayment ?? billingCalc.suggestedAmount;
+
+            await tx.insert(transactions).values({
+                type: "DEBIT",
+                category: "FEE",
+                amount: amountToBill,
+                familyId: familyId,
+                description: `Admission Fee for ${sanitizedData.studentName} (${billingCalc.explanation})`,
+            });
+
+            // Update Family Balance
+            await tx.update(families)
+                .set({
+                    balance: sql`${families.balance} - ${amountToBill}`,
+                    updatedAt: new Date()
+                })
+                .where(eq(families.id, familyId));
+
+            return { studentId: newStudent.id, familyId, billingDetails: billingCalc };
         });
-
-        if (existingFamily) {
-            familyId = existingFamily.id;
-        } else {
-            const [newFamily] = await db.insert(families).values({
-                fatherName: sanitizedData.fatherName,
-                phone: sanitizedData.phone,
-                balance: 0,
-            }).returning({ id: families.id });
-            familyId = newFamily.id;
-        }
-
-        // 2. Billing Calculation Verification
-        const billingCalc = calculateJoiningFee(sanitizedData.joiningDate, sanitizedData.monthlyFee);
-
-        // In a real app, the admin would have confirmed the amount in the UI before submitting.
-        // For this action, we assume the 'initialPayment' is what was finalized (Suggested or Overridden).
-
-        // 3. Create Student
-        const [newStudent] = await db.insert(students).values({
-            familyId,
-            name: sanitizedData.studentName,
-            class: sanitizedData.studentClass,
-            // If the agreed fee is essentially different permanently, we might set override, 
-            // but for "Scenario 1.2" it implies just the first month is pro-rata.
-            isActive: true,
-        }).returning({ id: students.id });
-
-        // 4. Create Transaction (Initial Debit/Demand)
-        // The "Fee" for the month (or pro-rata part) needs to be debited against the family balance.
-        const amountToBill = sanitizedData.initialPayment ?? billingCalc.suggestedAmount;
-
-        await db.insert(transactions).values({
-            type: "DEBIT", // We are charging them
-            category: "FEE",
-            amount: amountToBill,
-            familyId: familyId,
-            description: `Admission Fee for ${sanitizedData.studentName} (${billingCalc.explanation})`,
-        });
-
-        // Update Family Balance (Debit subtacts from balance, creating negative valid)
-        await db.update(families)
-            .set({
-                balance: sql`${families.balance} - ${amountToBill}`,
-                updatedAt: new Date()
-            })
-            .where(eq(families.id, familyId));
 
         safeRevalidatePath("/admission");
         safeRevalidatePath("/");
-        return { success: true, studentId: newStudent.id, familyId, billingDetails: billingCalc };
+        return { success: true, ...result };
 
     } catch (error) {
         if (error instanceof AuthorizationError) {

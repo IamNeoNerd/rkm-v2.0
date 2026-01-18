@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Calendar, CheckCircle, XCircle, Clock, Users, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,24 +25,7 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
 
-    // Load students when batch is selected
-    useEffect(() => {
-        if (selectedBatchId) {
-            loadBatchStudents();
-        } else {
-            setStudents([]);
-            setAttendance({});
-        }
-    }, [selectedBatchId]);
-
-    // Load existing attendance when date changes
-    useEffect(() => {
-        if (selectedBatchId && selectedDate) {
-            loadExistingAttendance();
-        }
-    }, [selectedDate, selectedBatchId]);
-
-    const loadBatchStudents = async () => {
+    const loadBatchStudents = useCallback(async () => {
         setLoading(true);
         const { students: enrolled } = await getBatchStudentsForAttendance(parseInt(selectedBatchId));
         setStudents(enrolled);
@@ -53,9 +36,9 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
         });
         setAttendance(initial);
         setLoading(false);
-    };
+    }, [selectedBatchId]);
 
-    const loadExistingAttendance = async () => {
+    const loadExistingAttendance = useCallback(async () => {
         const { attendance: existing } = await getAttendanceByBatch(
             parseInt(selectedBatchId),
             new Date(selectedDate)
@@ -67,7 +50,30 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
             });
             setAttendance(prev => ({ ...prev, ...attendanceMap }));
         }
-    };
+    }, [selectedBatchId, selectedDate]);
+
+    // Load students when batch is selected
+    useEffect(() => {
+        const fetchStudents = async () => {
+            if (selectedBatchId) {
+                await loadBatchStudents();
+            } else {
+                setStudents([]);
+                setAttendance({});
+            }
+        };
+        fetchStudents();
+    }, [selectedBatchId, loadBatchStudents]);
+
+    // Load existing attendance when date changes
+    useEffect(() => {
+        const fetchAttendance = async () => {
+            if (selectedBatchId && selectedDate) {
+                await loadExistingAttendance();
+            }
+        };
+        fetchAttendance();
+    }, [selectedDate, selectedBatchId, loadExistingAttendance]);
 
     const setStatus = (studentId: number, status: AttendanceStatus) => {
         setAttendance(prev => ({ ...prev, [studentId]: status }));

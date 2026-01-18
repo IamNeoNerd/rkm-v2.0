@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
     AppError,
     AuthenticationError,
@@ -195,8 +195,7 @@ describe('Response Helpers', () => {
         });
 
         it('should format standard Error with message in development', () => {
-            const originalEnv = process.env.NODE_ENV;
-            process.env.NODE_ENV = 'development';
+            vi.stubEnv('NODE_ENV', 'development');
 
             const error = new Error('Something broke');
             const response = createErrorResponse(error);
@@ -205,12 +204,11 @@ describe('Response Helpers', () => {
             expect(response.error.code).toBe('INTERNAL_ERROR');
             expect(response.error.message).toBe('Something broke');
 
-            process.env.NODE_ENV = originalEnv;
+            vi.unstubAllEnvs();
         });
 
         it('should hide message in production for standard Error', () => {
-            const originalEnv = process.env.NODE_ENV;
-            process.env.NODE_ENV = 'production';
+            vi.stubEnv('NODE_ENV', 'production');
 
             const error = new Error('Sensitive error info');
             const response = createErrorResponse(error);
@@ -218,7 +216,7 @@ describe('Response Helpers', () => {
             expect(response.success).toBe(false);
             expect(response.error.message).toBe('An unexpected error occurred');
 
-            process.env.NODE_ENV = originalEnv;
+            vi.unstubAllEnvs();
         });
 
         it('should handle unknown error types', () => {

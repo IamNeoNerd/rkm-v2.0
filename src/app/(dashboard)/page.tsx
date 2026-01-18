@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { FamilyCard } from "@/components/dashboard/FamilyCard"
 import { FeeCollectionModal } from "@/components/modals/FeeCollectionModal"
 import { Family } from "@/types"
@@ -16,22 +16,40 @@ import { OverviewChart } from "@/components/dashboard/OverviewChart"
 import { RecentActivity } from "@/components/dashboard/RecentActivity"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
+interface DashboardMetrics {
+  revenue: number;
+  activeStudents: number;
+  pendingFees: number;
+  revenueTrend?: string;
+  revenueTrendUp?: boolean;
+  studentsTrend?: string;
+}
+
+interface DashboardActivityItem {
+  id: number;
+  name: string;
+  type: string;
+  amount: number;
+  createdAt: Date;
+}
+
+interface ChartItem {
+  name: string;
+  total: number;
+}
+
 export default function DashboardPage() {
   const [families, setFamilies] = useState<Family[]>([])
-  const [metrics, setMetrics] = useState({ revenue: 0, activeStudents: 0, pendingFees: 0 })
-  const [recentActivity, setRecentActivity] = useState<any[]>([])
-  const [chartData, setChartData] = useState<any[]>([])
+  const [metrics, setMetrics] = useState<DashboardMetrics>({ revenue: 0, activeStudents: 0, pendingFees: 0 })
+  const [recentActivity, setRecentActivity] = useState<DashboardActivityItem[]>([])
+  const [chartData, setChartData] = useState<ChartItem[]>([])
 
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedFamily, setSelectedFamily] = useState<Family | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    loadData();
-  }, [])
-
-  async function loadData() {
+  const loadData = useCallback(async () => {
     try {
       const [data, metricsData, activityData, chartD] = await Promise.all([
         getDashboardData(),
@@ -41,9 +59,14 @@ export default function DashboardPage() {
       ]);
 
       setFamilies(data);
-      setMetrics(metricsData);
-      setRecentActivity(activityData);
-      setChartData(chartD);
+      setMetrics(metricsData as DashboardMetrics);
+
+      const formattedActivity = activityData.map((item: { createdAt?: string | Date | null }) => ({
+        ...item,
+        createdAt: item.createdAt ? new Date(item.createdAt) : new Date()
+      }));
+      setRecentActivity(formattedActivity as DashboardActivityItem[]);
+      setChartData(chartD as ChartItem[]);
 
     } catch (err) {
       console.error("Failed to load dashboard data", err);
@@ -51,7 +74,14 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await loadData();
+    };
+    fetchData();
+  }, [loadData]);
 
   const handleCollectFee = (family: Family) => {
     setSelectedFamily(family)
@@ -99,14 +129,14 @@ export default function DashboardPage() {
           title="Total Revenue (Monthly)"
           value={`₹${metrics.revenue.toLocaleString()}`}
           icon={<IndianRupee className="h-4 w-4 text-green-600" />}
-          trend={(metrics as any).revenueTrend}
-          trendUp={(metrics as any).revenueTrendUp}
+          trend={metrics.revenueTrend}
+          trendUp={metrics.revenueTrendUp}
         />
         <StatCard
           title="Active Students"
           value={metrics.activeStudents}
           icon={<Users className="h-4 w-4 text-blue-600" />}
-          trend={(metrics as any).studentsTrend}
+          trend={metrics.studentsTrend}
           trendUp={true}
         />
         <StatCard

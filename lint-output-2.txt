@@ -1,0 +1,501 @@
+
+> rk-institute-erp@0.1.0 lint
+> eslint
+
+
+D:\RKM\rk-institute-erp\scripts\load-test.ts
+   1:8   warning  'axios' is defined but never used                    @typescript-eslint/no-unused-vars
+   3:7   warning  'BASE_URL' is assigned a value but never used        @typescript-eslint/no-unused-vars
+   7:16  warning  'simulateUser' is defined but never used             @typescript-eslint/no-unused-vars
+   9:11  warning  'start' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  10:9   error    'requests' is never reassigned. Use 'const' instead  prefer-const
+  10:9   warning  'requests' is assigned a value but never used        @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\seed-everything.ts
+  14:14  warning  'sql' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\simulate-all.ts
+   4:37  warning  'batches' is defined but never used              @typescript-eslint/no-unused-vars
+   4:46  warning  'enrollments' is defined but never used          @typescript-eslint/no-unused-vars
+   4:59  warning  'transactions' is defined but never used         @typescript-eslint/no-unused-vars
+   5:14  warning  'like' is defined but never used                 @typescript-eslint/no-unused-vars
+  87:11  warning  'student2Id' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\test-academics.ts
+  3:32  warning  'createBatch' is defined but never used  @typescript-eslint/no-unused-vars
+  5:39  warning  'enrollments' is defined but never used  @typescript-eslint/no-unused-vars
+  6:10  warning  'eq' is defined but never used           @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\test-all-flows.ts
+  15:73  warning  'attendance' is defined but never used  @typescript-eslint/no-unused-vars
+  16:14  warning  'and' is defined but never used         @typescript-eslint/no-unused-vars
+  16:19  warning  'like' is defined but never used        @typescript-eslint/no-unused-vars
+  16:25  warning  'desc' is defined but never used        @typescript-eslint/no-unused-vars
+  16:40  warning  'lt' is defined but never used          @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\test-edge-cases.ts
+   20:26  warning  'calculateTotalDue' is defined but never used  @typescript-eslint/no-unused-vars
+  238:19  warning  'hasData' is assigned a value but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\test-failure-scenarios.ts
+  15:10  warning  'db' is defined but never used            @typescript-eslint/no-unused-vars
+  16:10  warning  'transactions' is defined but never used  @typescript-eslint/no-unused-vars
+  16:24  warning  'attendance' is defined but never used    @typescript-eslint/no-unused-vars
+  16:36  warning  'enrollments' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\test-normal-flows.ts
+  17:39  warning  'enrollments' is defined but never used   @typescript-eslint/no-unused-vars
+  17:52  warning  'transactions' is defined but never used  @typescript-eslint/no-unused-vars
+  17:66  warning  'attendance' is defined but never used    @typescript-eslint/no-unused-vars
+  18:14  warning  'desc' is defined but never used          @typescript-eslint/no-unused-vars
+  18:20  warning  'and' is defined but never used           @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\verify-admin.ts
+  5:10  warning  'eq' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\scripts\verify-staff-academics.ts
+  3:23  warning  'getAllStaff' is defined but never used     @typescript-eslint/no-unused-vars
+  4:45  warning  'getAllBatches' is defined but never used   @typescript-eslint/no-unused-vars
+  5:28  warning  'getAllStudents' is defined but never used  @typescript-eslint/no-unused-vars
+  7:10  warning  'staff' is defined but never used           @typescript-eslint/no-unused-vars
+  7:17  warning  'batches' is defined but never used         @typescript-eslint/no-unused-vars
+  7:26  warning  'enrollments' is defined but never used     @typescript-eslint/no-unused-vars
+  8:10  warning  'eq' is defined but never used              @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\auth-settings.ts
+  5:10  warning  'eq' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\billing.ts
+   5:28  warning  'and' is defined but never used                          @typescript-eslint/no-unused-vars
+  82:11  warning  'studentEnrollments' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\finance.ts
+    4:46  warning  'students' is defined but never used  @typescript-eslint/no-unused-vars
+    5:36  warning  'desc' is defined but never used      @typescript-eslint/no-unused-vars
+  411:72  warning  'month' is defined but never used     @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\notifications.ts
+    4:42  warning  'students' is defined but never used         @typescript-eslint/no-unused-vars
+  372:15  warning  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\reports.ts
+  4:20  warning  'students' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\session.ts
+    4:66  warning  'families' is defined but never used         @typescript-eslint/no-unused-vars
+    4:76  warning  'transactions' is defined but never used     @typescript-eslint/no-unused-vars
+    7:43  warning  'requireAuth' is defined but never used      @typescript-eslint/no-unused-vars
+  177:44  warning  'newSessionId' is defined but never used     @typescript-eslint/no-unused-vars
+  246:48  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+  305:23  warning  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  383:76  error    Unexpected any. Specify a different type     @typescript-eslint/no-explicit-any
+
+D:\RKM\rk-institute-erp\src\actions\student.ts
+  5:14  warning  'sql' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\actions\users.ts
+  5:14  warning  'ne' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\admission\page.tsx
+   4:20  warning  'useEffect' is defined but never used                            @typescript-eslint/no-unused-vars
+  98:91  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\attendance\attendance-client.tsx
+  31:13  error    Error: Cannot access variable before it is declared
+
+`loadBatchStudents` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\attendance\attendance-client.tsx:31:13
+  29 |     useEffect(() => {
+  30 |         if (selectedBatchId) {
+> 31 |             loadBatchStudents();
+     |             ^^^^^^^^^^^^^^^^^ `loadBatchStudents` accessed before it is declared
+  32 |         } else {
+  33 |             setStudents([]);
+  34 |             setAttendance({});
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\attendance\attendance-client.tsx:45:5
+  43 |     }, [selectedDate, selectedBatchId]);
+  44 |
+> 45 |     const loadBatchStudents = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |         setLoading(true);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |         const { students: enrolled } = await getBatchStudentsForAttendance(parseInt(selectedBatchId));
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 55 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^
+> 56 |     };
+     | ^^^^^^^ `loadBatchStudents` is declared here
+  57 |
+  58 |     const loadExistingAttendance = async () => {
+  59 |         const { attendance: existing } = await getAttendanceByBatch(                                                                                                          react-hooks/immutability
+  36:8   warning  React Hook useEffect has a missing dependency: 'loadBatchStudents'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/exhaustive-deps
+  41:13  error    Error: Cannot access variable before it is declared
+
+`loadExistingAttendance` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\attendance\attendance-client.tsx:41:13
+  39 |     useEffect(() => {
+  40 |         if (selectedBatchId && selectedDate) {
+> 41 |             loadExistingAttendance();
+     |             ^^^^^^^^^^^^^^^^^^^^^^ `loadExistingAttendance` accessed before it is declared
+  42 |         }
+  43 |     }, [selectedDate, selectedBatchId]);
+  44 |
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\attendance\attendance-client.tsx:58:5
+  56 |     };
+  57 |
+> 58 |     const loadExistingAttendance = async () => {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |         const { attendance: existing } = await getAttendanceByBatch(
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |             parseInt(selectedBatchId),
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 69 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 70 |     };
+     | ^^^^^^^ `loadExistingAttendance` is declared here
+  71 |
+  72 |     const setStatus = (studentId: number, status: AttendanceStatus) => {
+  73 |         setAttendance(prev => ({ ...prev, [studentId]: status }));  react-hooks/immutability
+  43:8   warning  React Hook useEffect has a missing dependency: 'loadExistingAttendance'. Either include it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                react-hooks/exhaustive-deps
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\batches\[id]\page.tsx
+  3:14  warning  'and' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\fees\bulk\page.tsx
+  30:9  error  Error: Cannot access variable before it is declared
+
+`loadFamilies` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\fees\bulk\page.tsx:30:9
+  28 |
+  29 |     useEffect(() => {
+> 30 |         loadFamilies();
+     |         ^^^^^^^^^^^^ `loadFamilies` accessed before it is declared
+  31 |     }, []);
+  32 |
+  33 |     async function loadFamilies() {
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\fees\bulk\page.tsx:33:5
+  31 |     }, []);
+  32 |
+> 33 |     async function loadFamilies() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 34 |         const data = await getDashboardData();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 35 |         // getDashboardData returns an array with {id, father_name, phone, total_due, ...}
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |     }
+     | ^^^^^^ `loadFamilies` is declared here
+  45 |
+  46 |     function toggleFamily(id: number) {
+  47 |         const newSelected = new Set(selectedFamilies);  react-hooks/immutability
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\fees\page.tsx
+  62:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\fees\page.tsx:62:13
+  60 |     useEffect(() => {
+  61 |         if (searchQuery.length < 2) {
+> 62 |             setSearchResults([]);
+     |             ^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  63 |             return;
+  64 |         }
+  65 |  react-hooks/set-state-in-effect
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\page.tsx
+    9:51  warning  'TrendingUp' is defined but never used    @typescript-eslint/no-unused-vars
+   68:57  error    Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  105:14  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\reports\dues\page.tsx
+   8:23  warning  'formatDateForExport' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   @typescript-eslint/no-unused-vars
+  37:9   error    Error: Cannot access variable before it is declared
+
+`loadReport` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\reports\dues\page.tsx:37:9
+  35 |
+  36 |     useEffect(() => {
+> 37 |         loadReport();
+     |         ^^^^^^^^^^ `loadReport` accessed before it is declared
+  38 |     }, []);
+  39 |
+  40 |     async function loadReport() {
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\reports\dues\page.tsx:40:5
+  38 |     }, []);
+  39 |
+> 40 |     async function loadReport() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |         const result = await getDuesAgingReport();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |         if (result.success) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |             setReport(result.report || []);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |             setSummary(result.summary || null);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |             setTotalDue(result.totalDue || 0);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 46 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 47 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 48 |     }
+     | ^^^^^^ `loadReport` is declared here
+  49 |
+  50 |     const filteredReport = filter === 'all'
+  51 |         ? report  react-hooks/immutability
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\reports\finance\page.tsx
+  22:5   warning  'getStaffSalaryReport' is defined but never used  @typescript-eslint/no-unused-vars
+  23:5   warning  'getExpenseReport' is defined but never used      @typescript-eslint/no-unused-vars
+  98:18  warning  'error' is defined but never used                 @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\reports\transactions\page.tsx
+  51:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\audit-logs\audit-logs-client.tsx
+   9:5  warning  'ArrowLeft' is defined but never used  @typescript-eslint/no-unused-vars
+  25:8  warning  'Link' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\auth\page.tsx
+   23:10  warning  'Separator' is defined but never used                            @typescript-eslint/no-unused-vars
+  123:43  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  123:63  error    `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\fees\page.tsx
+  33:9  error  Error: Cannot access variable before it is declared
+
+`loadStructures` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\fees\page.tsx:33:9
+  31 |
+  32 |     useEffect(() => {
+> 33 |         loadStructures();
+     |         ^^^^^^^^^^^^^^ `loadStructures` accessed before it is declared
+  34 |     }, []);
+  35 |
+  36 |     async function loadStructures() {
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\fees\page.tsx:36:5
+  34 |     }, []);
+  35 |
+> 36 |     async function loadStructures() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 37 |         const result = await getFeeStructures();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 38 |         if (result.success && result.feeStructures) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 39 |             setStructures(result.feeStructures);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |     }
+     | ^^^^^^ `loadStructures` is declared here
+  43 |
+  44 |     async function handleSubmit(e: React.FormEvent) {
+  45 |         e.preventDefault();  react-hooks/immutability
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\profile\page.tsx
+   8:20  warning  'ArrowLeft' is defined but never used  @typescript-eslint/no-unused-vars
+  10:8   warning  'Link' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\sessions\page.tsx
+  36:9  error  Error: Cannot access variable before it is declared
+
+`loadSessions` is accessed before it is declared, which prevents the earlier access from updating when this value changes over time.
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\sessions\page.tsx:36:9
+  34 |
+  35 |     useEffect(() => {
+> 36 |         loadSessions();
+     |         ^^^^^^^^^^^^ `loadSessions` accessed before it is declared
+  37 |     }, []);
+  38 |
+  39 |     async function loadSessions() {
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\sessions\page.tsx:39:5
+  37 |     }, []);
+  38 |
+> 39 |     async function loadSessions() {
+     |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 40 |         const result = await getAcademicSessions();
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 41 |         if (result.success && result.sessions) {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 42 |             setSessions(result.sessions);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 43 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 44 |         setLoading(false);
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 45 |     }
+     | ^^^^^^ `loadSessions` is declared here
+  46 |
+  47 |     async function handleSubmit(e: React.FormEvent) {
+  48 |         e.preventDefault();  react-hooks/immutability
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\settings\sessions\session-transition-dialog.tsx
+  100:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  120:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\(dashboard)\student\[id]\page.tsx
+   3:10  warning  'useState' is defined but never used                             @typescript-eslint/no-unused-vars
+   4:36  warning  'Clock' is defined but never used                                @typescript-eslint/no-unused-vars
+   4:43  warning  'AlertCircle' is defined but never used                          @typescript-eslint/no-unused-vars
+   4:56  warning  'CheckCircle2' is defined but never used                         @typescript-eslint/no-unused-vars
+  40:46  warning  'params' is defined but never used                               @typescript-eslint/no-unused-vars
+  86:96  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+D:\RKM\rk-institute-erp\src\app\login\page.tsx
+  47:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\parent\page.tsx
+  4:55  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\app\verify\page.tsx
+  4:8  warning  'Link' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\auth.ts
+   25:15  warning  'JWT' is defined but never used      @typescript-eslint/no-unused-vars
+  107:39  warning  'profile' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\CommandPalette.tsx
+  72:39  error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This value was memoized in source but not in compilation output.
+
+D:\RKM\rk-institute-erp\src\components\CommandPalette.tsx:72:39
+  70 |     }, [open]);
+  71 |
+> 72 |     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+     |                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 73 |         if (e.key === "ArrowDown") {
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 74 |             e.preventDefault();
+     …
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 86 |         }
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 87 |     }, [flatItems, selectedIndex, router]);
+     | ^^^^^^ Could not preserve existing memoization
+  88 |
+  89 |     const handleSelect = (href: string) => {
+  90 |         router.push(href);  react-hooks/preserve-manual-memoization
+  87:9   error  Compilation Skipped: Existing memoization could not be preserved
+
+React Compiler has skipped optimizing this component because the existing manual memoization could not be preserved. This dependency may be mutated later, which could cause the value to change unexpectedly.
+
+D:\RKM\rk-institute-erp\src\components\CommandPalette.tsx:87:9
+  85 |             setOpen(false);
+  86 |         }
+> 87 |     }, [flatItems, selectedIndex, router]);
+     |         ^^^^^^^^^ This dependency may be modified later
+  88 |
+  89 |     const handleSelect = (href: string) => {
+  90 |         router.push(href);                                                                                                                                                                                                                                                                                                                                                react-hooks/preserve-manual-memoization
+
+D:\RKM\rk-institute-erp\src\components\NotificationBell.tsx
+   4:16  warning  'Check' is defined but never used                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  @typescript-eslint/no-unused-vars
+  65:13  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\RKM\rk-institute-erp\src\components\NotificationBell.tsx:65:13
+  63 |     useEffect(() => {
+  64 |         if (open) {
+> 65 |             loadNotifications();
+     |             ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  66 |         }
+  67 |     }, [open, loadNotifications]);
+  68 |     react-hooks/set-state-in-effect
+  76:9   error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+D:\RKM\rk-institute-erp\src\components\NotificationBell.tsx:76:9
+  74 |
+  75 |         // Initial load
+> 76 |         loadNotifications();
+     |         ^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  77 |
+  78 |         return () => clearInterval(interval);
+  79 |     }, [loadNotifications]);  react-hooks/set-state-in-effect
+
+D:\RKM\rk-institute-erp\src\components\QuickPaymentDialog.tsx
+  4:23  warning  'CreditCard' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\ReceiptDialog.tsx
+  4:22  warning  'Download' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\UsersTable.tsx
+  48:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  61:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\dashboard\RecentActivity.tsx
+  2:34  warning  'AvatarImage' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\dashboard\SummaryCards.tsx
+  10:5  warning  'Wallet' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\layout\Sidebar.tsx
+   31:11  error  Unexpected any. Specify a different type                          @typescript-eslint/no-explicit-any
+  107:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+D:\RKM\rk-institute-erp\src\components\modals\FeeCollectionModal.tsx
+  16:10  warning  'Label' is defined but never used    @typescript-eslint/no-unused-vars
+  17:10  warning  'Student' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\components\ui\input.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+D:\RKM\rk-institute-erp\src\lib\accessibility.ts
+  124:14  warning  'title' is defined but never used    @typescript-eslint/no-unused-vars
+  130:13  warning  'message' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\lib\action-wrapper.ts
+  103:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:67  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\RKM\rk-institute-erp\src\lib\billing.ts
+  2:44  warning  'startOfMonth' is defined but never used  @typescript-eslint/no-unused-vars
+  2:70  warning  'addMonths' is defined but never used     @typescript-eslint/no-unused-vars
+
+D:\RKM\rk-institute-erp\src\lib\server-utils.ts
+  9:23  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\RKM\rk-institute-erp\src\middleware.ts
+  7:43  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+D:\RKM\rk-institute-erp\tests\e2e\admission.spec.ts
+  7:41  warning  'waitForToast' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 122 problems (27 errors, 95 warnings)
+  1 error and 0 warnings potentially fixable with the `--fix` option.
+

@@ -22,7 +22,8 @@ type StaffMember = {
     name: string;
     phone: string;
     email: string | null;
-    role: "ADMIN" | "TEACHER" | "RECEPTIONIST";
+    role: "ADMIN" | "TEACHER" | "RECEPTIONIST" | "STAFF";
+    roleType?: string | null;
     baseSalary: number;
 };
 
@@ -110,6 +111,7 @@ export function EditStaffDialog({ staff }: { staff: StaffMember }) {
                             value={formData.role}
                             onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
                         >
+                            <option value="STAFF">Staff (No System Access)</option>
                             <option value="TEACHER">Teacher</option>
                             <option value="RECEPTIONIST">Receptionist</option>
                             <option value="ADMIN">Admin</option>

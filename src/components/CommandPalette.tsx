@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -38,18 +38,18 @@ export function CommandPalette() {
     const router = useRouter();
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const filteredItems = searchItems.filter(item =>
+    const filteredItems = useMemo(() => searchItems.filter(item =>
         item.title.toLowerCase().includes(search.toLowerCase()) ||
         item.category.toLowerCase().includes(search.toLowerCase())
-    );
+    ), [search]);
 
-    const groupedItems = filteredItems.reduce((acc, item) => {
+    const groupedItems = useMemo(() => filteredItems.reduce((acc, item) => {
         if (!acc[item.category]) acc[item.category] = [];
         acc[item.category].push(item);
         return acc;
-    }, {} as Record<string, SearchItem[]>);
+    }, {} as Record<string, SearchItem[]>), [filteredItems]);
 
-    const flatItems = Object.values(groupedItems).flat();
+    const flatItems = useMemo(() => Object.values(groupedItems).flat(), [groupedItems]);
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {

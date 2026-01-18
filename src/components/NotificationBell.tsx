@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell, Check, CheckCheck, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,26 +47,7 @@ export function NotificationBell() {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
-    // Load notifications when dropdown opens
-    useEffect(() => {
-        if (open) {
-            loadNotifications();
-        }
-    }, [open]);
-
-    // Poll for new notifications every 60 seconds
-    useEffect(() => {
-        const interval = setInterval(() => {
-            loadNotifications();
-        }, 60000);
-
-        // Initial load
-        loadNotifications();
-
-        return () => clearInterval(interval);
-    }, []);
-
-    async function loadNotifications() {
+    const loadNotifications = useCallback(async () => {
         try {
             const result = await getUserNotifications({ limit: 10 });
             if (result.success) {
@@ -76,7 +57,36 @@ export function NotificationBell() {
         } catch (error) {
             console.error("Failed to load notifications", error);
         }
-    }
+    }, []);
+
+    // Load notifications when dropdown opens
+    useEffect(() => {
+        const init = async () => {
+            if (open) {
+                await loadNotifications();
+            }
+        };
+        init();
+    }, [open, loadNotifications]);
+
+    // Poll for new notifications every 60 seconds
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchData = async () => {
+            if (isMounted) {
+                await loadNotifications();
+            }
+        };
+
+        fetchData();
+        const interval = setInterval(fetchData, 60000);
+
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+    }, [loadNotifications]);
 
     async function handleMarkRead(id: number) {
         await markNotificationRead(id);

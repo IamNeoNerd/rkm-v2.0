@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
 
-export default auth((req) => {
+export const proxy = auth((req) => {
     const isLoggedIn = !!req.auth;
     const userRole = req.auth?.user?.role;
-    const isVerified = (req.auth?.user as any)?.isVerified;
+    const isVerified = (req.auth?.user as { isVerified?: boolean })?.isVerified;
     const { pathname } = req.nextUrl;
 
     const isOnLoginPage = pathname.startsWith("/login");

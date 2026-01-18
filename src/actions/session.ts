@@ -243,7 +243,19 @@ export async function transitionToNewSession(
         }
 
         const currentSession = await getCurrentSession();
-        const transitionReport: Record<string, any> = {
+        interface TransitionReport {
+            from: string;
+            to: string;
+            changes: {
+                studentsPromoted?: number;
+                studentsGraduated?: number;
+                enrollmentsReset?: boolean;
+                feeOverridesReset?: boolean;
+                feeStructuresCopied?: number;
+            };
+        }
+
+        const transitionReport: TransitionReport = {
             from: currentSession.session?.name || 'None',
             to: newSession.name,
             changes: {},
@@ -364,8 +376,7 @@ export async function transitionToNewSession(
         if (error instanceof AuthorizationError) {
             return { success: false, error: error.message };
         }
-        logger.error('Session transition failed', error);
-        return { success: false, error: "Session transition failed" };
+        return { success: false, error: error instanceof Error ? error.message : "Session transition failed" };
     }
 }
 
@@ -377,10 +388,11 @@ export async function getFeeStructures(sessionId?: number) {
     try {
         await requireRole(['admin', 'super-admin']);
 
-        let query = db.select().from(feeStructures);
+        const query = db.select().from(feeStructures);
 
         if (sessionId) {
-            query = query.where(eq(feeStructures.sessionId, sessionId)) as any;
+            const structures = await db.select().from(feeStructures).where(eq(feeStructures.sessionId, sessionId)).orderBy(feeStructures.className);
+            return { success: true, feeStructures: structures };
         }
 
         const structures = await query.orderBy(feeStructures.className);

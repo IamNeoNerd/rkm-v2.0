@@ -3,6 +3,17 @@ import { format } from "date-fns";
 import { Receipt, ArrowUpCircle, ArrowDownCircle } from "lucide-react";
 import { ExportTransactionsButton } from "./export-button";
 
+interface Transaction {
+    id: number;
+    receiptNumber: string | null;
+    createdAt: Date | null;
+    type: "CREDIT" | "DEBIT";
+    fatherName: string | null;
+    description: string | null;
+    paymentMode: string | null;
+    amount: number;
+}
+
 export default async function TransactionHistoryPage() {
     const { transactions } = await getRecentTransactions(100);
 
@@ -48,7 +59,7 @@ export default async function TransactionHistoryPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                         {transactions && transactions.length > 0 ? (
-                            transactions.map((txn: any) => (
+                            transactions.map((txn: Transaction) => (
                                 <tr key={txn.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-indigo-600">
                                         {txn.receiptNumber || "-"}
@@ -96,6 +107,6 @@ export default async function TransactionHistoryPage() {
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div >
     );
 }

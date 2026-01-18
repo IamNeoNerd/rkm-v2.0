@@ -120,7 +120,7 @@ export default function AuthSettingsPage() {
                         <CardHeader>
                             <CardTitle>Google Authentication</CardTitle>
                             <CardDescription>
-                                Configure "Sign in with Google" settings.
+                                Configure &quot;Sign in with Google&quot; settings.
                             </CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">

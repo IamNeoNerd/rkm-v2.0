@@ -4,7 +4,7 @@
 import { useState, useEffect } from "react";
 import { processAdmission } from "@/actions/admission";
 import { format } from "date-fns";
-import { calculateJoiningFee, BILLING_CYCLE_START_DAY } from "@/lib/billing";
+import { calculateJoiningFee } from "@/lib/billing";
 import { toast } from "sonner";
 
 export default function AdmissionPage() {
@@ -14,17 +14,9 @@ export default function AdmissionPage() {
         studentName: "",
         studentClass: "10",
         monthlyFee: 2000,
-        joiningDate: "", // Will be set in useEffect
+        joiningDate: format(new Date(), "yyyy-MM-dd"),
         overrideAmount: "",
     });
-
-    // Set default date on client-side to avoid hydration mismatch
-    useEffect(() => {
-        setFormData(prev => ({
-            ...prev,
-            joiningDate: format(new Date(), "yyyy-MM-dd")
-        }));
-    }, []);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [phoneError, setPhoneError] = useState("");
@@ -78,7 +70,7 @@ export default function AdmissionPage() {
             initialPayment: finalAmount,
         });
 
-        if (result.success) {
+        if (result.success && 'studentId' in result) {
             toast.success(`Admission successful! Student ID: ${result.studentId}`);
             // Reset form
             setFormData({
@@ -103,7 +95,7 @@ export default function AdmissionPage() {
             <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700">Father's Name</label>
+                        <label className="block text-sm font-medium text-slate-700">Father&apos;s Name</label>
                         <input
                             type="text"
                             required

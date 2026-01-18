@@ -4,10 +4,10 @@ const BASE_URL = 'http://localhost:3000';
 const CONCURRENT_USERS = 50; // We'll start with 50 and ramp up
 const DURATION_SECONDS = 30;
 
-async function simulateUser(userId: number) {
-    console.log(`User ${userId} started session...`);
-    const start = Date.now();
-    let requests = 0;
+async function simulateUser(_userId: number) {
+    // console.log(`User ${userId} started session...`);
+    // const start = Date.now();
+    // let requests = 0;
 
     // Note: Since we have middleware, we'd normally need a valid session cookie.
     // For this test, we can either:

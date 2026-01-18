@@ -5,7 +5,7 @@ import { relations } from "drizzle-orm";
 // Enums
 export const transactionTypeEnum = pgEnum("transaction_type", ["CREDIT", "DEBIT"]);
 export const transactionCategoryEnum = pgEnum("transaction_category", ["FEE", "SALARY", "EXPENSE", "REFUND"]);
-export const staffRoleEnum = pgEnum("staff_role", ["ADMIN", "TEACHER", "RECEPTIONIST"]);
+export const staffRoleEnum = pgEnum("staff_role", ["ADMIN", "TEACHER", "RECEPTIONIST", "STAFF"]);
 
 // Authentication Tables (NextAuth.js required tables)
 export const users = pgTable("user", {
@@ -88,12 +88,22 @@ export const staff = pgTable("staff", {
     name: text("name").notNull(),
     phone: text("phone").notNull().unique(),
     email: text("email").unique(), // For auto-matching with NextAuth users
-    role: staffRoleEnum("role").notNull(),
+    role: staffRoleEnum("role").notNull(), // System roles: ADMIN, TEACHER, RECEPTIONIST
+    roleType: text("role_type"), // Custom role type (e.g., "Sweeper", "Peon", "Cook")
     authUserId: text("auth_user_id").unique(), // From external Auth provider (e.g., Clerk)
     baseSalary: integer("base_salary").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
     createdAt: timestamp("created_at").defaultNow(),
     updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Custom Staff Role Types (for non-system roles like Sweeper, Peon, Cook, MTS)
+export const staffRoleTypes = pgTable("staff_role_types", {
+    id: serial("id").primaryKey(),
+    name: text("name").notNull().unique(),
+    description: text("description"),
+    isActive: boolean("is_active").notNull().default(true),
+    createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Configuration Tables

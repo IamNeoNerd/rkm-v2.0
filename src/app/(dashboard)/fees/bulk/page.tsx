@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getDashboardData } from "@/actions/dashboard";
 import { processPayment } from "@/actions/billing";
 import { Button } from "@/components/ui/button";
@@ -26,11 +26,7 @@ export default function BulkFeeCollectionPage() {
     const [paymentMode, setPaymentMode] = useState<"CASH" | "UPI">("CASH");
     const [results, setResults] = useState<Record<number, { success: boolean; receipt?: string; error?: string }>>({});
 
-    useEffect(() => {
-        loadFamilies();
-    }, []);
-
-    async function loadFamilies() {
+    const loadFamilies = useCallback(async () => {
         const data = await getDashboardData();
         // getDashboardData returns an array with {id, father_name, phone, total_due, ...}
         const mappedFamilies = data.map((f: { id: string; father_name: string; phone: string; total_due: number }) => ({
@@ -41,7 +37,14 @@ export default function BulkFeeCollectionPage() {
         }));
         setFamilies(mappedFamilies);
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            await loadFamilies();
+        };
+        init();
+    }, [loadFamilies]);
 
     function toggleFamily(id: number) {
         const newSelected = new Set(selectedFamilies);

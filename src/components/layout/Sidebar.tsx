@@ -21,6 +21,7 @@ import {
     TrendingUp
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
+import { type LucideIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -28,7 +29,7 @@ import { Button } from "@/components/ui/button"
 interface SidebarNavItem {
     title: string;
     href: string;
-    icon: any;
+    icon: LucideIcon;
     role?: string;
     children?: SidebarNavItem[];
 }
@@ -104,7 +105,7 @@ const sidebarNavItems: SidebarNavItem[] = [
     },
 ]
 
-interface SidebarProps extends React.HTMLAttributes<HTMLDivElement> { }
+type SidebarProps = React.HTMLAttributes<HTMLDivElement>
 
 export function Sidebar({ className }: SidebarProps) {
     const pathname = usePathname()

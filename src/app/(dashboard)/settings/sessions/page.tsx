@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getAllSessions as getAcademicSessions, createSession as createAcademicSession, activateSession as setCurrentSession } from "@/actions/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,17 +32,20 @@ export default function SessionsSettingsPage() {
         isCurrent: false,
     });
 
-    useEffect(() => {
-        loadSessions();
-    }, []);
-
-    async function loadSessions() {
+    const loadSessions = useCallback(async () => {
         const result = await getAcademicSessions();
         if (result.success && result.sessions) {
             setSessions(result.sessions);
         }
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            await loadSessions();
+        };
+        init();
+    }, [loadSessions]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

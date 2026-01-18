@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { getFeeStructures, createFeeStructure, updateFeeStructure, deleteFeeStructure } from "@/actions/session";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,17 +29,20 @@ export default function FeesSettingsPage() {
         admissionFee: "",
     });
 
-    useEffect(() => {
-        loadStructures();
-    }, []);
-
-    async function loadStructures() {
+    const loadStructures = useCallback(async () => {
         const result = await getFeeStructures();
         if (result.success && result.feeStructures) {
             setStructures(result.feeStructures);
         }
         setLoading(false);
-    }
+    }, []);
+
+    useEffect(() => {
+        const init = async () => {
+            await loadStructures();
+        };
+        init();
+    }, [loadStructures]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();

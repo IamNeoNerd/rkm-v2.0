@@ -2,6 +2,7 @@ import { getAllStaff } from "@/actions/staff";
 import { AddStaffDialog } from "./add-staff-dialog";
 import { EditStaffDialog } from "./edit-staff-dialog";
 import { DeactivateStaffButton } from "./deactivate-staff-button";
+import { StaffRoleTypesManager } from "./staff-role-types-manager";
 import { Users, Phone, Mail } from "lucide-react";
 import { format } from "date-fns";
 import { auth } from "@/auth";
@@ -24,16 +25,19 @@ export default async function StaffPage() {
         <div className="p-6 max-w-7xl mx-auto">
             <div className="flex items-center justify-between mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 flex items-center gap-2">
                         <Users className="h-8 w-8 text-indigo-600" />
                         Staff Management
                     </h1>
-                    <p className="text-gray-600 mt-1">Manage teachers, receptionists, and admins</p>
+                    <p className="text-gray-600 dark:text-gray-400 mt-1">Manage teachers, receptionists, admins, and support staff</p>
                 </div>
                 <AddStaffDialog />
             </div>
 
-            <div className="bg-white rounded-lg shadow overflow-hidden border border-gray-200 overflow-x-auto">
+            {/* Custom Staff Types Manager */}
+            <StaffRoleTypesManager />
+
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700 overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
@@ -76,12 +80,22 @@ export default async function StaffPage() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                            ${employee.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
-                                                employee.role === 'TEACHER' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-green-100 text-green-800'}`}>
-                                            {employee.role}
-                                        </span>
+                                        <div className="flex flex-col gap-1">
+                                            {/* Show roleType (custom type) if available */}
+                                            {employee.roleType && (
+                                                <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                                                    {employee.roleType}
+                                                </span>
+                                            )}
+                                            {/* Show system role */}
+                                            <span className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                                ${employee.role === 'ADMIN' ? 'bg-purple-100 text-purple-800' :
+                                                    employee.role === 'TEACHER' ? 'bg-blue-100 text-blue-800' :
+                                                        employee.role === 'STAFF' ? 'bg-gray-100 text-gray-600' :
+                                                            'bg-green-100 text-green-800'}`}>
+                                                {employee.role}
+                                            </span>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900 flex items-center gap-1">
