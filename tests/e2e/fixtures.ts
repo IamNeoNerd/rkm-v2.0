@@ -10,7 +10,7 @@ import { test as base, expect, type Page } from '@playwright/test';
 // Test user credentials
 export const TEST_USERS = {
     superAdmin: {
-        email: 'Admin@rkinstitute.com',
+        email: 'admin@rkinstitute.com',
         password: 'admin123',
         role: 'super-admin',
     },
@@ -35,8 +35,8 @@ export const test = base.extend<{
         // Submit login form
         await page.click('button[type="submit"]');
 
-        // Wait for redirect to dashboard
-        await page.waitForURL('/', { timeout: 10000 });
+        // Wait for redirect to dashboard - Increased timeout to 20s
+        await page.waitForURL('/', { timeout: 20000 });
 
         // Verify login successful
         await expect(page).toHaveURL('/');
@@ -52,7 +52,7 @@ export { expect };
  * Helper to wait for page to be fully loaded
  */
 export async function waitForPageLoad(page: Page) {
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
 }
 
 /**

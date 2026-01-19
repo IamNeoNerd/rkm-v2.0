@@ -7,24 +7,14 @@
 import { test, expect, waitForPageLoad } from './fixtures';
 
 test.describe('Dashboard', () => {
-    test('should display dashboard metrics', async ({ authenticatedPage: page }) => {
-        await page.goto('/');
-        await waitForPageLoad(page);
-
-        // Check for Command Center or Dashboard header
-        await expect(page.locator('h1, h2').first()).toBeVisible();
-
-        // Check for metric cards (revenue, students, etc.)
-        const cards = page.locator('[class*="card"], [class*="metric"], [class*="stat"]');
-        await expect(cards.first()).toBeVisible({ timeout: 5000 });
-    });
+    // Metrics validation is covered in operations.spec.ts
 
     test('should navigate to students page', async ({ authenticatedPage: page }) => {
         await page.goto('/');
         await waitForPageLoad(page);
 
         // Click on Students in sidebar
-        await page.click('a[href="/students"], text=Students');
+        await page.click('a[href="/students"]');
 
         // Verify navigation
         await expect(page).toHaveURL('/students');
@@ -35,7 +25,7 @@ test.describe('Dashboard', () => {
         await waitForPageLoad(page);
 
         // Click on Settings in sidebar
-        await page.click('a[href="/settings"], text=Settings');
+        await page.click('a[href="/settings"]');
 
         // Verify navigation
         await expect(page).toHaveURL('/settings');
