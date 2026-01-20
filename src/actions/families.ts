@@ -105,6 +105,12 @@ export async function getFamilyById(id: number) {
             transactions: familyTransactions,
         };
     } catch (error) {
+        // Check if it's an authorization error
+        if (error instanceof Error && error.name === 'AuthorizationError') {
+            console.error("Authorization error in getFamilyById:", error.message);
+            return { error: error.message }; // Return the actual auth error message
+        }
+
         console.error("Error fetching family detail:", error);
         return { error: "Failed to fetch family details" };
     }
