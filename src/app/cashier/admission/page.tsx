@@ -110,7 +110,7 @@ export default function CashierAdmissionPage() {
                     </h2>
                     <div className="grid sm:grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Father's Name *</label>
+                            <label className="block text-sm text-slate-400 mb-1">Father&apos;s Name *</label>
                             <Input
                                 value={formData.fatherName}
                                 onChange={(e) => handleChange('fatherName', e.target.value)}
@@ -119,7 +119,7 @@ export default function CashierAdmissionPage() {
                             />
                         </div>
                         <div>
-                            <label className="block text-sm text-slate-400 mb-1">Mother's Name</label>
+                            <label className="block text-sm text-slate-400 mb-1">Mother&apos;s Name</label>
                             <Input
                                 value={formData.motherName}
                                 onChange={(e) => handleChange('motherName', e.target.value)}

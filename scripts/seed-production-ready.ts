@@ -120,6 +120,7 @@ async function main() {
         const createdStaff = await db.insert(staff).values(STAFF_DATA.map((s, idx) => ({
             name: s.name,
             phone: `90000000${(10 + idx).toString().padStart(2, '0')}`,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             role: s.role as any,
             roleType: s.roleType || null,
             baseSalary: s.baseSalary,
@@ -144,6 +145,7 @@ async function main() {
         // FAMILIES & STUDENTS
         log("🏡 Populating Families & Students...");
         let studentCount = 0;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const allStudents: any[] = [];
 
         for (const fData of EXTENDED_INDIAN_FAMILIES) {

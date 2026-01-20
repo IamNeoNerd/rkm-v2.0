@@ -40,6 +40,7 @@ async function DashboardContent() {
 
   const metrics = metricsData as DashboardMetrics;
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const formattedActivity = activityData.map((item: any) => ({
     ...item,
     createdAt: item.createdAt ? new Date(item.createdAt) : new Date()

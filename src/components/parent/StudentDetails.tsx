@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import {
     Sheet,
     SheetContent,
@@ -27,25 +27,35 @@ interface StudentDetailsProps {
 }
 
 export function StudentDetails({ student, isOpen, onClose }: StudentDetailsProps) {
-    const [loading, setLoading] = useState(true);
+    const [isPending, startTransition] = useTransition();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [attendance, setAttendance] = useState<any[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [batches, setBatches] = useState<any[]>([]);
 
     useEffect(() => {
-        if (student && isOpen) {
-            setLoading(true);
-            Promise.all([
-                getStudentAttendance(student.id),
-                getStudentBatches(student.id)
-            ]).then(([attRes, batchRes]) => {
-                setAttendance(attRes.attendance || []);
-                setBatches(batchRes.batches || []);
-                setLoading(false);
-            }).catch(error => {
+        if (!student || !isOpen) return;
+
+        let isMounted = true;
+
+        startTransition(async () => {
+            try {
+                const [attRes, batchRes] = await Promise.all([
+                    getStudentAttendance(student.id),
+                    getStudentBatches(student.id)
+                ]);
+                if (isMounted) {
+                    setAttendance(attRes.attendance || []);
+                    setBatches(batchRes.batches || []);
+                }
+            } catch (error) {
                 console.error("Error loading student details:", error);
-                setLoading(false);
-            });
-        }
+            }
+        });
+
+        return () => {
+            isMounted = false;
+        };
     }, [student, isOpen]);
 
     if (!student) return null;
@@ -78,7 +88,7 @@ export function StudentDetails({ student, isOpen, onClose }: StudentDetailsProps
                     </TabsList>
 
                     <TabsContent value="attendance">
-                        {loading ? (
+                        {isPending ? (
                             <div className="space-y-4">
                                 <Skeleton className="h-8 w-48" />
                                 <Skeleton className="h-[300px] w-full" />
@@ -98,7 +108,7 @@ export function StudentDetails({ student, isOpen, onClose }: StudentDetailsProps
                     </TabsContent>
 
                     <TabsContent value="schedule">
-                        {loading ? (
+                        {isPending ? (
                             <div className="space-y-4">
                                 <Skeleton className="h-16 w-full" />
                                 <Skeleton className="h-16 w-full" />

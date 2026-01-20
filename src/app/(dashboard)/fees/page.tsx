@@ -137,7 +137,7 @@ export default function FeesPage() {
 
     const loadTransactions = useCallback(async () => {
         setLoadingTransactions(true);
-        const result = await getRecentTransactions(20);
+        const result = await getRecentTransactions({ limit: 20 });
         if (result.transactions) {
             setTransactions(result.transactions as Transaction[]);
         }

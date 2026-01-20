@@ -49,7 +49,15 @@ export default function ParentPortal() {
     const [detailsOpen, setDetailsOpen] = useState(false);
 
     // Receipt Modal State
-    const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
+    const [selectedReceipt, setSelectedReceipt] = useState<{
+        receiptNumber: string;
+        date: Date;
+        familyName: string;
+        familyId: number;
+        amount: number;
+        paymentMode: string;
+        newBalance: number;
+    } | null>(null);
 
     const handleLookup = async () => {
         if (phone.length !== 10) {

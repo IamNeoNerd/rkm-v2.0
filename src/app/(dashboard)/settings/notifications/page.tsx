@@ -31,7 +31,7 @@ async function NotificationContent({ searchParams }: NotificationPageProps) {
         <NotificationSettings
             notifications={res.notifications || []}
             pagination={res.pagination}
-            unreadCount={res.unreadCount}
+            unreadCount={res.unreadCount ?? 0}
         />
     );
 }

@@ -78,7 +78,7 @@ export default async function CashierDashboard() {
                     <div className="text-2xl font-bold text-emerald-400">
                         ₹{todayTotal.toLocaleString('en-IN')}
                     </div>
-                    <div className="text-slate-400 text-sm">Today's Collection</div>
+                    <div className="text-slate-400 text-sm">Today&apos;s Collection</div>
                 </div>
                 <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-5 text-center">
                     <Users className="h-8 w-8 text-indigo-400 mx-auto mb-2" />

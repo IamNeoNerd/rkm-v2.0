@@ -115,7 +115,7 @@ export async function getAllStudents(options?: {
         const status = options?.status;
 
         // Build where conditions
-        let whereConditions = [];
+        const whereConditions = [];
 
         if (search) {
             whereConditions.push(sql`${students.name} ILIKE ${'%' + search + '%'} OR ${families.fatherName} ILIKE ${'%' + search + '%'} OR ${families.phone} ILIKE ${'%' + search + '%'}`);

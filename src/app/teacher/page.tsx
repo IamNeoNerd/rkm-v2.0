@@ -91,8 +91,8 @@ export default async function TeacherDashboard() {
                                         </div>
                                     </div>
                                     <span className={`px-2 py-1 text-xs rounded-full ${batch.isActive
-                                            ? 'bg-emerald-500/20 text-emerald-400'
-                                            : 'bg-red-500/20 text-red-400'
+                                        ? 'bg-emerald-500/20 text-emerald-400'
+                                        : 'bg-red-500/20 text-red-400'
                                         }`}>
                                         {batch.isActive ? 'Active' : 'Inactive'}
                                     </span>
@@ -113,7 +113,7 @@ export default async function TeacherDashboard() {
                     >
                         <Calendar className="h-8 w-8 text-emerald-400 mb-3" />
                         <h3 className="text-lg font-semibold text-white group-hover:text-emerald-400">
-                            Mark Today's Attendance
+                            Mark Today&apos;s Attendance
                         </h3>
                         <p className="text-slate-400 text-sm mt-1">
                             Record attendance for your batches

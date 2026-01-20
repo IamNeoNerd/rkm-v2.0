@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Archive scripts - no longer maintained
+    "scripts/_archive/**",
   ]),
 ]);
 
