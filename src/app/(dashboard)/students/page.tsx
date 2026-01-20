@@ -5,19 +5,20 @@ import { Suspense } from "react";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 interface StudentsPageProps {
-    searchParams: {
+    searchParams: Promise<{
         page?: string;
         search?: string;
         class?: string;
         status?: string;
-    };
+    }>;
 }
 
 async function StudentsContent({ searchParams }: StudentsPageProps) {
-    const page = Number(searchParams.page) || 1;
-    const search = searchParams.search || '';
-    const className = searchParams.class || 'all';
-    const status = searchParams.status || 'all';
+    const params = await searchParams;
+    const page = Number(params.page) || 1;
+    const search = params.search || '';
+    const className = params.class || 'all';
+    const status = params.status || 'all';
 
     const { students, pagination, error } = await getAllStudents({
         page,
@@ -35,12 +36,20 @@ async function StudentsContent({ searchParams }: StudentsPageProps) {
         );
     }
 
-    if (students && students.length === 0 && !search) {
+    if (students && students.length === 0) {
+        const hasFilters = search || className !== 'all' || status !== 'all';
+
         return (
             <div className="bg-gray-50 border border-gray-200 rounded-lg p-12 text-center">
                 <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Students Yet</h3>
-                <p className="text-gray-600">Get started by admitting your first student.</p>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    {hasFilters ? 'No Students Found' : 'No Students Yet'}
+                </h3>
+                <p className="text-gray-600">
+                    {hasFilters
+                        ? 'Try adjusting your search or filter criteria.'
+                        : 'Get started by admitting your first student.'}
+                </p>
             </div>
         );
     }

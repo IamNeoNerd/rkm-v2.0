@@ -5,15 +5,16 @@ import { FamiliesTable } from "@/components/FamiliesTable";
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 interface FamiliesPageProps {
-    searchParams: {
+    searchParams: Promise<{
         page?: string;
         search?: string;
-    };
+    }>;
 }
 
 async function FamiliesContent({ searchParams }: FamiliesPageProps) {
-    const page = parseInt(searchParams.page || "1");
-    const search = searchParams.search || "";
+    const params = await searchParams;
+    const page = parseInt(params.page || "1");
+    const search = params.search || "";
 
     const { families, pagination, error } = await getAllFamilies({
         page,

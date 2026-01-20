@@ -88,7 +88,7 @@ function LoginFormContent() {
             sessionStorage.setItem("parentFamilyId", result.family.id.toString());
             sessionStorage.setItem("parentFamilyName", result.family.fatherName);
             toast.success(`Welcome, ${result.family.fatherName}!`);
-            router.push("/parent/dashboard");
+            router.push("/parent");
         }
     };
 

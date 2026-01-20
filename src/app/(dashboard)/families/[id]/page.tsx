@@ -25,13 +25,14 @@ export const metadata: Metadata = {
 };
 
 interface FamilyPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export default async function FamilyDetailPage({ params }: FamilyPageProps) {
-    const familyId = parseInt(params.id);
+    const { id } = await params;
+    const familyId = parseInt(id);
     const result = await getFamilyById(familyId);
 
     if (result.error || !result.family) {
