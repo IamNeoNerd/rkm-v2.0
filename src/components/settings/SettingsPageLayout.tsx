@@ -10,7 +10,7 @@ interface SettingsPageLayoutProps {
     children: React.ReactNode;
     title: string;
     description?: string;
-    icon: LucideIcon;
+    icon: React.ReactNode;
     showHeader?: boolean;
     maxWidth?: "md" | "lg" | "xl" | "none";
 }
@@ -19,7 +19,7 @@ export function SettingsPageLayout({
     children,
     title,
     description,
-    icon: Icon,
+    icon,
     showHeader = true,
     maxWidth = "xl"
 }: SettingsPageLayoutProps) {
@@ -55,7 +55,7 @@ export function SettingsPageLayout({
                     <div className="space-y-4">
                         <div className="flex items-center gap-4">
                             <div className="p-3 bg-indigo-50 rounded-xl">
-                                <Icon className="h-8 w-8 text-indigo-600" />
+                                {icon}
                             </div>
                             <div>
                                 <h1 className="text-3xl font-bold tracking-tight text-slate-900">{title}</h1>

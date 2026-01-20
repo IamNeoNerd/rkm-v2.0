@@ -10,22 +10,30 @@ test.describe('Dashboard Operations', () => {
     test('should display meaningful revenue and student metrics', async ({ authenticatedPage: page }) => {
         await navigateTo(page, '/');
 
-        await expect(page.locator('text=/Revenue/i')).toBeVisible();
-        await expect(page.locator('text=/Students/i')).toBeVisible();
+        // Use stable test IDs instead of text-based selectors
+        const revenueCard = page.getByTestId('stat-card-total-revenue-monthly');
+        const studentsCard = page.getByTestId('stat-card-active-students');
 
-        // Match approximate seeded student count
-        const studentStats = page.locator('div[class*="card"]:has-text("Students")');
-        await expect(studentStats).toContainText(/33|34|35|38/);
+        await expect(revenueCard).toBeVisible();
+        await expect(studentsCard).toBeVisible();
+
+        // Verify student count is within expected range
+        await expect(studentsCard).toContainText(/33|34|35|38/);
     });
 
     test('should show recent activity on dashboard', async ({ authenticatedPage: page }) => {
         await navigateTo(page, '/');
 
-        await expect(page.locator('text=/Recent Activity|Latest Transactions/i').first()).toBeVisible();
-        const activityList = page.locator('div[class*="activity"], div[class*="transaction"], table tr');
-        await expect(activityList.count()).toBeGreaterThan(0);
+        // Use test ID for the Recent Activity card
+        const activityCard = page.getByTestId('recent-activity-card');
+        await expect(activityCard).toBeVisible();
+
+        // Check that activity items exist using the stable test ID
+        const activityItems = page.getByTestId('activity-item');
+        await expect(activityItems.first()).toBeVisible();
     });
 });
+
 
 test.describe('Financial Reports Verification', () => {
     test('should display dues in aging report', async ({ authenticatedPage: page }) => {

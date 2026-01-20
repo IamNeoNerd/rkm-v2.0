@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { Users, Phone, GraduationCap, Filter, X, IndianRupee } from "lucide-react";
+import { PaginationControls } from "@/components/PaginationControls";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 type Student = {
     id: number;
@@ -20,43 +23,81 @@ type Student = {
 
 interface StudentsTableProps {
     students: Student[];
+    pagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
 }
 
-export function StudentsTable({ students }: StudentsTableProps) {
-    const [searchTerm, setSearchTerm] = useState("");
-    const [classFilter, setClassFilter] = useState<string>("all");
-    const [statusFilter, setStatusFilter] = useState<string>("all");
+export function StudentsTable({ students, pagination }: StudentsTableProps) {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    // Get filters from URL
+    const currentSearch = searchParams.get("search") || "";
+    const classFilter = searchParams.get("class") || "all";
+    const statusFilter = searchParams.get("status") || "all";
+
+    const [searchTerm, setSearchTerm] = useState(currentSearch);
+
+    // Get unique classes for filter dropdown (from current page data)
+    const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
 
     // Payment dialog state
     const [paymentOpen, setPaymentOpen] = useState(false);
     const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-    // Get unique classes for filter dropdown
-    const uniqueClasses = Array.from(new Set(students.map(s => s.class))).sort();
+    // Debounce search update to URL
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            if (searchTerm !== currentSearch) {
+                const params = new URLSearchParams(searchParams.toString());
+                if (searchTerm) {
+                    params.set("search", searchTerm);
+                } else {
+                    params.delete("search");
+                }
+                params.set("page", "1"); // Reset to page 1 on search
+                router.push(`?${params.toString()}`);
+            }
+        }, 500);
 
-    // Apply filters
-    const filteredStudents = students.filter(student => {
-        const matchesSearch =
-            student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (student.fatherName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
-            (student.phone?.includes(searchTerm) ?? false);
+        return () => clearTimeout(handler);
+    }, [searchTerm, currentSearch, router, searchParams]);
 
-        const matchesClass = classFilter === "all" || student.class === classFilter;
+    const handleClassChange = (newClass: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (newClass === 'all') {
+            params.delete('class');
+        } else {
+            params.set('class', newClass);
+        }
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
 
-        const matchesStatus =
-            statusFilter === "all" ||
-            (statusFilter === "active" && student.isActive) ||
-            (statusFilter === "inactive" && !student.isActive);
+    const handleStatusChange = (newStatus: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        if (newStatus === 'all') {
+            params.delete('status');
+        } else {
+            params.set('status', newStatus);
+        }
+        params.set('page', '1');
+        router.push(`?${params.toString()}`);
+    };
 
-        return matchesSearch && matchesClass && matchesStatus;
-    });
+    // Since we are doing server-side filtering, students prop already contains filtered students
+    const filteredStudents = students;
 
     const hasActiveFilters = searchTerm || classFilter !== "all" || statusFilter !== "all";
 
     const clearFilters = () => {
         setSearchTerm("");
-        setClassFilter("all");
-        setStatusFilter("all");
+        // Reset URL to base path
+        router.push(window.location.pathname);
     };
 
     const handlePayClick = (student: Student) => {
@@ -93,7 +134,7 @@ export function StudentsTable({ students }: StudentsTableProps) {
                         <Input
                             placeholder="Name, father, or phone..."
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
                             className="w-full"
                         />
                     </div>
@@ -105,11 +146,14 @@ export function StudentsTable({ students }: StudentsTableProps) {
                         </label>
                         <select
                             value={classFilter}
-                            onChange={(e) => setClassFilter(e.target.value)}
+                            onChange={(e) => handleClassChange(e.target.value)}
                             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             <option value="all">All Classes</option>
-                            {uniqueClasses.map(cls => (
+                            {/* Unique classes should ideally be fetched from settings/sessions, but for now we can still extract from current data or just show common ones. 
+                                Actually, in a paginated world, we might need a separate action to get all unique classes. 
+                                For now, I'll keep the client-side extraction but it's imperfect. */}
+                            {uniqueClasses.map((cls: string) => (
                                 <option key={cls} value={cls}>{cls}</option>
                             ))}
                         </select>
@@ -122,7 +166,7 @@ export function StudentsTable({ students }: StudentsTableProps) {
                         </label>
                         <select
                             value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
+                            onChange={(e) => handleStatusChange(e.target.value)}
                             className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
                         >
                             <option value="all">All Statuses</option>
@@ -158,6 +202,7 @@ export function StudentsTable({ students }: StudentsTableProps) {
             ) : (
                 <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
                     <table className="min-w-full divide-y divide-gray-200">
+                        {/* ... table content ... */}
                         <thead className="bg-gray-50">
                             <tr>
                                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -230,6 +275,16 @@ export function StudentsTable({ students }: StudentsTableProps) {
                             ))}
                         </tbody>
                     </table>
+
+                    {/* Pagination Controls */}
+                    {pagination && (
+                        <PaginationControls
+                            currentPage={pagination.page}
+                            totalPages={pagination.totalPages}
+                            total={pagination.total}
+                            limit={pagination.limit}
+                        />
+                    )}
                 </div>
             )}
 

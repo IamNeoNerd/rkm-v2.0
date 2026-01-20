@@ -122,7 +122,7 @@ export default function AuditLogsClient() {
         <SettingsPageLayout
             title="Audit Logs"
             description="Track all system activities and user actions"
-            icon={History}
+            icon={<History className="h-8 w-8 text-indigo-600" />}
         >
             <div className="flex justify-end mb-6">
                 <Button onClick={() => fetchLogs()} variant="outline" disabled={loading}>

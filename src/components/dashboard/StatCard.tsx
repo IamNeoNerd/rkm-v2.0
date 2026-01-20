@@ -13,8 +13,11 @@ interface StatCardProps {
 }
 
 export function StatCard({ title, value, description, icon, trend, trendUp, className }: StatCardProps) {
+    // Generate test ID from title for E2E testing
+    const testId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
     return (
-        <Card className={cn("overflow-hidden hover:shadow-md transition-shadow", className)}>
+        <Card className={cn("overflow-hidden hover:shadow-md transition-shadow", className)} data-testid={`stat-card-${testId}`}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                     {title}

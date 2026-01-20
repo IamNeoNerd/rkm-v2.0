@@ -87,7 +87,7 @@ export default function SessionsSettingsPage() {
         <SettingsPageLayout
             title="Academic Sessions"
             description="Manage academic years and session periods"
-            icon={Calendar}
+            icon={<Calendar className="h-8 w-8 text-indigo-600" />}
             maxWidth="lg"
         >
             <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">

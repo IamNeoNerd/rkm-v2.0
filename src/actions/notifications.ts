@@ -93,6 +93,7 @@ export async function createBulkNotifications(
 // ============================================
 
 export async function getUserNotifications(options?: {
+    page?: number;
     limit?: number;
     unreadOnly?: boolean;
 }) {
@@ -102,7 +103,8 @@ export async function getUserNotifications(options?: {
             return { success: false, error: "Unauthorized", notifications: [] };
         }
 
-        const { limit = 20, unreadOnly = false } = options || {};
+        const { page = 1, limit = 20, unreadOnly = false } = options || {};
+        const offset = (page - 1) * limit;
 
         // Get user ID from email
         const [user] = await db
@@ -112,7 +114,7 @@ export async function getUserNotifications(options?: {
             .limit(1);
 
         if (!user) {
-            return { success: true, notifications: [], unreadCount: 0 };
+            return { success: true, notifications: [], unreadCount: 0, pagination: { total: 0, page, limit, totalPages: 0 } };
         }
 
         // Build conditions
@@ -126,9 +128,10 @@ export async function getUserNotifications(options?: {
             .from(notifications)
             .where(and(...conditions))
             .orderBy(desc(notifications.createdAt))
-            .limit(limit);
+            .limit(limit)
+            .offset(offset);
 
-        // Get unread count
+        // Get counts
         const [unreadResult] = await db
             .select({ count: count() })
             .from(notifications)
@@ -136,6 +139,13 @@ export async function getUserNotifications(options?: {
                 eq(notifications.userId, user.id),
                 eq(notifications.isRead, false)
             ));
+
+        const [totalResult] = await db
+            .select({ count: count() })
+            .from(notifications)
+            .where(and(...conditions));
+
+        const total = Number(totalResult?.count || 0);
 
         const parsedNotifications: Notification[] = results.map(n => ({
             ...n,
@@ -145,7 +155,13 @@ export async function getUserNotifications(options?: {
         return {
             success: true,
             notifications: parsedNotifications,
-            unreadCount: unreadResult?.count || 0,
+            unreadCount: Number(unreadResult?.count || 0),
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
         };
     } catch (error) {
         logger.error("Failed to fetch notifications", error);
@@ -361,25 +377,47 @@ export async function sendSystemNotification(
 }
 
 // ============================================
-// Cleanup Old Notifications
+// Delete Notifications
 // ============================================
 
-export async function cleanupOldNotifications(daysOld: number = 30) {
+export async function deleteNotification(id: number) {
     try {
-        const cutoffDate = new Date();
-        cutoffDate.setDate(cutoffDate.getDate() - daysOld);
+        const session = await auth();
+        if (!session?.user?.email) {
+            return { success: false, error: "Unauthorized" };
+        }
 
-        const result = await db
-            .delete(notifications)
-            .where(and(
-                eq(notifications.isRead, true),
-                lte(notifications.createdAt, cutoffDate)
-            ));
-
-        logger.info(`Cleaned up old notifications older than ${daysOld} days`);
+        await db.delete(notifications).where(eq(notifications.id, id));
         return { success: true };
     } catch (error) {
-        logger.error("Failed to cleanup notifications", error);
-        return { success: false, error: "Failed to cleanup notifications" };
+        logger.error("Failed to delete notification", error);
+        return { success: false, error: "Failed to delete notification" };
+    }
+}
+
+export async function deleteAllNotifications() {
+    try {
+        const session = await auth();
+        if (!session?.user?.email) {
+            return { success: false, error: "Unauthorized" };
+        }
+
+        // Get user ID
+        const [user] = await db
+            .select({ id: users.id })
+            .from(users)
+            .where(eq(users.email, session.user.email))
+            .limit(1);
+
+        if (!user) {
+            return { success: false, error: "User not found" };
+        }
+
+        await db.delete(notifications).where(eq(notifications.userId, user.id));
+
+        return { success: true };
+    } catch (error) {
+        logger.error("Failed to delete all notifications", error);
+        return { success: false, error: "Failed to clear notification history" };
     }
 }

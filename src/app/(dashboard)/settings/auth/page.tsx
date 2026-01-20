@@ -111,7 +111,7 @@ export default function AuthSettingsPage() {
         <SettingsPageLayout
             title="Authentication Settings"
             description="Configure how users log in and access the system."
-            icon={Save}
+            icon={<Save className="h-8 w-8 text-indigo-600" />}
             maxWidth="lg"
         >
             <Form {...form}>

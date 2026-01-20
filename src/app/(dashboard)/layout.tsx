@@ -4,6 +4,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { CommandPalette } from "@/components/CommandPalette"
 import { NotificationBell } from "@/components/NotificationBell"
 import { SkipLink } from "@/components/SkipLink"
+import { UserNav } from "@/components/layout/UserNav";
 
 export default function DashboardLayout({
     children,
@@ -24,28 +25,23 @@ export default function DashboardLayout({
             </nav>
 
             <div className="flex flex-1 flex-col lg:pl-72 w-full">
-                {/* Header: Mobile & Tablet */}
+                {/* Unified Header: Works on all viewports */}
                 <header
-                    className="sticky top-0 z-20 flex h-16 items-center justify-between border-b bg-white px-4 lg:hidden"
+                    className="sticky top-0 z-20 flex h-16 lg:h-14 items-center justify-between border-b bg-white px-4 lg:px-6"
                     role="banner"
                 >
-                    <div className="flex items-center gap-2">
+                    {/* Left side: Mobile nav + branding (mobile/tablet only) */}
+                    <div className="flex items-center gap-2 lg:hidden">
                         <MobileNav />
                         <span className="font-semibold text-lg text-indigo-600">RK Institute ERP</span>
                     </div>
-                    <div className="flex items-center gap-2">
+
+                    {/* Right side: Notification bell + Command palette (all viewports) */}
+                    <div className="flex items-center gap-4 ml-auto">
                         <NotificationBell />
                         <CommandPalette />
+                        <UserNav />
                     </div>
-                </header>
-
-                {/* Header: Desktop */}
-                <header
-                    className="hidden lg:flex sticky top-0 z-20 h-14 items-center justify-end border-b bg-white px-6 gap-3"
-                    role="banner"
-                >
-                    <NotificationBell />
-                    <CommandPalette />
                 </header>
 
                 {/* Main Content */}

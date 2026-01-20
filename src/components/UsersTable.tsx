@@ -19,9 +19,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCircle2, ShieldAlert, Loader2, Trash2 } from "lucide-react";
+import { CheckCircle2, ShieldAlert, Loader2, Trash2, Key } from "lucide-react";
 import { toast } from "sonner";
-import { updateUserRole, deleteUser, verifyUser } from "@/actions/users";
+import { updateUserRole, deleteUser, verifyUser, resetUserPassword } from "@/actions/users";
 import { useSession } from "next-auth/react";
 
 interface User {
@@ -31,12 +31,13 @@ interface User {
     role: string;
     isVerified: boolean;
     image: string | null;
-    createdAt: Date | null;
+    createdAt: string | null;
 }
 
 export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
     const [users, setUsers] = useState(initialUsers);
     const [loadingId, setLoadingId] = useState<string | null>(null);
+    const [resetPasswordId, setResetPasswordId] = useState<string | null>(null);
     const { data: session } = useSession();
 
     const handleRoleChange = async (userId: string, newRole: string) => {
@@ -77,6 +78,24 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
             toast.error(error instanceof Error ? error.message : "Failed to delete user");
         } finally {
             setLoadingId(null);
+        }
+    };
+
+    const handleResetPassword = async (userId: string) => {
+        const password = prompt("Enter new password (min 8 characters):");
+        if (!password || password.length < 8) {
+            if (password) toast.error("Password must be at least 8 characters");
+            return;
+        }
+
+        setResetPasswordId(userId);
+        try {
+            await resetUserPassword(userId, password);
+            toast.success("Password reset successfully");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to reset password");
+        } finally {
+            setResetPasswordId(null);
         }
     };
 
@@ -138,7 +157,10 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
                                     <SelectContent>
                                         <SelectItem value="super-admin">Super Admin</SelectItem>
                                         <SelectItem value="admin">Admin</SelectItem>
-                                        <SelectItem value="user">Standard User</SelectItem>
+                                        <SelectItem value="teacher">Teacher</SelectItem>
+                                        <SelectItem value="cashier">Cashier</SelectItem>
+                                        <SelectItem value="parent">Parent</SelectItem>
+                                        <SelectItem value="user">Pending User</SelectItem>
                                     </SelectContent>
                                 </Select>
                             )}
@@ -159,6 +181,22 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
                                         <Loader2 className="h-3 w-3 animate-spin" />
                                     ) : (
                                         "Verify"
+                                    )}
+                                </Button>
+                            )}
+                            {user.id !== session?.user?.id && (
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-8 w-8 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                    onClick={() => handleResetPassword(user.id)}
+                                    disabled={resetPasswordId === user.id}
+                                    title="Reset Password"
+                                >
+                                    {resetPasswordId === user.id ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <Key className="h-4 w-4" />
                                     )}
                                 </Button>
                             )}

@@ -10,18 +10,31 @@ import { safeRevalidatePath } from "@/lib/server-utils";
 export async function getUsers() {
     const session = await auth();
     if (!session || session.user.role !== "super-admin") {
-        throw new Error("Unauthorized");
+        return { success: false, error: "Unauthorized", users: [] };
     }
 
-    return await db.select({
-        id: users.id,
-        name: users.name,
-        email: users.email,
-        role: users.role,
-        isVerified: users.isVerified,
-        image: users.image,
-        createdAt: users.createdAt,
-    }).from(users);
+    try {
+        const userList = await db.select({
+            id: users.id,
+            name: users.name,
+            email: users.email,
+            role: users.role,
+            isVerified: users.isVerified,
+            image: users.image,
+            createdAt: users.createdAt,
+        }).from(users);
+
+        // Serialize dates for SSR compatibility
+        const serializedUsers = userList.map(u => ({
+            ...u,
+            createdAt: u.createdAt?.toISOString() || null,
+        }));
+
+        return { success: true, users: serializedUsers };
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        return { success: false, error: "Failed to fetch users", users: [] };
+    }
 }
 
 export async function verifyUser(userId: string) {
@@ -47,7 +60,7 @@ export async function updateUserRole(userId: string, newRole: string) {
     }
 
     // Role validation
-    if (!["super-admin", "admin", "user"].includes(newRole)) {
+    if (!["super-admin", "admin", "teacher", "cashier", "parent", "user"].includes(newRole)) {
         throw new Error("Invalid role");
     }
 
@@ -99,6 +112,36 @@ export async function deleteUser(userId: string) {
     await db.delete(users).where(eq(users.id, userId));
 
     await audit(AuditAction.USER_DELETE, { userId }, 'user', userId);
+
+    safeRevalidatePath("/settings/users");
+    return { success: true };
+}
+
+/**
+ * Reset password for any user (admin/super-admin only)
+ */
+export async function resetUserPassword(userId: string, newPassword: string) {
+    const session = await auth();
+    if (!session || !["super-admin", "admin"].includes(session.user.role)) {
+        throw new Error("Unauthorized");
+    }
+
+    if (!newPassword || newPassword.length < 8) {
+        throw new Error("Password must be at least 8 characters");
+    }
+
+    // Import bcrypt dynamically to avoid issues
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    await db.update(users)
+        .set({
+            password: hashedPassword,
+            updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+
+    await audit(AuditAction.USER_UPDATE, { userId, action: "password_reset" }, 'user', userId);
 
     safeRevalidatePath("/settings/users");
     return { success: true };

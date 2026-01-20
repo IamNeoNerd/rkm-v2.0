@@ -15,7 +15,7 @@ export class AuthorizationError extends Error {
 /**
  * Valid roles in the system
  */
-export type UserRole = "super-admin" | "admin" | "user";
+export type UserRole = "super-admin" | "admin" | "teacher" | "cashier" | "parent" | "user";
 
 /**
  * Get the current session or throw if not authenticated

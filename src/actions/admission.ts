@@ -3,7 +3,7 @@
 
 import { db } from "@/db";
 import { families, students, transactions } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
 import { calculateJoiningFee } from "@/lib/billing";
 import { safeRevalidatePath } from "@/lib/server-utils";
 import { requireAuth, AuthorizationError } from "@/lib/auth-guard";
@@ -103,17 +103,35 @@ export async function getAllStudents(options?: {
     page?: number;
     limit?: number;
     search?: string;
+    class?: string;
+    status?: string;
 }) {
     try {
         const page = options?.page || 1;
         const limit = options?.limit || 20;
         const offset = (page - 1) * limit;
         const search = options?.search?.trim() || '';
+        const className = options?.class;
+        const status = options?.status;
 
-        // Build where condition
-        const whereCondition = search
-            ? sql`${students.name} ILIKE ${'%' + search + '%'} OR ${families.fatherName} ILIKE ${'%' + search + '%'} OR ${families.phone} ILIKE ${'%' + search + '%'}`
-            : undefined;
+        // Build where conditions
+        let whereConditions = [];
+
+        if (search) {
+            whereConditions.push(sql`${students.name} ILIKE ${'%' + search + '%'} OR ${families.fatherName} ILIKE ${'%' + search + '%'} OR ${families.phone} ILIKE ${'%' + search + '%'}`);
+        }
+
+        if (className && className !== 'all') {
+            whereConditions.push(eq(students.class, className));
+        }
+
+        if (status === 'active') {
+            whereConditions.push(eq(students.isActive, true));
+        } else if (status === 'inactive') {
+            whereConditions.push(eq(students.isActive, false));
+        }
+
+        const whereClause = whereConditions.length > 0 ? and(...whereConditions) : undefined;
 
         // Get paginated results
         const queryBuilder = db
@@ -130,14 +148,20 @@ export async function getAllStudents(options?: {
             .from(students)
             .leftJoin(families, eq(students.familyId, families.id));
 
-        const allStudents = whereCondition
-            ? await queryBuilder.where(whereCondition).orderBy(students.name).limit(limit).offset(offset)
+        const allStudents = whereClause
+            ? await queryBuilder.where(whereClause).orderBy(students.name).limit(limit).offset(offset)
             : await queryBuilder.orderBy(students.name).limit(limit).offset(offset);
 
-        // Get total count for pagination
-        const countResult = await db
+        // Get total count for pagination (correctly taking filters into account)
+        const countQueryBuilder = db
             .select({ count: sql<number>`count(*)` })
-            .from(students);
+            .from(students)
+            .leftJoin(families, eq(students.familyId, families.id));
+
+        const countResult = whereClause
+            ? await countQueryBuilder.where(whereClause)
+            : await countQueryBuilder;
+
         const total = Number(countResult[0]?.count || 0);
 
         return {

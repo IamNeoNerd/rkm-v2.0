@@ -114,6 +114,7 @@ export function NotificationBell() {
                 size="icon"
                 className="relative h-9 w-9"
                 onClick={() => setOpen(!open)}
+                data-testid="notification-bell-button"
             >
                 <Bell className="h-5 w-5 text-gray-600" />
                 {unreadCount > 0 && (
@@ -125,7 +126,7 @@ export function NotificationBell() {
 
             {/* Dropdown */}
             {open && (
-                <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border z-50 overflow-hidden">
+                <div className="absolute right-0 top-full mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-xl border z-50 overflow-hidden" data-testid="notification-dropdown">
                     {/* Header */}
                     <div className="flex items-center justify-between px-4 py-3 border-b bg-gray-50">
                         <h3 className="font-semibold text-gray-900">Notifications</h3>

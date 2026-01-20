@@ -44,17 +44,25 @@ test.describe('Dashboard', () => {
         await page.goto('/');
         await waitForPageLoad(page);
 
-        // Find and click bell icon
-        // The bell should be in the header area
-        const header = page.locator('header');
-        const buttons = header.locator('button');
+        // Wait for network idle to ensure all components are loaded
+        await page.waitForLoadState('networkidle');
 
-        // Click the first button that looks like a notification (has bell svg)
-        await buttons.first().click();
+        // Click the notification bell using stable test ID
+        const bellButton = page.getByTestId('notification-bell-button');
 
-        // Should show notification dropdown or panel
-        await page.waitForTimeout(500);
+        // Ensure button is visible and stable before clicking
+        await expect(bellButton).toBeVisible();
+        await bellButton.waitFor({ state: 'attached' });
+        await bellButton.click({ force: false });
+
+        // Verify the dropdown appears
+        const dropdown = page.getByTestId('notification-dropdown');
+        await expect(dropdown).toBeVisible({ timeout: 5000 });
+
+        // Verify dropdown contains the "Notifications" heading
+        await expect(dropdown).toContainText('Notifications');
     });
+
 });
 
 test.describe('Sidebar Navigation', () => {

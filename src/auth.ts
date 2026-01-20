@@ -31,19 +31,20 @@ declare module "next-auth/jwt" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-    adapter: DrizzleAdapter(db, {
-        usersTable: users,
-        accountsTable: accounts,
-        sessionsTable: sessions,
-        verificationTokensTable: verificationTokens,
-    }),
+    // adapter: DrizzleAdapter(db, {
+    //     usersTable: users,
+    //     accountsTable: accounts,
+    //     sessionsTable: sessions,
+    //     verificationTokensTable: verificationTokens,
+    // }),
     session: {
         strategy: "jwt",
     },
+    secret: process.env.AUTH_SECRET,
     pages: {
         signIn: "/login",
     },
-    debug: process.env.NODE_ENV === "development",
+    debug: true,
     trustHost: true,
     providers: [
         GoogleProvider({
@@ -60,27 +61,46 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         CredentialsProvider({
             name: "credentials",
             credentials: {
-                email: { label: "Email", type: "email" },
+                identifier: { label: "Email or Phone", type: "text" },
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
+                console.log("[AUTH] Authorize start", { identifier: credentials?.identifier });
                 // Check if credentials login is enabled
                 const settings = await getAuthSettingsInternal();
                 if (!settings.credentialsEnabled) {
+                    console.log("[AUTH] Credentials disabled by settings");
                     throw new Error("Email/password login is currently disabled");
                 }
 
-                if (!credentials?.email || !credentials?.password) {
+                if (!credentials?.identifier || !credentials?.password) {
+                    console.log("[AUTH] Missing credentials");
                     throw new Error("Missing credentials");
                 }
 
-                const [user] = await db
-                    .select()
-                    .from(users)
-                    .where(eq(users.email, credentials.email as string))
-                    .limit(1);
+                const identifier = (credentials.identifier as string).trim();
+                const isPhone = /^\d{10}$/.test(identifier);
+
+                let user;
+
+                if (isPhone) {
+                    // Phone login - look up by phone
+                    [user] = await db
+                        .select()
+                        .from(users)
+                        .where(eq(users.phone, identifier))
+                        .limit(1);
+                } else {
+                    // Email login
+                    [user] = await db
+                        .select()
+                        .from(users)
+                        .where(eq(users.email, identifier.toLowerCase()))
+                        .limit(1);
+                }
 
                 if (!user || !user.password) {
+                    console.log("[AUTH] User not found or no password", { email: identifier });
                     throw new Error("Invalid credentials");
                 }
 
@@ -90,11 +110,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 );
 
                 if (!isValidPassword) {
+                    console.log("[AUTH] Invalid password for user", { email: identifier });
                     throw new Error("Invalid credentials");
                 }
 
+                console.log("[AUTH] Authorize success", { id: user.id, email: user.email, role: user.role });
                 return {
-                    id: user.id,
+                    id: String(user.id),
                     email: user.email,
                     name: user.name,
                     role: user.role,
@@ -105,6 +127,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account, profile }) {
+            console.log("[AUTH] SignIn callback", { provider: account?.provider, email: user.email });
             // Check provider-specific settings
             if (account?.provider === "google") {
                 const settings = await getAuthSettingsInternal();
@@ -146,34 +169,23 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return true;
         },
         async jwt({ token, user, trigger, session }) {
+            // Log only on significant events to keep logs clean
             if (user) {
+                console.log("[AUTH] JWT callback (initial login)", { email: user.email, role: user.role });
                 token.id = user.id;
                 token.role = user.role;
                 token.isVerified = user.isVerified;
-            } else if (token.email) {
-                // Fetch fresh data from DB to ensure session stays in sync with admin changes
-                const [dbUser] = await db
-                    .select({
-                        role: users.role,
-                        isVerified: users.isVerified,
-                    })
-                    .from(users)
-                    .where(eq(users.email, token.email))
-                    .limit(1);
-
-                if (dbUser) {
-                    token.role = dbUser.role;
-                    token.isVerified = dbUser.isVerified;
-                }
             }
 
             if (trigger === "update" && session) {
+                console.log("[AUTH] JWT callback (manual update)", { newRole: session.user?.role });
                 return { ...token, ...session.user };
             }
 
             return token;
         },
         async session({ session, token }) {
+            console.log("[AUTH] Session callback", { tokenRole: token?.role });
             if (token && session.user) {
                 session.user.role = token.role as string;
                 session.user.isVerified = token.isVerified as boolean;

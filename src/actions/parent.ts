@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { families, students, transactions } from "@/db/schema";
+import { families, students, transactions, attendance, batches, enrollments, staff } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 // Lookup family by phone number (parent portal)
@@ -64,6 +64,7 @@ export async function getParentPaymentHistory(familyId: number, limit = 10) {
                 description: transactions.description,
                 createdAt: transactions.createdAt,
                 receiptNumber: transactions.receiptNumber,
+                paymentMode: transactions.paymentMode,
             })
             .from(transactions)
             .where(eq(transactions.familyId, familyId))
@@ -74,5 +75,60 @@ export async function getParentPaymentHistory(familyId: number, limit = 10) {
     } catch (error) {
         console.error("Error fetching payment history:", error);
         return { transactions: [], error: "Failed to fetch history" };
+    }
+}
+// Get attendance for a student
+export async function getStudentAttendance(studentId: number, month?: number, year?: number) {
+    try {
+        const query = db
+            .select({
+                id: attendance.id,
+                date: attendance.date,
+                status: attendance.status,
+                batchId: attendance.batchId,
+            })
+            .from(attendance)
+            .where(eq(attendance.studentId, studentId));
+
+        // If month/year provided, filter (Postgres date is YYYY-MM-DD string or Date object depending on driver)
+        // For Postgres, we can use string matching or date functions. 
+        // Simple approach: Fetch all and filter in JS if the numbers are small, or use sql``
+        const records = await query;
+
+        // Basic filtering if month/year are provided
+        const filtered = records.filter(r => {
+            const d = new Date(r.date);
+            if (month !== undefined && d.getMonth() !== month) return false;
+            if (year !== undefined && d.getFullYear() !== year) return false;
+            return true;
+        });
+
+        return { attendance: filtered };
+    } catch (error) {
+        console.error("Error fetching attendance:", error);
+        return { attendance: [], error: "Failed to fetch attendance" };
+    }
+}
+
+// Get batches a student is enrolled in
+export async function getStudentBatches(studentId: number) {
+    try {
+        const studentBatches = await db
+            .select({
+                id: batches.id,
+                name: batches.name,
+                schedule: batches.schedule,
+                teacherName: staff.name,
+                isActive: enrollments.isActive
+            })
+            .from(enrollments)
+            .innerJoin(batches, eq(enrollments.batchId, batches.id))
+            .leftJoin(staff, eq(batches.teacherId, staff.id))
+            .where(eq(enrollments.studentId, studentId));
+
+        return { batches: studentBatches };
+    } catch (error) {
+        console.error("Error fetching student batches:", error);
+        return { batches: [], error: "Failed to fetch schedules" };
     }
 }

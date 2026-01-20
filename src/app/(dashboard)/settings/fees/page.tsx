@@ -112,7 +112,7 @@ export default function FeesSettingsPage() {
         <SettingsPageLayout
             title="Fee Structure"
             description="Configure class-wise monthly and admission fees"
-            icon={IndianRupee}
+            icon={<IndianRupee className="h-8 w-8 text-indigo-600" />}
             maxWidth="lg"
         >
             <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">

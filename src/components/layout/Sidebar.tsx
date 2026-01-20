@@ -18,7 +18,11 @@ import {
     Calendar,
     ChevronDown,
     IndianRupee,
-    TrendingUp
+    TrendingUp,
+    Shield,
+    Bell,
+    Key,
+    User
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
 import { type LucideIcon } from "lucide-react"
@@ -49,6 +53,11 @@ const sidebarNavItems: SidebarNavItem[] = [
         title: "Students",
         href: "/students",
         icon: Users,
+    },
+    {
+        title: "Families",
+        href: "/families",
+        icon: UsersRound,
     },
     {
         title: "Academics",
@@ -101,7 +110,44 @@ const sidebarNavItems: SidebarNavItem[] = [
         title: "Settings",
         href: "/settings",
         icon: Settings,
-        role: "super-admin"
+        role: "super-admin",
+        children: [
+            {
+                title: "User Management",
+                href: "/settings/users",
+                icon: UsersRound,
+            },
+            {
+                title: "Fee Structure",
+                href: "/settings/fees",
+                icon: IndianRupee,
+            },
+            {
+                title: "Academic Sessions",
+                href: "/settings/sessions",
+                icon: Calendar,
+            },
+            {
+                title: "Authentication",
+                href: "/settings/auth",
+                icon: Shield,
+            },
+            {
+                title: "Activity Logs",
+                href: "/settings/audit-logs",
+                icon: History,
+            },
+            {
+                title: "Notifications",
+                href: "/settings/notifications",
+                icon: Bell,
+            },
+            {
+                title: "My Profile",
+                href: "/settings/profile",
+                icon: User,
+            },
+        ]
     },
 ]
 
@@ -113,7 +159,7 @@ export function Sidebar({ className }: SidebarProps) {
     const userRole = session?.user?.role || "user"
 
     // Track which groups are expanded
-    const [expandedGroups, setExpandedGroups] = useState<string[]>(["Billing"])
+    const [expandedGroups, setExpandedGroups] = useState<string[]>([])
 
     const toggleGroup = (title: string) => {
         setExpandedGroups(prev =>

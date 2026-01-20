@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Phone, Users, CreditCard, Calendar, Receipt, ChevronRight, Wallet, X } from "lucide-react";
+import { Phone, Users, CreditCard, Calendar, Receipt, ChevronRight, Wallet, X, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { lookupFamilyByPhone, getFamilyChildren, getParentPaymentHistory } from "@/actions/parent";
@@ -23,12 +23,17 @@ type Child = {
 
 type Transaction = {
     id: number;
-    type: string;
+    type: "CREDIT" | "DEBIT";
     amount: number;
     description: string | null;
     createdAt: Date;
     receiptNumber: string | null;
+    paymentMode: string | null;
 };
+
+import { ParentPortalSkeleton } from "@/components/ui/skeletons";
+import { StudentDetails } from "@/components/parent/StudentDetails";
+import { ReceiptModal } from "@/components/ReceiptModal";
 
 export default function ParentPortal() {
     const [phone, setPhone] = useState("");
@@ -39,6 +44,13 @@ export default function ParentPortal() {
     const [children, setChildren] = useState<Child[]>([]);
     const [transactions, setTransactions] = useState<Transaction[]>([]);
 
+    // Detail View State
+    const [selectedStudent, setSelectedStudent] = useState<Child | null>(null);
+    const [detailsOpen, setDetailsOpen] = useState(false);
+
+    // Receipt Modal State
+    const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
+
     const handleLookup = async () => {
         if (phone.length !== 10) {
             setError("Please enter a valid 10-digit phone number");
@@ -48,26 +60,31 @@ export default function ParentPortal() {
         setIsLoading(true);
         setError("");
 
-        const result = await lookupFamilyByPhone(phone);
+        try {
+            const result = await lookupFamilyByPhone(phone);
 
-        if (result.error) {
-            setError(result.error);
-            setFamily(null);
-            setChildren([]);
-            setTransactions([]);
-        } else if (result.family) {
-            setFamily(result.family);
+            if (result.error) {
+                setError(result.error);
+                setFamily(null);
+                setChildren([]);
+                setTransactions([]);
+            } else if (result.family) {
+                setFamily(result.family);
 
-            // Fetch children and payments
-            const [childrenRes, paymentsRes] = await Promise.all([
-                getFamilyChildren(result.family.id),
-                getParentPaymentHistory(result.family.id),
-            ]);
+                // Fetch children and payments
+                const [childrenRes, paymentsRes] = await Promise.all([
+                    getFamilyChildren(result.family.id),
+                    getParentPaymentHistory(result.family.id),
+                ]);
 
-            setChildren(childrenRes.children || []);
-            setTransactions(paymentsRes.transactions || []);
+                setChildren(childrenRes.children || []);
+                setTransactions(paymentsRes.transactions as Transaction[] || []);
+            }
+        } catch (err) {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     };
 
     const handleReset = () => {
@@ -76,7 +93,34 @@ export default function ParentPortal() {
         setChildren([]);
         setTransactions([]);
         setError("");
+        setDetailsOpen(false);
+        setSelectedStudent(null);
+        setSelectedReceipt(null);
     };
+
+    const handleChildClick = (child: Child) => {
+        setSelectedStudent(child);
+        setDetailsOpen(true);
+    };
+
+    const handleReceiptClick = (txn: Transaction) => {
+        if (txn.type === 'CREDIT' && family) {
+            setSelectedReceipt({
+                receiptNumber: txn.receiptNumber || `PAY-${txn.id}`,
+                date: txn.createdAt,
+                familyName: family.fatherName,
+                familyId: family.id,
+                amount: txn.amount,
+                paymentMode: txn.paymentMode || 'CASH',
+                newBalance: family.balance // Showing current balance as approximation
+            });
+        }
+    };
+
+    // Show skeleton while loading details after phone submission
+    if (isLoading) {
+        return <ParentPortalSkeleton />;
+    }
 
     // If not logged in, show phone input
     if (!family) {
@@ -177,20 +221,24 @@ export default function ParentPortal() {
                 ) : (
                     <div className="space-y-3">
                         {children.map((child) => (
-                            <div
+                            <button
                                 key={child.id}
-                                className={`p-4 rounded-lg border ${child.isActive ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200'}`}
+                                onClick={() => handleChildClick(child)}
+                                className={`w-full text-left p-4 rounded-lg border transition-all hover:shadow-md active:scale-[0.98] ${child.isActive ? 'bg-indigo-50 border-indigo-200' : 'bg-gray-50 border-gray-200'}`}
                             >
                                 <div className="flex items-center justify-between">
-                                    <div>
-                                        <p className="font-semibold text-gray-900">{child.name}</p>
-                                        <p className="text-sm text-gray-600">{child.class}</p>
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2 bg-white rounded-full">
+                                            <GraduationCap className="h-5 w-5 text-indigo-600" />
+                                        </div>
+                                        <div>
+                                            <p className="font-semibold text-gray-900">{child.name}</p>
+                                            <p className="text-xs text-gray-600">{child.class}</p>
+                                        </div>
                                     </div>
-                                    <span className={`px-2 py-1 text-xs rounded-full ${child.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
-                                        {child.isActive ? 'Active' : 'Inactive'}
-                                    </span>
+                                    <ChevronRight className="h-5 w-5 text-indigo-300" />
                                 </div>
-                            </div>
+                            </button>
                         ))}
                     </div>
                 )}
@@ -208,17 +256,18 @@ export default function ParentPortal() {
                 ) : (
                     <div className="space-y-3">
                         {transactions.map((txn) => (
-                            <div
+                            <button
                                 key={txn.id}
-                                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                                onClick={() => handleReceiptClick(txn)}
+                                className={`w-full flex items-center justify-between p-3 rounded-lg transition-colors ${txn.type === 'CREDIT' ? 'bg-gray-50 hover:bg-green-50 cursor-pointer' : 'bg-gray-50 opacity-80 cursor-default'}`}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${txn.type === 'CREDIT' ? 'bg-green-100' : 'bg-red-100'}`}>
                                         <CreditCard className={`h-4 w-4 ${txn.type === 'CREDIT' ? 'text-green-600' : 'text-red-600'}`} />
                                     </div>
-                                    <div>
+                                    <div className="text-left">
                                         <p className="text-sm font-medium text-gray-900">
-                                            {txn.type === 'CREDIT' ? 'Payment' : 'Fee Charge'}
+                                            {txn.type === 'CREDIT' ? 'Payment Received' : 'Fee Charge'}
                                         </p>
                                         <div className="flex items-center gap-1 text-xs text-gray-500">
                                             <Calendar className="h-3 w-3" />
@@ -226,14 +275,32 @@ export default function ParentPortal() {
                                         </div>
                                     </div>
                                 </div>
-                                <span className={`font-semibold ${txn.type === 'CREDIT' ? 'text-green-700' : 'text-red-700'}`}>
-                                    {txn.type === 'CREDIT' ? '+' : '-'}₹{txn.amount}
-                                </span>
-                            </div>
+                                <div>
+                                    <p className={`font-semibold text-right ${txn.type === 'CREDIT' ? 'text-green-700' : 'text-red-700'}`}>
+                                        {txn.type === 'CREDIT' ? '+' : '-'}₹{txn.amount}
+                                    </p>
+                                    <p className="text-[10px] text-gray-400 font-mono text-right">{txn.receiptNumber || 'No Receipt'}</p>
+                                </div>
+                            </button>
                         ))}
                     </div>
                 )}
             </div>
+
+            {/* Student Detail View */}
+            <StudentDetails
+                student={selectedStudent}
+                isOpen={detailsOpen}
+                onClose={() => setDetailsOpen(false)}
+            />
+
+            {/* Receipt Modal */}
+            {selectedReceipt && (
+                <ReceiptModal
+                    receipt={selectedReceipt}
+                    onClose={() => setSelectedReceipt(null)}
+                />
+            )}
         </div>
     );
 }

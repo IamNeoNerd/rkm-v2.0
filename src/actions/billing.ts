@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { families, students, enrollments, batches, transactions, feeStructures } from "@/db/schema";
-import { eq, sql, inArray, and } from "drizzle-orm";
+import { eq, sql, inArray, and, desc } from "drizzle-orm";
 import { safeRevalidatePath } from "@/lib/server-utils";
 import { z } from "zod";
 import { requireRole, AuthorizationError, requireAuth } from "@/lib/auth-guard";
@@ -220,8 +220,39 @@ export async function processPayment(data: { familyId: string; amount: number; m
     }
 }
 
-export async function getRecentTransactions(limit = 50) {
+export async function getRecentTransactions(options: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    type?: string;
+    mode?: string;
+} = {}) {
+    const {
+        page = 1,
+        limit = 50,
+        search = "",
+        type = "all",
+        mode = "all"
+    } = options;
+
+    const offset = (page - 1) * limit;
+
     try {
+        let whereClause = and();
+
+        if (search) {
+            const searchTerm = `%${search.toLowerCase()}%`;
+            whereClause = and(whereClause, sql`(LOWER(${transactions.receiptNumber}) LIKE ${searchTerm} OR LOWER(${families.fatherName}) LIKE ${searchTerm})`);
+        }
+
+        if (type !== "all") {
+            whereClause = and(whereClause, eq(transactions.type, type as "CREDIT" | "DEBIT"));
+        }
+
+        if (mode !== "all") {
+            whereClause = and(whereClause, eq(transactions.paymentMode, mode));
+        }
+
         const recentTransactions = await db
             .select({
                 id: transactions.id,
@@ -239,10 +270,29 @@ export async function getRecentTransactions(limit = 50) {
             })
             .from(transactions)
             .leftJoin(families, eq(transactions.familyId, families.id))
-            .orderBy(sql`${transactions.createdAt} DESC`)
-            .limit(limit);
+            .where(whereClause)
+            .orderBy(desc(transactions.createdAt))
+            .limit(limit)
+            .offset(offset);
 
-        return { transactions: recentTransactions };
+        // Get total count for pagination
+        const [countResult] = await db
+            .select({ count: sql<number>`count(*)` })
+            .from(transactions)
+            .leftJoin(families, eq(transactions.familyId, families.id))
+            .where(whereClause);
+
+        const total = Number(countResult?.count || 0);
+
+        return {
+            transactions: recentTransactions,
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     } catch (error) {
         console.error("Error fetching transactions:", error);
         return { transactions: [], error: "Failed to fetch transactions" };

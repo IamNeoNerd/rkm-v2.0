@@ -43,7 +43,7 @@ export default function ProfileSettingsPage() {
         <SettingsPageLayout
             title="Change Password"
             description="Update your account password"
-            icon={KeyRound}
+            icon={<KeyRound className="h-8 w-8 text-indigo-600" />}
             maxWidth="lg"
         >
             <div className="bg-white rounded-lg shadow-md p-6 max-w-xl">

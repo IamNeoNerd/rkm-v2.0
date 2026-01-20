@@ -16,7 +16,7 @@ interface RecentActivityProps {
 
 export function RecentActivity({ data }: RecentActivityProps) {
     return (
-        <Card className="col-span-4 lg:col-span-3">
+        <Card className="col-span-4 lg:col-span-3" data-testid="recent-activity-card">
             <CardHeader>
                 <CardTitle>Recent Activity</CardTitle>
                 <CardDescription>
@@ -24,10 +24,10 @@ export function RecentActivity({ data }: RecentActivityProps) {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="space-y-8">
+                <div className="space-y-8" data-testid="activity-list">
                     {data.length === 0 && <p className="text-sm text-muted-foreground">No recent activity.</p>}
                     {data.map((item, index) => (
-                        <div key={`${item.type}-${item.id}-${index}`} className="flex items-start justify-between space-x-4">
+                        <div key={`${item.type}-${item.id}-${index}`} className="flex items-start justify-between space-x-4" data-testid="activity-item">
                             <div className="flex items-center space-x-4 min-w-0">
                                 <Avatar className="h-9 w-9 flex-shrink-0">
                                     <AvatarFallback className={item.type === 'ADMISSION' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>

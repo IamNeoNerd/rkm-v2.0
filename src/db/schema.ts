@@ -154,7 +154,28 @@ export const systemSettings = pgTable("system_settings", {
     updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-// Notification Types enum
+// User Roles enum for RBAC
+export const userRoleEnum = pgEnum("user_role", [
+    "super-admin",
+    "admin",
+    "teacher",
+    "cashier",
+    "parent",
+    "user"
+]);
+
+// Role Permissions table for granular access control
+export const rolePermissions = pgTable("role_permissions", {
+    id: serial("id").primaryKey(),
+    role: text("role").notNull(), // 'admin', 'teacher', 'cashier', 'parent'
+    feature: text("feature").notNull(), // 'students', 'fees', 'attendance', etc.
+    canView: boolean("can_view").default(false),
+    canCreate: boolean("can_create").default(false),
+    canEdit: boolean("can_edit").default(false),
+    canDelete: boolean("can_delete").default(false),
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+});
 export const notificationTypeEnum = pgEnum("notification_type", [
     "FEE_REMINDER",
     "PAYMENT_RECEIVED",

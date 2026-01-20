@@ -1,7 +1,7 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ function LoginFormContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
+    const error = searchParams.get("error");
 
     const [activeTab, setActiveTab] = useState<LoginTab>("admin");
 
@@ -26,27 +27,42 @@ function LoginFormContent() {
     // Parent login state
     const [phone, setPhone] = useState("");
 
+    // Handle auth errors from URL params (when NextAuth redirects back with error)
+    useEffect(() => {
+        if (error) {
+            if (error === "CredentialsSignin") {
+                toast.error("Invalid email or password");
+            } else {
+                toast.error("An error occurred during login");
+            }
+            // Clear error from URL without full page reload
+            router.replace("/login", { scroll: false });
+        }
+    }, [error, router]);
+
     const handleAdminSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
 
         try {
+            // Use signIn from next-auth/react with redirect: false to handle errors
             const result = await signIn("credentials", {
-                email,
-                password,
+                identifier: email,
+                password: password,
                 redirect: false,
+                callbackUrl: callbackUrl,
             });
 
             if (result?.error) {
-                toast.error("Invalid credentials");
-            } else {
-                toast.success("Logged in successfully");
+                toast.error("Invalid email or password");
+                setIsLoading(false);
+            } else if (result?.ok) {
+                toast.success("Login successful!");
                 router.push(callbackUrl);
-                router.refresh();
             }
         } catch (error) {
-            toast.error("An error occurred");
-        } finally {
+            console.error("Login error:", error);
+            toast.error("An unexpected error occurred");
             setIsLoading(false);
         }
     };
@@ -100,8 +116,8 @@ function LoginFormContent() {
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-md text-sm font-medium transition-all ${activeTab === tab.id
-                                ? "bg-white text-indigo-600 shadow-sm"
-                                : "text-gray-600 hover:text-gray-900"
+                            ? "bg-white text-indigo-600 shadow-sm"
+                            : "text-gray-600 hover:text-gray-900"
                             }`}
                     >
                         <tab.icon className="h-4 w-4" />
@@ -265,10 +281,20 @@ function LoginFormContent() {
 
 export default function LoginPage() {
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-4">
             <Suspense fallback={<div className="text-center">Loading...</div>}>
                 <LoginFormContent />
             </Suspense>
+
+            {/* Browse Courses Link */}
+            <div className="mt-6 text-center">
+                <p className="text-gray-500 text-sm">
+                    Not registered yet?{" "}
+                    <a href="/browse" className="text-indigo-600 hover:underline font-medium">
+                        Browse our courses
+                    </a>
+                </p>
+            </div>
         </div>
     );
 }

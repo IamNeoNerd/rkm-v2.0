@@ -6,7 +6,8 @@ import {
     ChevronRight,
     IndianRupee,
     Calendar,
-    History
+    History,
+    Bell
 } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -68,6 +69,14 @@ export default async function SettingsPage() {
             icon: Key,
             color: "text-indigo-600",
             bgColor: "bg-indigo-50"
+        },
+        {
+            title: "Notifications",
+            description: "Control communication preferences and alerts.",
+            href: "/settings/notifications",
+            icon: Bell,
+            color: "text-amber-600",
+            bgColor: "bg-amber-50"
         },
         {
             title: "Database & Backups",

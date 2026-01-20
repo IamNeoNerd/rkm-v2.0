@@ -6,36 +6,38 @@ import { families, students, transactions } from "@/db/schema";
 import { and, count, desc, eq, sql, sum } from "drizzle-orm";
 
 export async function getDashboardData() {
+    // 1. Fetch all families
     const allFamilies = await db.select().from(families).orderBy(desc(families.createdAt));
 
-    // We need to attach children
-    // This is N+1 but fine for now or use relational query
-    // Let's use relational query if possible or just map
+    // 2. Fetch all students in one query
+    const allStudents = await db.select().from(students);
 
-    const familiesWithChildren = await Promise.all(allFamilies.map(async (f) => {
-        const children = await db.select().from(students).where(eq(students.familyId, f.id));
+    // 3. Group students by familyId for efficient lookup
+    const studentsByFamilyId = allStudents.reduce((acc, student) => {
+        if (!student.familyId) return acc;
+        const fid = student.familyId.toString();
+        if (!acc[fid]) acc[fid] = [];
+        acc[fid].push(student);
+        return acc;
+    }, {} as Record<string, typeof allStudents>);
+
+    // 4. Map families to the required frontend format
+    const familiesWithChildren = allFamilies.map((f) => {
+        const children = studentsByFamilyId[f.id.toString()] || [];
         return {
-            id: f.id.toString(), // Convert number to string for frontend types if needed
+            id: f.id.toString(),
             father_name: f.fatherName,
             phone: f.phone,
-            total_due: f.balance, // Note: Schema convention needed. 
-            // In schema: balance. If positive = credit? If negative = due? 
-            // Previous mock data: total_due: -5000 means they OWE. 
-            // Let's stick to Schema: balance. If balance is negative, it's a Due? 
-            // Wait, standard accounting: Credit is usually positive liability for institute (advance). Debit is negative asset (due).
-            // Let's assume Balance = what family owns. 
-            // If Balance = -1000, they owe 1000.
-            // If Balance = 500, they have 500 advance.
-
+            total_due: f.balance,
             children: children.map(c => ({
                 id: c.id.toString(),
                 name: c.name,
                 class: c.class,
                 status: c.isActive ? "ACTIVE" : "ARCHIVED" as "ACTIVE" | "ARCHIVED",
-                balance_status: f.balance < 0 ? "DUE" : "CLEAR" as "CLEAR" | "DUE" // Simplified per family
+                balance_status: f.balance < 0 ? "DUE" : "CLEAR" as "CLEAR" | "DUE"
             }))
         };
-    }));
+    });
 
     return familiesWithChildren;
 }
