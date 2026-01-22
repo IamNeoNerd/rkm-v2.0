@@ -18,6 +18,7 @@ import { GlassCard } from "@/components/modern/Card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { format } from "date-fns";
 import { Metadata } from "next";
+import { FamilyQuickActions } from "./FamilyQuickActions";
 
 export const metadata: Metadata = {
     title: "Family Profile | RKM 3.0",
@@ -124,12 +125,15 @@ export default async function FamilyDetailPage({ params }: FamilyPageProps) {
                                 </GlassCard>
                             )}
 
-                            <Link href={`/fees?family=${family.id}`} className="block">
-                                <Button variant="primary" size="lg" className="w-full rounded-2xl shadow-xl shadow-primary/20 h-14">
-                                    <IndianRupee className="h-5 w-5 mr-2" />
-                                    Collect Payment
-                                </Button>
-                            </Link>
+                            {/* Quick Actions Section */}
+                            <div className="space-y-3 pt-4">
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">Quick Actions</h3>
+                                <FamilyQuickActions
+                                    familyId={family.id}
+                                    familyName={family.fatherName}
+                                    familyPhone={family.phone}
+                                />
+                            </div>
                         </div>
                     </GlassCard>
 

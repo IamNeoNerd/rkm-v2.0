@@ -166,7 +166,9 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                         <h2 className="text-sm font-black uppercase tracking-widest text-foreground mb-2">Neural Link Actions</h2>
                         <p className="text-xs text-muted-foreground mb-4">Execute high-priority operations on this student profile.</p>
                         <StudentQuickActions
+                            studentDbId={student.id}
                             studentName={student.name}
+                            studentClass={student.class}
                             familyId={student.familyId}
                             fatherName={student.fatherName || "Family"}
                             balance={balance}

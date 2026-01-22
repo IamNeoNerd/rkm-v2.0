@@ -1,3 +1,5 @@
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { IndianRupee, Users, AlertCircle, Plus } from "lucide-react";
 import { getDashboardData, getDashboardMetrics, getRecentActivity, getAdmissionsChartData } from "@/actions/dashboard";
@@ -95,6 +97,22 @@ async function DashboardContent() {
 }
 
 export default async function DashboardPage() {
+  const session = await auth();
+
+  if (!session?.user) {
+    redirect("/login");
+  }
+
+  // Redirect based on role
+  if (session.user.role === "student") {
+    redirect("/student/portal");
+  }
+
+  // Redirect staff members to their simplified dashboard
+  if (session.user.role !== "admin" && session.user.role !== "super-admin") {
+    redirect("/staff/dashboard");
+  }
+
   return (
     <div className="flex-1 space-y-10 p-4 md:p-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

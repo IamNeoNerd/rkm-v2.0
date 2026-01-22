@@ -31,6 +31,13 @@ import { cn } from "@/lib/utils";
 import { GlassCard } from "./Card";
 import { Button } from "./Button";
 import { type FeatureKey, type PermissionCheck } from "@/lib/permissions";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
 
 interface NavItem {
     title: string;
@@ -72,6 +79,7 @@ export function FloatingNav() {
     const pathname = usePathname();
     const { data: session } = useSession();
     const [isExpanded, setIsExpanded] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => setMounted(true), []);
@@ -90,11 +98,24 @@ export function FloatingNav() {
 
         // Feature-based filtering (Dynamic RBAC)
         if (item.feature) {
+            // Special case: Dashboard is available for all authenticated users, 
+            // but the destination depends on the role
+            if (item.feature === 'dashboard') return true;
+
             const hasAccess = permissions?.[item.feature]?.canView ?? false;
             if (!hasAccess) return false;
         }
 
         return true;
+    }).map(item => {
+        // Adjust Dashboard href based on role
+        if (item.feature === 'dashboard' && userRole !== 'admin' && userRole !== 'super-admin') {
+            if (userRole === 'student') {
+                return { ...item, href: '/student/portal' };
+            }
+            return { ...item, href: '/staff/dashboard' };
+        }
+        return item;
     });
 
     return (
@@ -171,7 +192,7 @@ export function FloatingNav() {
                 </GlassCard>
             </div>
 
-            {/* Mobile Bottom Bar (Alternative for smaller screens) */}
+            {/* Mobile Bottom Bar with Sheet Menu */}
             <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[90%] max-w-sm">
                 <GlassCard className="flex items-center justify-around py-4 px-2 border-white/40 shadow-2xl backdrop-blur-2xl rounded-3xl" intensity="medium">
                     {filteredItems.slice(0, 4).map((item) => {
@@ -182,11 +203,66 @@ export function FloatingNav() {
                             </Link>
                         );
                     })}
-                    <button className="p-2 text-muted-foreground rounded-xl">
-                        <Menu className="h-6 w-6" />
-                    </button>
+
+                    {/* Mobile Menu Sheet Trigger */}
+                    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                        <SheetTrigger asChild>
+                            <button className="p-2 text-muted-foreground rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
+                                <Menu className="h-6 w-6" />
+                            </button>
+                        </SheetTrigger>
+                        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl bg-background/95 backdrop-blur-xl border-t border-white/20">
+                            <SheetHeader className="pb-4 border-b border-white/10">
+                                <SheetTitle className="text-lg font-black uppercase tracking-widest text-foreground">
+                                    Navigation
+                                </SheetTitle>
+                            </SheetHeader>
+
+                            {/* Mobile Navigation Grid */}
+                            <nav className="grid grid-cols-3 gap-4 py-6 overflow-y-auto max-h-[calc(70vh-120px)]">
+                                {filteredItems.map((item) => {
+                                    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={() => setMobileMenuOpen(false)}
+                                            className={cn(
+                                                "flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-300",
+                                                isActive
+                                                    ? "bg-primary text-white shadow-lg"
+                                                    : "bg-white/30 dark:bg-slate-800/30 text-muted-foreground hover:bg-white/60 dark:hover:bg-slate-800/60"
+                                            )}
+                                        >
+                                            <item.icon className="h-6 w-6" />
+                                            <span className="text-[10px] font-black uppercase tracking-wider text-center">
+                                                {item.title}
+                                            </span>
+                                        </Link>
+                                    );
+                                })}
+                            </nav>
+
+                            {/* Logout Button */}
+                            <div className="absolute bottom-6 left-4 right-4">
+                                <button
+                                    onClick={() => {
+                                        setMobileMenuOpen(false);
+                                        signOut({ callbackUrl: "/login" });
+                                    }}
+                                    className="flex items-center justify-center gap-3 w-full p-4 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all border border-red-500/20"
+                                >
+                                    <LogOut className="h-5 w-5" />
+                                    <span className="font-black text-xs uppercase tracking-widest">
+                                        Sign Out
+                                    </span>
+                                </button>
+                            </div>
+                        </SheetContent>
+                    </Sheet>
                 </GlassCard>
             </div>
         </>
     );
 }
+

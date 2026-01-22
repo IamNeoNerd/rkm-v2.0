@@ -15,80 +15,85 @@ test.describe('Staff Management', () => {
         await navigateTo(authenticatedPage, '/staff');
     });
 
-    test('should display staff management page', async ({ authenticatedPage }) => {
+    test('should display personnel terminal page', async ({ authenticatedPage }) => {
         const page = authenticatedPage;
 
-        // Verify page title
-        await expect(page.locator('h1')).toContainText('Staff Management');
+        // Ensure page is fully settled
+        await page.waitForLoadState('networkidle');
 
-        // Verify Add Staff button exists
-        await expect(page.locator('button:has-text("Add Staff")')).toBeVisible();
+        // Verify page title (exact match for rendered text)
+        // using { state: 'visible' } to ensure it's not just in DOM but rendered
+        const heading = page.locator('h1:has-text("PERSONNEL TERMINAL")');
+        await expect(heading).toBeVisible({ timeout: 15000 });
 
-        // Verify Custom Staff Types section
-        await expect(page.locator('text=Custom Staff Types')).toBeVisible();
+        // Verify Add Personnel button exists
+        await expect(page.locator('button:has-text("ADD PERSONNEL NODE")')).toBeVisible();
+
+        // Verify Configure Role Vectors button (for custom staff types)
+        await expect(page.locator('text=Configure Role Vectors')).toBeVisible();
     });
 
     test('should add a custom role type', async ({ authenticatedPage }) => {
         const page = authenticatedPage;
         const timestamp = Date.now();
-        const roleTypeName = `TestRole_${timestamp}`;
+        const roleTypeName = `Test_Role_${timestamp}`;
 
-        // Expand the Custom Staff Types section
-        await page.click('text=Manage');
-        await page.waitForTimeout(300);
+        // Click Configure Role Vectors button
+        await page.click('text=Configure Role Vectors');
+        await page.waitForTimeout(1000);
 
         // Fill in the new role type name
-        await page.fill('input[placeholder*="staff type"]', roleTypeName);
+        await page.fill('input[placeholder*="ROLE SIGNATURE"]', roleTypeName);
 
-        // Click Add Type button
-        await page.click('button:has-text("Add Type")');
+        // Click Deploy button
+        await page.click('button:has-text("DEPLOY")');
 
         // Wait for success toast
-        await waitForToast(page, 'added');
+        await waitForToast(page, 'registered');
 
         // Verify the role type appears in the list
-        await expect(page.locator(`text=${roleTypeName}`)).toBeVisible();
+        await expect(page.locator(`text=${roleTypeName}`.toUpperCase())).toBeVisible();
     });
 
     test('should add a new staff member', async ({ authenticatedPage }) => {
         const page = authenticatedPage;
         const timestamp = Date.now();
-        const staffName = `TestStaff_${timestamp}`;
+        const staffName = `Test_Staff_${timestamp}`;
         const staffPhone = `99${timestamp.toString().slice(-8)}`;
 
-        // Click Add Staff button
-        await page.click('button:has-text("Add Staff")');
+        // Click Add Personnel button
+        await page.click('button:has-text("ADD PERSONNEL NODE")');
 
         // Wait for dialog to open
         await page.waitForSelector('[role="dialog"]');
 
         // Fill in staff details
-        await page.fill('input:near(:text("Name"))', staffName);
-        await page.fill('input:near(:text("Phone"))', staffPhone);
-        await page.fill('input:near(:text("Email"))', `test_${timestamp}@example.com`);
+        await page.fill('input[placeholder="ENTER NAME"]', staffName);
+        await page.fill('input[placeholder="+91 XXXXX XXXXX"]', staffPhone);
+        await page.fill('input[placeholder="STAFF@RKINSTITUTE.COM"]', `test_${timestamp}@example.com`);
 
-        // Select role
-        await page.selectOption('select:near(:text("System Role"))', 'STAFF');
+        // Select role (using native select)
+        await page.selectOption('select:near(:text("System Role Vector"))', 'STAFF');
 
         // Fill salary
-        await page.fill('input:near(:text("Salary"))', '15000');
+        await page.fill('input[placeholder="0.00"]', '15000');
 
         // Submit form
-        await page.click('button:has-text("Save Staff")');
+        await page.click('button:has-text("INITIALIZE PERSONNEL NODE")');
 
         // Wait for success toast
         await waitForToast(page, 'successfully');
 
-        // Verify staff appears in table
-        await page.waitForTimeout(500);
+        // Verify staff appears in grid
+        await page.waitForTimeout(1000);
         await expect(page.locator(`text=${staffName}`)).toBeVisible();
     });
 
     test('should edit staff member', async ({ authenticatedPage }) => {
         const page = authenticatedPage;
 
-        // Find first edit button in the table
-        const editButton = page.locator('button:has(svg.lucide-pencil)').first();
+        // Find first edit button (using lucide-edit3 search)
+        const editButton = page.locator('button:has(svg.lucide-edit3)').first();
 
         // Skip if no staff members exist
         if (!(await editButton.isVisible())) {
@@ -101,8 +106,8 @@ test.describe('Staff Management', () => {
         // Wait for dialog to open
         await page.waitForSelector('[role="dialog"]');
 
-        // Verify edit dialog is open
-        await expect(page.locator('text=Edit Staff Member')).toBeVisible();
+        // Verify edit dialog title
+        await expect(page.locator('text=Recalibrate Node')).toBeVisible();
 
         // Close dialog
         await page.keyboard.press('Escape');

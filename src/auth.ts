@@ -4,7 +4,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { db } from "@/db";
-import { users, accounts, sessions, verificationTokens, staff } from "@/db/schema";
+import { users, accounts, sessions, verificationTokens, staff, students, families } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuthSettingsInternal, isDomainAllowed } from "@/lib/auth-settings-helper";
 import { getAllPermissionsForRole, type FeatureKey, type PermissionCheck } from "@/lib/permissions";
@@ -84,16 +84,53 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                 const identifier = (credentials.identifier as string).trim();
                 const isPhone = /^\d{10}$/.test(identifier);
+                const isStudentId = /^\d{6}$/.test(identifier);
 
                 let user;
 
-                if (isPhone) {
-                    // Phone login - look up by phone
+                if (isStudentId) {
+                    // Student login - look up in students table first
+                    const [studentResult] = await db
+                        .select({
+                            id: users.id,
+                            email: users.email,
+                            name: users.name,
+                            password: users.password,
+                            role: users.role,
+                            isVerified: users.isVerified,
+                        })
+                        .from(students)
+                        .innerJoin(users, eq(students.userId, users.id))
+                        .where(eq(students.studentId, identifier))
+                        .limit(1);
+
+                    user = studentResult;
+                } else if (isPhone) {
+                    // Phone login - first check users table, then families table
                     [user] = await db
                         .select()
                         .from(users)
                         .where(eq(users.phone, identifier))
                         .limit(1);
+
+                    // If not found in users, check families table for parent login
+                    if (!user) {
+                        const [parentResult] = await db
+                            .select({
+                                id: users.id,
+                                email: users.email,
+                                name: users.name,
+                                password: users.password,
+                                role: users.role,
+                                isVerified: users.isVerified,
+                            })
+                            .from(families)
+                            .innerJoin(users, eq(families.userId, users.id))
+                            .where(eq(families.phone, identifier))
+                            .limit(1);
+
+                        user = parentResult;
+                    }
                 } else {
                     // Email login
                     [user] = await db

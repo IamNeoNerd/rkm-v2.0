@@ -11,7 +11,7 @@ export const staffRoleEnum = pgEnum("staff_role", ["ADMIN", "TEACHER", "RECEPTIO
 export const users = pgTable("user", {
     id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text("name"),
-    email: text("email").notNull().unique(),
+    email: text("email").unique(), // Made nullable for students/parents
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
     password: text("password"), // For credentials provider
@@ -66,6 +66,7 @@ export const families = pgTable("families", {
     id: serial("id").primaryKey(),
     fatherName: text("father_name").notNull(),
     phone: text("phone").notNull().unique(), // Assuming phone is unique for family lookup
+    userId: text("user_id").references(() => users.id), // Link to auth user for session-based access
     balance: integer("balance").notNull().default(0),
     status: text("status").notNull().default("active"),
     createdAt: timestamp("created_at").defaultNow(),
@@ -75,6 +76,8 @@ export const families = pgTable("families", {
 export const students = pgTable("students", {
     id: serial("id").primaryKey(),
     familyId: integer("family_id").references(() => families.id).notNull(),
+    userId: text("user_id").references(() => users.id), // Link to auth user
+    studentId: text("student_id").unique(), // Unique 6-digit identifier for login
     name: text("name").notNull(),
     class: text("class").notNull(),
     baseFeeOverride: integer("base_fee_override"), // Null means standard class fee applies
@@ -161,6 +164,7 @@ export const userRoleEnum = pgEnum("user_role", [
     "teacher",
     "cashier",
     "parent",
+    "student",
     "user"
 ]);
 

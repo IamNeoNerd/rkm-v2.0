@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { lookupFamilyByPhone } from "@/actions/parent";
 import { cn } from "@/lib/utils";
 
-type LoginTab = "admin" | "parent" | "staff";
+type LoginTab = "admin" | "parent" | "staff" | "student";
 
 function LoginFormContent() {
     const router = useRouter();
@@ -28,6 +28,9 @@ function LoginFormContent() {
 
     // Parent login state
     const [phone, setPhone] = useState("");
+
+    // Student login state
+    const [studentId, setStudentId] = useState("");
 
     // Handle auth errors
     useEffect(() => {
@@ -94,7 +97,8 @@ function LoginFormContent() {
 
     const tabs = [
         { id: "admin" as const, label: "Admin", icon: Shield },
-        { id: "parent" as const, label: "Parent", icon: User },
+        { id: "student" as const, label: "Student", icon: User },
+        { id: "parent" as const, label: "Parent", icon: Phone },
         { id: "staff" as const, label: "Staff", icon: GraduationCap },
     ];
 
@@ -216,16 +220,16 @@ function LoginFormContent() {
 
                     {/* Parent Login Form */}
                     {activeTab === "parent" && (
-                        <form onSubmit={handleParentSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <form onSubmit={handleAdminSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div className="bg-primary/5 border border-primary/10 rounded-2xl p-4 mb-6 backdrop-blur-sm">
                                 <p className="text-sm text-primary font-medium flex gap-3 items-start">
                                     <ArrowRight className="h-4 w-4 mt-1 shrink-0" />
-                                    Access child growth metrics and fee statements using your phone number.
+                                    Access child growth metrics and fee statements using your credentials.
                                 </p>
                             </div>
 
                             <div className="space-y-1.5">
-                                <label htmlFor="phone" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                                <label htmlFor="parent-phone" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
                                     Registered Mobile
                                 </label>
                                 <div className="relative group">
@@ -233,10 +237,10 @@ function LoginFormContent() {
                                         <span className="text-muted-foreground font-bold text-sm tracking-tight">+91</span>
                                     </div>
                                     <Input
-                                        id="phone"
+                                        id="parent-phone"
                                         type="tel"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                                        value={email} // Reusing email state for identifier
+                                        onChange={(e) => setEmail(e.target.value.replace(/\D/g, "").slice(0, 10))}
                                         placeholder="9876543210"
                                         maxLength={10}
                                         className="pl-20 h-14 text-lg tracking-[0.2em] font-bold"
@@ -246,9 +250,25 @@ function LoginFormContent() {
                                 </div>
                             </div>
 
+                            <div className="space-y-1.5">
+                                <label htmlFor="parent-password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                                    Access Key
+                                </label>
+                                <Input
+                                    id="parent-password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    disabled={isLoading}
+                                    className="border-primary/20 focus:border-primary"
+                                />
+                            </div>
+
                             <Button
                                 type="submit"
-                                disabled={isLoading || phone.length !== 10}
+                                disabled={isLoading || email.length !== 10}
                                 className="w-full"
                                 variant="cta"
                                 size="lg"
@@ -266,6 +286,69 @@ function LoginFormContent() {
 
                             <p className="text-center text-xs text-muted-foreground mt-8 p-4 border border-dashed border-border rounded-xl">
                                 Trouble logging in? Reach out to support.
+                            </p>
+                        </form>
+                    )}
+
+                    {/* Student Login Form */}
+                    {activeTab === "student" && (
+                        <form onSubmit={handleAdminSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-indigo-500/5 border border-indigo-500/10 rounded-2xl p-4 mb-6 backdrop-blur-sm">
+                                <p className="text-sm text-indigo-600 font-medium flex gap-3 items-start">
+                                    <GraduationCap className="h-4 w-4 mt-1 shrink-0" />
+                                    Review your academic progress and batch details using your student ID.
+                                </p>
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label htmlFor="student-id" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                                    Student ID (6-Digits)
+                                </label>
+                                <Input
+                                    id="student-id"
+                                    type="text"
+                                    value={email} // Using email state for identifier to reuse handleAdminSubmit
+                                    onChange={(e) => setEmail(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    placeholder="000123"
+                                    maxLength={6}
+                                    required
+                                    disabled={isLoading}
+                                    className="border-indigo-500/20 focus:border-indigo-500 font-mono tracking-[0.2em] text-lg text-center"
+                                />
+                            </div>
+
+                            <div className="space-y-1.5">
+                                <label htmlFor="student-password" className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                                    Access Key
+                                </label>
+                                <Input
+                                    id="student-password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    disabled={isLoading}
+                                    className="border-indigo-500/20 focus:border-indigo-500"
+                                />
+                            </div>
+
+                            <Button
+                                type="submit"
+                                disabled={isLoading || email.length !== 6}
+                                className="w-full bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/20"
+                                size="lg"
+                            >
+                                {isLoading ? (
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                ) : (
+                                    <LogIn className="mr-2 h-5 w-5" />
+                                )}
+                                Enter Portal
+                            </Button>
+
+                            <p className="text-center text-[10px] text-muted-foreground/80 mt-6 font-mono">
+                                Use your 6-digit identifier and password provided by the office.
                             </p>
                         </form>
                     )}
