@@ -36,11 +36,11 @@ type Transaction = {
 
 interface ParentDashboardProps {
     family: Family;
-    children: Child[];
+    students: Child[];
     transactions: Transaction[];
 }
 
-export function ParentDashboard({ family, children, transactions }: ParentDashboardProps) {
+export function ParentDashboard({ family, students, transactions }: ParentDashboardProps) {
     const [selectedStudent, setSelectedStudent] = useState<Child | null>(null);
     const [detailsOpen, setDetailsOpen] = useState(false);
     const [selectedReceipt, setSelectedReceipt] = useState<{
@@ -166,16 +166,16 @@ export function ParentDashboard({ family, children, transactions }: ParentDashbo
                 {/* Entity Matrix (Children Section) */}
                 <section className="space-y-8">
                     <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
-                        <Users className="h-3 w-3" /> Entity Matrix ({children.length})
+                        <Users className="h-3 w-3" /> Entity Matrix ({students.length})
                     </h3>
 
-                    {children.length === 0 ? (
+                    {students.length === 0 ? (
                         <GlassCard className="p-12 text-center border-slate-100" intensity="low">
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">No entities identified under this node.</p>
                         </GlassCard>
                     ) : (
                         <div className="grid gap-4">
-                            {children.map((child) => (
+                            {students.map((child) => (
                                 <button
                                     key={child.id}
                                     onClick={() => handleChildClick(child)}

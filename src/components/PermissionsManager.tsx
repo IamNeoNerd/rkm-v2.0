@@ -24,7 +24,8 @@ import {
     Eye,
     Scan,
     Activity,
-    Cpu
+    Cpu,
+    type LucideIcon
 } from "lucide-react";
 import { toast } from "sonner";
 import { getPermissionsForRole, savePermission } from "@/actions/permissions";
@@ -40,7 +41,7 @@ import {
 } from "@/components/ui/select";
 import { type FeatureKey, type PermissionCheck } from "@/lib/permissions";
 
-const FEATURE_CONFIG: Record<FeatureKey, { label: string; description: string; icon: any; color: string }> = {
+const FEATURE_CONFIG: Record<FeatureKey, { label: string; description: string; icon: LucideIcon; color: string }> = {
     dashboard: {
         label: "Strategic Dashboard",
         description: "Primary analytics pulse and command center telemetry.",
@@ -198,7 +199,7 @@ export default function PermissionsManagerClient() {
         );
     }
 
-    const actionKeys: { key: keyof PermissionCheck; label: string; icon: any; activeColor: string }[] = [
+    const actionKeys: { key: keyof PermissionCheck; label: string; icon: LucideIcon; activeColor: string }[] = [
         { key: "canView", label: "VISUAL", icon: Eye, activeColor: "text-blue-400 shadow-blue-500/20" },
         { key: "canCreate", label: "APPEND", icon: UserPlus, activeColor: "text-emerald-400 shadow-emerald-500/20" },
         { key: "canEdit", label: "MODIFY", icon: Scan, activeColor: "text-amber-400 shadow-amber-500/20" },

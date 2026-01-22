@@ -47,7 +47,10 @@ export function AddStaffDialog() {
 
     useEffect(() => {
         if (open) {
-            loadRoleTypes();
+            const timer = setTimeout(() => {
+                loadRoleTypes();
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [open, loadRoleTypes]);
 

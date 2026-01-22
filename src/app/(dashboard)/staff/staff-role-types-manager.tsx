@@ -28,7 +28,10 @@ export function StaffRoleTypesManager() {
     }, []);
 
     useEffect(() => {
-        loadRoleTypes();
+        const init = async () => {
+            await loadRoleTypes();
+        };
+        init();
     }, [loadRoleTypes]);
 
     const handleAdd = async (e: React.FormEvent) => {

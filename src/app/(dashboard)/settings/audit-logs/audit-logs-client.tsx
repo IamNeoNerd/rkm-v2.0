@@ -22,7 +22,8 @@ import {
     AlertCircle,
     Zap,
     Cpu,
-    ArrowRight
+    ArrowRight,
+    type LucideIcon
 } from "lucide-react";
 import { format, formatDistanceToNow } from "date-fns";
 import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
@@ -30,7 +31,7 @@ import { GlassCard } from "@/components/modern/Card";
 import { cn } from "@/lib/utils";
 
 // Action category icons and colors
-const actionConfig: Record<string, { icon: any; color: string; gradient: string }> = {
+const actionConfig: Record<string, { icon: LucideIcon; color: string; gradient: string }> = {
     auth: { icon: Shield, color: "text-blue-500", gradient: "from-blue-500/10 to-transparent" },
     user: { icon: User, color: "text-purple-500", gradient: "from-purple-500/10 to-transparent" },
     payment: { icon: CreditCard, color: "text-emerald-500", gradient: "from-emerald-500/10 to-transparent" },

@@ -42,13 +42,16 @@ export function EditFamilyDialog({
     // Fetch current identity status on open
     useEffect(() => {
         if (open) {
-            setIsFetching(true);
-            setPasskey("");
-            getFamilyIdentityStatus(familyId).then((status) => {
-                setHasLinkedUser(status.hasLinkedUser);
-                setUserName(status.userName);
-                setIsFetching(false);
-            });
+            const timer = setTimeout(() => {
+                setIsFetching(true);
+                setPasskey("");
+                getFamilyIdentityStatus(familyId).then((status) => {
+                    setHasLinkedUser(status.hasLinkedUser);
+                    setUserName(status.userName);
+                    setIsFetching(false);
+                });
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [open, familyId]);
 

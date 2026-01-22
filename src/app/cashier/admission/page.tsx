@@ -133,7 +133,7 @@ export default function CashierAdmissionPage() {
                             </h2>
                             <GlassCard className="p-8 space-y-6 border-white/60 shadow-xl" intensity="medium">
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Father's Legal Name</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Father&apos;s Legal Name</label>
                                     <Input
                                         value={formData.fatherName}
                                         onChange={(e) => handleChange('fatherName', e.target.value)}
@@ -143,7 +143,7 @@ export default function CashierAdmissionPage() {
                                     />
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mother's Legal Name</label>
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mother&apos;s Legal Name</label>
                                     <Input
                                         value={formData.motherName}
                                         onChange={(e) => handleChange('motherName', e.target.value)}

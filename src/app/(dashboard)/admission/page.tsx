@@ -120,7 +120,7 @@ export default function AdmissionPage() {
 
                         <div className="space-y-4">
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Father's Full Name</label>
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Father&apos;s Full Name</label>
                                 <Input
                                     required
                                     placeholder="Enter full legal name"
@@ -232,7 +232,7 @@ export default function AdmissionPage() {
                                         <h3 className="text-[11px] font-black uppercase tracking-widest text-amber-600">Pro-Rata Conflict Detected</h3>
                                     </div>
                                     <p className="text-[11px] font-medium text-slate-600 leading-relaxed italic">
-                                        "{suggestion.explanation}"
+                                        &quot;{suggestion.explanation}&quot;
                                     </p>
                                     <div className="flex flex-col gap-3 pt-2">
                                         <button

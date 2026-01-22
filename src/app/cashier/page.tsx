@@ -109,7 +109,7 @@ export default async function CashierDashboard() {
                             <IndianRupee className="h-5 w-5 text-amber-600" />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-amber-700/60 uppercase tracking-[0.2em]">Today's Yield</p>
+                            <p className="text-[10px] font-black text-amber-700/60 uppercase tracking-[0.2em]">Today&apos;s Yield</p>
                             <h3 className="text-3xl font-black text-slate-900 tracking-tighter mt-1">
                                 ₹{todayTotal.toLocaleString('en-IN')}
                             </h3>

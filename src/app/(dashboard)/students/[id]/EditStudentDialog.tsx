@@ -43,15 +43,18 @@ export function EditStudentDialog({
     // Fetch current identity status on open
     useEffect(() => {
         if (open) {
-            setIsFetching(true);
-            getStudentIdentityStatus(studentDbId).then((status) => {
-                if (status.studentId) {
-                    setStudentId(status.studentId);
-                }
-                setHasExistingIdentity(status.hasIdentity);
-                setHasLinkedUser(status.hasLinkedUser);
-                setIsFetching(false);
-            });
+            const timer = setTimeout(() => {
+                setIsFetching(true);
+                getStudentIdentityStatus(studentDbId).then((status) => {
+                    if (status.studentId) {
+                        setStudentId(status.studentId);
+                    }
+                    setHasExistingIdentity(status.hasIdentity);
+                    setHasLinkedUser(status.hasLinkedUser);
+                    setIsFetching(false);
+                });
+            }, 0);
+            return () => clearTimeout(timer);
         }
     }, [open, studentDbId]);
 
