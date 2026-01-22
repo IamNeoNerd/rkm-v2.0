@@ -120,8 +120,7 @@ async function main() {
         const createdStaff = await db.insert(staff).values(STAFF_DATA.map((s, idx) => ({
             name: s.name,
             phone: `90000000${(10 + idx).toString().padStart(2, '0')}`,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            role: s.role as any,
+            role: s.role as "ADMIN" | "TEACHER" | "RECEPTIONIST" | "STAFF",
             roleType: s.roleType || null,
             baseSalary: s.baseSalary,
             isActive: s.isActive !== false
@@ -145,8 +144,14 @@ async function main() {
         // FAMILIES & STUDENTS
         log("🏡 Populating Families & Students...");
         let studentCount = 0;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const allStudents: any[] = [];
+        interface SeedStudent {
+            id: number;
+            familyId: number;
+            name: string;
+            class: string;
+            isActive: boolean;
+        }
+        const allStudents: SeedStudent[] = [];
 
         for (const fData of EXTENDED_INDIAN_FAMILIES) {
             const [fam] = await db.insert(families).values({
