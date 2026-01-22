@@ -100,8 +100,8 @@ export function AttendanceCalendar({ attendance }: AttendanceCalendarProps) {
                             {status && (
                                 <div className={`flex items-center mt-1`}>
                                     <Circle className={`h-3 w-3 fill-current ${status === 'Present' ? "text-green-500" :
-                                            status === 'Absent' ? "text-red-500" :
-                                                "text-yellow-500"
+                                        status === 'Absent' ? "text-red-500" :
+                                            "text-yellow-500"
                                         }`} />
                                 </div>
                             )}

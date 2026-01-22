@@ -7,18 +7,21 @@ import { db } from "@/db";
 import { users, accounts, sessions, verificationTokens, staff } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuthSettingsInternal, isDomainAllowed } from "@/lib/auth-settings-helper";
+import { getAllPermissionsForRole, type FeatureKey, type PermissionCheck } from "@/lib/permissions";
 
 declare module "next-auth" {
     interface Session {
         user: {
             role: string;
             isVerified: boolean;
+            permissions: Record<FeatureKey, PermissionCheck>;
         } & DefaultSession["user"]
     }
 
     interface User {
         role?: string;
         isVerified?: boolean;
+        permissions?: Record<FeatureKey, PermissionCheck>;
     }
 }
 
@@ -27,6 +30,7 @@ declare module "next-auth/jwt" {
     interface JWT {
         role?: string;
         isVerified?: boolean;
+        permissions?: Record<FeatureKey, PermissionCheck>;
     }
 }
 
@@ -100,7 +104,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 }
 
                 if (!user || !user.password) {
-                    console.log("[AUTH] User not found or no password", { email: identifier });
                     throw new Error("Invalid credentials");
                 }
 
@@ -110,17 +113,26 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 );
 
                 if (!isValidPassword) {
-                    console.log("[AUTH] Invalid password for user", { email: identifier });
                     throw new Error("Invalid credentials");
                 }
 
-                console.log("[AUTH] Authorize success", { id: user.id, email: user.email, role: user.role });
+                // Check verification for admin roles
+                if ((user.role === 'admin' || user.role === 'super-admin') && !user.isVerified) {
+                    throw new Error("Account not verified. Please contact super-admin.");
+                }
+
+                console.log(`[AUTH] Login successful: ${user.email} (${user.role})`);
+
+                // Fetch granular permissions
+                const permissions = await getAllPermissionsForRole(user.role);
+
                 return {
                     id: String(user.id),
                     email: user.email,
                     name: user.name,
                     role: user.role,
                     isVerified: user.isVerified,
+                    permissions,
                 };
             },
         }),
@@ -175,6 +187,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 token.id = user.id;
                 token.role = user.role;
                 token.isVerified = user.isVerified;
+                token.permissions = user.permissions;
             }
 
             if (trigger === "update" && session) {
@@ -189,6 +202,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             if (token && session.user) {
                 session.user.role = token.role as string;
                 session.user.isVerified = token.isVerified as boolean;
+                session.user.permissions = token.permissions as Record<FeatureKey, PermissionCheck>;
             }
 
             // Optional: Fetch fresh data from DB if needed for critical security

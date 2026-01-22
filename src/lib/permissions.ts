@@ -1,4 +1,4 @@
-"use server";
+
 
 import { db } from "@/db";
 import { rolePermissions } from "@/db/schema";

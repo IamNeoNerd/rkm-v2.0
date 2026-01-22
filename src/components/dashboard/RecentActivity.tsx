@@ -1,6 +1,6 @@
-
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { GlassCard } from "@/components/modern/Card"
+import { cn } from "@/lib/utils"
 
 interface ActivityItem {
     id: number;
@@ -16,40 +16,64 @@ interface RecentActivityProps {
 
 export function RecentActivity({ data }: RecentActivityProps) {
     return (
-        <Card className="col-span-4 lg:col-span-3" data-testid="recent-activity-card">
-            <CardHeader>
-                <CardTitle>Recent Activity</CardTitle>
-                <CardDescription>
-                    Latest admissions and transactions.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <div className="space-y-8" data-testid="activity-list">
-                    {data.length === 0 && <p className="text-sm text-muted-foreground">No recent activity.</p>}
-                    {data.map((item, index) => (
-                        <div key={`${item.type}-${item.id}-${index}`} className="flex items-start justify-between space-x-4" data-testid="activity-item">
-                            <div className="flex items-center space-x-4 min-w-0">
-                                <Avatar className="h-9 w-9 flex-shrink-0">
-                                    <AvatarFallback className={item.type === 'ADMISSION' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}>
-                                        {item.type === 'ADMISSION' ? 'AD' : 'PY'}
-                                    </AvatarFallback>
-                                </Avatar>
-                                <div className="space-y-1 min-w-0">
-                                    <p className="text-sm font-medium leading-none truncate pr-2">
-                                        {item.type === 'ADMISSION' ? `New Admission: ${item.name}` : `Payment Received`}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground truncate">
-                                        {new Date(item.createdAt).toLocaleString()}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="text-sm font-medium whitespace-nowrap flex-shrink-0">
-                                {item.type === 'PAYMENT' ? `+₹${item.amount}` : ''}
+        <GlassCard className="col-span-1 lg:col-span-3 p-6 flex flex-col h-full" intensity="medium">
+            <div className="mb-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1">
+                    Live Feed
+                </h3>
+                <h2 className="text-xl font-black text-foreground"> Recent Activity </h2>
+            </div>
+
+            <div className="space-y-6 flex-1 overflow-auto pr-2 custom-scrollbar">
+                {data.length === 0 && (
+                    <div className="flex flex-col items-center justify-center py-12 text-center opacity-50">
+                        <p className="text-sm font-bold uppercase tracking-widest">No recent pulses detected.</p>
+                    </div>
+                )}
+
+                {data.map((item, index) => (
+                    <div
+                        key={`${item.type}-${item.id}-${index}`}
+                        className="flex items-center justify-between p-3 rounded-2xl hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 group"
+                    >
+                        <div className="flex items-center gap-4">
+                            <Avatar className="h-10 w-10 border-2 border-white/50 shadow-sm">
+                                <AvatarFallback className={cn(
+                                    "font-black text-[10px]",
+                                    item.type === 'ADMISSION'
+                                        ? 'bg-primary/10 text-primary uppercase'
+                                        : 'bg-cta/10 text-cta uppercase'
+                                )}>
+                                    {item.type === 'ADMISSION' ? 'AD' : 'PY'}
+                                </AvatarFallback>
+                            </Avatar>
+                            <div className="space-y-0.5">
+                                <p className="text-sm font-bold text-foreground leading-tight group-hover:text-primary transition-colors">
+                                    {item.type === 'ADMISSION' ? `New Admission: ${item.name}` : `Payment Received`}
+                                </p>
+                                <p className="text-[10px] uppercase font-black tracking-widest text-muted-foreground/60">
+                                    {new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • {new Date(item.createdAt).toLocaleDateString()}
+                                </p>
                             </div>
                         </div>
-                    ))}
-                </div>
-            </CardContent>
-        </Card>
+                        <div className="text-right">
+                            {item.type === 'PAYMENT' ? (
+                                <div className="text-sm font-black text-primary">
+                                    +₹{item.amount.toLocaleString()}
+                                </div>
+                            ) : (
+                                <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+                            )}
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="mt-6 pt-6 border-t border-border/50">
+                <button className="w-full text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground hover:text-primary transition-colors py-2">
+                    View Full Audit Log →
+                </button>
+            </div>
+        </GlassCard>
     )
 }

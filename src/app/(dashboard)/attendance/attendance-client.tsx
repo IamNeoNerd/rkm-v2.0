@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Calendar, CheckCircle, XCircle, Clock, Users, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Calendar, CheckCircle, XCircle, Clock, Users, Check, Save } from "lucide-react";
+import { Button } from "@/components/modern/Button";
+import { GlassCard } from "@/components/modern/Card";
 import {
     markAttendance,
     getBatchStudentsForAttendance,
@@ -11,6 +12,7 @@ import {
 } from "@/actions/attendance";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 type Batch = { id: number; name: string; schedule: string | null };
 type Student = { studentId: number; studentName: string; studentClass: string };
@@ -117,16 +119,16 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in duration-500">
             {/* Controls */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <GlassCard className="p-8" intensity="medium">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Select Batch
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">
+                            Select Objective Batch
                         </label>
                         <select
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="flex h-12 w-full rounded-xl border border-input bg-white/50 px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 backdrop-blur-sm transition-all shadow-sm"
                             value={selectedBatchId}
                             onChange={(e) => setSelectedBatchId(e.target.value)}
                         >
@@ -140,109 +142,143 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            <Calendar className="inline h-4 w-4 mr-1" />
-                            Date
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">
+                            Session Date
                         </label>
-                        <input
-                            type="date"
-                            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                        />
+                        <div className="relative">
+                            <input
+                                type="date"
+                                className="flex h-12 w-full rounded-xl border border-input bg-white/50 px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 backdrop-blur-sm transition-all shadow-sm"
+                                value={selectedDate}
+                                onChange={(e) => setSelectedDate(e.target.value)}
+                            />
+                            <Calendar className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                        </div>
                     </div>
 
                     <div className="flex items-end">
                         <Button
                             onClick={markAllPresent}
-                            variant="outline"
+                            variant="glass"
                             disabled={students.length === 0}
-                            className="w-full"
+                            className="w-full text-[10px] font-black uppercase tracking-widest gap-2"
                         >
-                            <Check className="h-4 w-4 mr-2" />
-                            Mark All Present
+                            <Check className="h-4 w-4" />
+                            Reset All Present
                         </Button>
                     </div>
                 </div>
-            </div>
+            </GlassCard>
 
             {/* Students List */}
             {loading ? (
-                <div className="text-center py-12 text-gray-500">Loading students...</div>
-            ) : selectedBatchId && students.length === 0 ? (
-                <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                    <Users className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">No students enrolled in this batch</p>
+                <div className="text-center py-20 text-slate-400">
+                    <div className="animate-pulse flex flex-col items-center">
+                        <Users className="h-12 w-12 mb-4 opacity-20" />
+                        <p className="text-sm font-black uppercase tracking-widest">Querying Enrollments...</p>
+                    </div>
                 </div>
+            ) : selectedBatchId && students.length === 0 ? (
+                <GlassCard className="p-20 text-center" intensity="low">
+                    <Users className="h-16 w-16 text-slate-200 mx-auto mb-6" />
+                    <h3 className="text-xl font-bold text-slate-400 uppercase tracking-tight">Empty Cohort</h3>
+                    <p className="text-sm text-slate-400">No students are currently mapped to this academic unit.</p>
+                </GlassCard>
             ) : students.length > 0 && (
-                <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div className="p-4 border-b bg-gray-50 flex justify-between items-center">
-                        <h3 className="font-semibold text-gray-900">
-                            {students.length} Student{students.length !== 1 && 's'}
-                        </h3>
-                        <div className="flex gap-4 text-sm">
-                            <span className="flex items-center gap-1 text-green-600">
-                                <CheckCircle className="h-4 w-4" />
-                                {Object.values(attendance).filter(s => s === "Present").length} Present
-                            </span>
-                            <span className="flex items-center gap-1 text-red-600">
-                                <XCircle className="h-4 w-4" />
-                                {Object.values(attendance).filter(s => s === "Absent").length} Absent
-                            </span>
-                            <span className="flex items-center gap-1 text-yellow-600">
-                                <Clock className="h-4 w-4" />
-                                {Object.values(attendance).filter(s => s === "Late").length} Late
-                            </span>
+                <GlassCard className="p-0 overflow-hidden" intensity="high">
+                    <div className="p-8 border-b border-white/20 bg-white/40 flex flex-col sm:flex-row justify-between items-center gap-6">
+                        <div>
+                            <h3 className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+                                {students.length} Total Enrolled
+                            </h3>
+                            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">verification of presence</p>
+                        </div>
+
+                        <div className="flex gap-6 p-3 bg-white/30 rounded-2xl border border-white/20 backdrop-blur-md">
+                            <div className="flex items-center gap-2 px-3">
+                                <span className="h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                    {Object.values(attendance).filter(s => s === "Present").length} Present
+                                </span>
+                            </div>
+                            <div className="w-px h-4 bg-white/20 self-center" />
+                            <div className="flex items-center gap-2 px-3">
+                                <span className="h-2 w-2 rounded-full bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                    {Object.values(attendance).filter(s => s === "Absent").length} Absent
+                                </span>
+                            </div>
+                            <div className="w-px h-4 bg-white/20 self-center" />
+                            <div className="flex items-center gap-2 px-3">
+                                <span className="h-2 w-2 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                <span className="text-[10px] font-black uppercase tracking-widest text-slate-600">
+                                    {Object.values(attendance).filter(s => s === "Late").length} Late
+                                </span>
+                            </div>
                         </div>
                     </div>
 
-                    <div className="divide-y">
+                    <div className="divide-y divide-white/10 max-h-[600px] overflow-y-auto">
                         {students.map((s) => (
-                            <div key={s.studentId} className="p-4 flex items-center justify-between hover:bg-gray-50">
+                            <div key={s.studentId} className="px-8 py-5 flex items-center justify-between group hover:bg-white/40 transition-colors">
                                 <div>
-                                    <p className="font-medium text-gray-900">{s.studentName}</p>
-                                    <p className="text-sm text-gray-500">Class {s.studentClass}</p>
+                                    <p className="text-sm font-bold text-slate-900 group-hover:text-primary transition-colors">{s.studentName}</p>
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">Academic Grade: {s.studentClass}</p>
                                 </div>
                                 <div className="flex gap-2">
-                                    <Button
-                                        size="sm"
-                                        variant={attendance[s.studentId] === "Present" ? "default" : "outline"}
-                                        className={attendance[s.studentId] === "Present" ? "bg-green-600 hover:bg-green-700" : ""}
+                                    <button
                                         onClick={() => setStatus(s.studentId, "Present")}
+                                        className={cn(
+                                            "p-3 rounded-xl border transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
+                                            attendance[s.studentId] === "Present"
+                                                ? "bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 border-emerald-400 translate-y--0.5"
+                                                : "bg-white/50 text-slate-400 border-white/20 hover:border-emerald-300 hover:text-emerald-500"
+                                        )}
                                     >
                                         <CheckCircle className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant={attendance[s.studentId] === "Late" ? "default" : "outline"}
-                                        className={attendance[s.studentId] === "Late" ? "bg-yellow-500 hover:bg-yellow-600" : ""}
+                                        {attendance[s.studentId] === "Present" && "Present"}
+                                    </button>
+                                    <button
                                         onClick={() => setStatus(s.studentId, "Late")}
+                                        className={cn(
+                                            "p-3 rounded-xl border transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
+                                            attendance[s.studentId] === "Late"
+                                                ? "bg-amber-500 text-white shadow-lg shadow-amber-500/30 border-amber-400 translate-y--0.5"
+                                                : "bg-white/50 text-slate-400 border-white/20 hover:border-amber-300 hover:text-amber-500"
+                                        )}
                                     >
                                         <Clock className="h-4 w-4" />
-                                    </Button>
-                                    <Button
-                                        size="sm"
-                                        variant={attendance[s.studentId] === "Absent" ? "default" : "outline"}
-                                        className={attendance[s.studentId] === "Absent" ? "bg-red-600 hover:bg-red-700" : ""}
+                                        {attendance[s.studentId] === "Late" && "Late"}
+                                    </button>
+                                    <button
                                         onClick={() => setStatus(s.studentId, "Absent")}
+                                        className={cn(
+                                            "p-3 rounded-xl border transition-all duration-300 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest",
+                                            attendance[s.studentId] === "Absent"
+                                                ? "bg-red-500 text-white shadow-lg shadow-red-500/30 border-red-400 translate-y--0.5"
+                                                : "bg-white/50 text-slate-400 border-white/20 hover:border-red-300 hover:text-red-500"
+                                        )}
                                     >
                                         <XCircle className="h-4 w-4" />
-                                    </Button>
+                                        {attendance[s.studentId] === "Absent" && "Absent"}
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
 
-                    <div className="p-4 border-t bg-gray-50">
+                    <div className="p-8 border-t border-white/20 bg-white/40">
                         <Button
                             onClick={handleSubmit}
                             disabled={submitting}
-                            className="w-full bg-indigo-600 hover:bg-indigo-700"
+                            variant="primary"
+                            className="w-full text-[12px] font-black uppercase tracking-[0.2em] shadow-xl group"
                         >
-                            {submitting ? "Saving..." : "Save Attendance"}
+                            {submitting ? "Synchronizing..." : "Commit Attendance Records"}
+                            <Save className="h-4 w-4 ml-2 group-hover:scale-110 transition-transform" />
                         </Button>
                     </div>
-                </div>
+                </GlassCard>
             )}
         </div>
     );

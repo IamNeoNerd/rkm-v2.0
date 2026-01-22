@@ -6,41 +6,85 @@ description: Performance audit workflow for RK Institute ERP
 
 Use this workflow periodically to ensure the application maintains peak performance.
 
-## 1. Network Chaining Audit
-Check major routes (Dashboard, Student List, Family Page) for sequential client-side requests.
+0. Automated Performance Gate (MANDATORY – First Step)
 
-1. Open Browser DevTools (Network Tab).
-2. Load the page.
-3. **Red Flag**: If you see a waterfall where Request B only starts after Request A finishes, and both are needed for the initial UI.
-4. **Fix**: Consolidate into a single Server Component fetch with `Promise.all`.
+Before opening Browser DevTools, create and run Playwright performance tests that:
 
-## 2. N+1 Query Audit
-Review server actions and data fetchers for nested queries.
+Intercept all critical network requests (/api/*)
 
-1. Look for `.map()` or `for` loops containing `await db.select()`.
-2. **Red Flag**:
-   ```ts
-   families.map(async f => await db.select().from(students).where(eq(students.familyId, f.id)))
-   ```
-3. **Fix**: Fetch all related items in one query using `inArray` or a join, and group them in memory.
+Capture request start and end times
 
-## 3. Bundle Size Audit (Client Islands)
-Ensure Client Components aren't carrying excessive weight.
+Detect sequential (chained) requests required for initial UI rendering
 
-1. Verify that "Data Fetching" libraries are ONLY in the server layer.
-2. Check if a Client Component can be refactored into a Server Component with a smaller Client interactive wrapper.
+❌ Red Flag
 
-## 4. Middleware Latency Check
-Verify `/api/auth/session` response times.
+Request B starts only after Request A completes
 
-1. **Red Flag**: Response times > 100ms for session checks.
-2. **Fix**: Ensure the `jwt` callback in `src/auth.ts` has ZERO database queries.
+Both requests are required for first paint / initial UI
 
-## 5. Database Index Audit
-For slow queries identified via the Neon console:
+✅ Fix Expectation
 
-1. Use `explain_sql_statement` to check the execution plan.
-2. Add covering indexes for columns used in `WHERE` and `JOIN` clauses.
+Consolidate data fetching into a single Server Component or Server Action
 
----
-*Created: January 20, 2026*
+Use Promise.all for parallel fetching
+
+These tests must fail automatically if chaining is detected.
+
+1. Network Chaining Audit (Manual – Only If Tests Fail)
+
+Use Browser DevTools only after Playwright tests fail, to visually inspect the waterfall.
+
+2. N+1 Query Audit
+
+Audit server actions and data fetchers:
+
+Look for .map() or loops containing await db.*
+
+❌ Red Flag
+families.map(async f =>
+  await db.select().from(students).where(eq(students.familyId, f.id))
+)
+
+✅ Fix
+
+Fetch related data in a single query using JOIN or inArray
+
+Group results in memory
+
+3. Bundle Size Audit (Client Islands)
+
+Ensure data-fetching libraries exist only in the server layer
+
+Refactor Client Components into Server Components with minimal client wrappers where possible
+
+4. Middleware Latency Check
+
+Test /api/auth/session using automated timing assertions
+
+❌ Red Flag
+
+Response time > 100ms
+
+✅ Fix
+
+Ensure jwt callback in src/auth.ts performs zero database queries
+
+5. Database Index Audit
+
+Use Neon’s explain_sql_statement for slow queries
+
+Add covering indexes for WHERE and JOIN columns
+
+🧠 Operating Mode
+
+Act as a world-class performance engineer.
+
+Automation-first mindset
+
+DevTools is a debugging tool, not a testing tool
+
+Performance regressions must fail CI
+
+Optimize for real user experience, not synthetic scores
+
+Created: January 20, 2026 (Automation-first revision)

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { GraduationCap, Receipt } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/modern/Button";
 import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
 
 interface StudentQuickActionsProps {
@@ -25,17 +25,17 @@ export function StudentQuickActions({
 
     return (
         <>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-4 mt-6">
                 <Link href="/academics">
-                    <Button variant="outline">
+                    <Button variant="glass" className="border-primary/20 bg-primary/5 hover:bg-primary/10">
                         <GraduationCap className="h-4 w-4 mr-2" />
                         Enroll in Batch
                     </Button>
                 </Link>
                 <Button
-                    variant="outline"
+                    variant="primary"
                     onClick={() => setPaymentOpen(true)}
-                    className="text-green-600 border-green-200 hover:bg-green-50"
+                    className="shadow-primary/20 shadow-lg"
                 >
                     <Receipt className="h-4 w-4 mr-2" />
                     Collect Fee
@@ -50,7 +50,7 @@ export function StudentQuickActions({
                 studentName={studentName}
                 currentDue={currentDue}
                 onSuccess={() => {
-                    // Optionally refresh the page
+                    // Refresh the page to reflect balance changes
                     window.location.reload();
                 }}
             />

@@ -8,11 +8,13 @@ import {
     SheetTitle,
     SheetDescription
 } from "@/components/ui/sheet";
-import { GraduationCap, Calendar, Clock, User, AlertCircle } from "lucide-react";
+import { GraduationCap, Calendar, Clock, User, AlertCircle, Activity, Sparkles, ChevronRight } from "lucide-react";
 import { AttendanceCalendar } from "./AttendanceCalendar";
 import { getStudentAttendance, getStudentBatches } from "@/actions/parent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GlassCard } from "@/components/modern/Card";
+import { cn } from "@/lib/utils";
 
 interface Student {
     id: number;
@@ -63,27 +65,31 @@ export function StudentDetails({ student, isOpen, onClose }: StudentDetailsProps
     return (
         <Sheet open={isOpen} onOpenChange={onClose}>
             <SheetContent side="right" className="w-full sm:max-w-md overflow-y-auto">
-                <SheetHeader className="mb-6">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-indigo-100 p-3 rounded-full">
-                            <GraduationCap className="h-6 w-6 text-indigo-600" />
+                <SheetHeader className="pb-8 border-b border-slate-100">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-xl shadow-indigo-500/20">
+                            <GraduationCap className="h-8 w-8 text-white" />
                         </div>
                         <div>
-                            <SheetTitle className="text-xl font-bold">{student.name}</SheetTitle>
-                            <SheetDescription>{student.class}</SheetDescription>
+                            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.3em] mb-1">Entity Profile</p>
+                            <SheetTitle className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">{student.name}</SheetTitle>
+                            <div className="flex items-center gap-2 mt-2">
+                                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Node ID:</span>
+                                <span className="text-[10px] font-black text-slate-900 font-mono">#{student.id.toString().padStart(4, '0')}</span>
+                            </div>
                         </div>
                     </div>
                 </SheetHeader>
 
-                <Tabs defaultValue="attendance" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-6">
-                        <TabsTrigger value="attendance" className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            Attendance
+                <Tabs defaultValue="attendance" className="w-full mt-8">
+                    <TabsList className="grid w-full grid-cols-2 p-1.5 bg-slate-100/50 rounded-2xl mb-8">
+                        <TabsTrigger value="attendance" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg text-[10px] font-black uppercase tracking-widest gap-2">
+                            <Activity className="h-3.5 w-3.5" />
+                            Pulse Sync
                         </TabsTrigger>
-                        <TabsTrigger value="schedule" className="flex items-center gap-2">
-                            <Clock className="h-4 w-4" />
-                            Schedule
+                        <TabsTrigger value="schedule" className="rounded-xl data-[state=active]:bg-white data-[state=active]:shadow-lg text-[10px] font-black uppercase tracking-widest gap-2">
+                            <Clock className="h-3.5 w-3.5" />
+                            Temporal Node
                         </TabsTrigger>
                     </TabsList>
 
@@ -117,26 +123,37 @@ export function StudentDetails({ student, isOpen, onClose }: StudentDetailsProps
                             <div className="space-y-4">
                                 {batches.length > 0 ? (
                                     batches.map(batch => (
-                                        <div key={batch.id} className="p-4 rounded-xl border-2 border-slate-100 bg-white shadow-sm space-y-3">
+                                        <GlassCard key={batch.id} className="p-5 border-white/60 shadow-lg space-y-4 hover:border-indigo-500/20 transition-all duration-300" intensity="medium">
                                             <div className="flex justify-between items-start">
-                                                <h4 className="font-bold text-gray-900">{batch.name}</h4>
-                                                <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${batch.isActive ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-                                                    }`}>
-                                                    {batch.isActive ? "Active" : "Inactive"}
-                                                </span>
+                                                <div>
+                                                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Instructional Node</p>
+                                                    <h4 className="text-xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">{batch.name}</h4>
+                                                </div>
+                                                <div className={cn(
+                                                    "px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest border",
+                                                    batch.isActive
+                                                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                        : "bg-red-50 text-red-600 border-red-100"
+                                                )}>
+                                                    {batch.isActive ? "ACTIVE" : "OFFLINE"}
+                                                </div>
                                             </div>
 
-                                            <div className="grid gap-2">
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Clock className="h-4 w-4 text-indigo-500" />
-                                                    <span>{batch.schedule || "No schedule set"}</span>
+                                            <div className="grid gap-3 pt-4 border-t border-slate-100">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center">
+                                                        <Clock className="h-4 w-4 text-indigo-500" />
+                                                    </div>
+                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-tight">{batch.schedule || "ST_SCHEDULE_NULL"}</span>
                                                 </div>
-                                                <div className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <User className="h-4 w-4 text-indigo-500" />
-                                                    <span>Teacher: {batch.teacherName || "Not assigned"}</span>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center">
+                                                        <User className="h-4 w-4 text-purple-500" />
+                                                    </div>
+                                                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-tight">INSTRUCTOR: {batch.teacherName || "UNASSIGNED"}</span>
                                                 </div>
                                             </div>
-                                        </div>
+                                        </GlassCard>
                                     ))
                                 ) : (
                                     <div className="text-center py-12 text-gray-500">

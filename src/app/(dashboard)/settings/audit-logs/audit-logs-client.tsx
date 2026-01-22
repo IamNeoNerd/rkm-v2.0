@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
     History,
-    ArrowLeft,
     Search,
     Filter,
     RefreshCw,
@@ -20,22 +19,26 @@ import {
     CreditCard,
     GraduationCap,
     Settings,
-    AlertCircle
+    AlertCircle,
+    Zap,
+    Cpu,
+    ArrowRight
 } from "lucide-react";
-import Link from "next/link";
 import { format, formatDistanceToNow } from "date-fns";
 import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
+import { GlassCard } from "@/components/modern/Card";
+import { cn } from "@/lib/utils";
 
 // Action category icons and colors
-const actionConfig: Record<string, { icon: React.ReactNode; color: string; bgColor: string }> = {
-    auth: { icon: <Shield className="h-4 w-4" />, color: "text-blue-600", bgColor: "bg-blue-50" },
-    user: { icon: <User className="h-4 w-4" />, color: "text-purple-600", bgColor: "bg-purple-50" },
-    payment: { icon: <CreditCard className="h-4 w-4" />, color: "text-green-600", bgColor: "bg-green-50" },
-    admission: { icon: <Users className="h-4 w-4" />, color: "text-indigo-600", bgColor: "bg-indigo-50" },
-    batch: { icon: <GraduationCap className="h-4 w-4" />, color: "text-orange-600", bgColor: "bg-orange-50" },
-    staff: { icon: <Users className="h-4 w-4" />, color: "text-teal-600", bgColor: "bg-teal-50" },
-    settings: { icon: <Settings className="h-4 w-4" />, color: "text-gray-600", bgColor: "bg-gray-50" },
-    system: { icon: <AlertCircle className="h-4 w-4" />, color: "text-red-600", bgColor: "bg-red-50" },
+const actionConfig: Record<string, { icon: any; color: string; gradient: string }> = {
+    auth: { icon: Shield, color: "text-blue-500", gradient: "from-blue-500/10 to-transparent" },
+    user: { icon: User, color: "text-purple-500", gradient: "from-purple-500/10 to-transparent" },
+    payment: { icon: CreditCard, color: "text-emerald-500", gradient: "from-emerald-500/10 to-transparent" },
+    admission: { icon: Users, color: "text-indigo-500", gradient: "from-indigo-500/10 to-transparent" },
+    batch: { icon: GraduationCap, color: "text-amber-500", gradient: "from-amber-500/10 to-transparent" },
+    staff: { icon: Users, color: "text-cyan-500", gradient: "from-cyan-500/10 to-transparent" },
+    settings: { icon: Settings, color: "text-slate-500", gradient: "from-slate-500/10 to-transparent" },
+    system: { icon: AlertCircle, color: "text-rose-500", gradient: "from-rose-500/10 to-transparent" },
 };
 
 function getActionCategory(action: string): string {
@@ -56,7 +59,7 @@ export default function AuditLogsClient() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedAction, setSelectedAction] = useState("");
     const [actionTypes, setActionTypes] = useState<string[]>([]);
-    const [pagination, setPagination] = useState({ page: 1, limit: 25, total: 0, totalPages: 0 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 15, total: 0, totalPages: 0 });
     const [stats, setStats] = useState<{ recentActivityCount: number; activeUsersLast24h: number } | null>(null);
 
     const fetchLogs = useCallback(async () => {
@@ -83,243 +86,235 @@ export default function AuditLogsClient() {
         }
     }, [pagination.page, pagination.limit, searchQuery, selectedAction]);
 
-    const fetchStats = async () => {
-        try {
-            const result = await getAuditLogStats();
-            if (result.success) {
-                setStats(result.stats);
-            }
-        } catch (error) {
-            console.error("Failed to fetch stats:", error);
-        }
-    };
-
-    const fetchActionTypes = async () => {
-        try {
-            const types = await getAuditActionTypes();
-            setActionTypes(types);
-        } catch (error) {
-            console.error("Failed to fetch action types:", error);
-        }
-    };
-
     useEffect(() => {
         fetchLogs();
     }, [fetchLogs]);
 
     useEffect(() => {
-        fetchStats();
-        fetchActionTypes();
+        const fetchStatsAndTypes = async () => {
+            try {
+                const [statsRes, types] = await Promise.all([
+                    getAuditLogStats(),
+                    getAuditActionTypes()
+                ]);
+                if (statsRes.success) setStats(statsRes.stats);
+                setActionTypes(types);
+            } catch (error) {
+                console.error("Failed to sync audit metadata:", error);
+            }
+        };
+        fetchStatsAndTypes();
     }, []);
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        setPagination(prev => ({ ...prev, page: 1 }));
-        fetchLogs();
-    };
 
     return (
         <SettingsPageLayout
-            title="Audit Logs"
-            description="Track all system activities and user actions"
-            icon={<History className="h-8 w-8 text-indigo-600" />}
+            title="Audit Ledger"
+            description="Investigate operational history and security trails."
+            icon={<History className="h-8 w-8 text-amber-500" />}
+            maxWidth="xl"
+            showNavigation={false}
+            showHeader={false}
         >
-            <div className="flex justify-end mb-6">
-                <Button onClick={() => fetchLogs()} variant="outline" disabled={loading}>
-                    <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-                    Refresh
-                </Button>
-            </div>
-
-            {/* Stats Cards */}
-            {stats && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="bg-gradient-to-r from-indigo-500 to-indigo-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center gap-3">
-                            <Activity className="h-8 w-8 opacity-80" />
-                            <div>
-                                <p className="text-sm opacity-80">Last 24 Hours</p>
-                                <p className="text-2xl font-bold">{stats.recentActivityCount}</p>
-                            </div>
-                        </div>
+            <div className="space-y-10 animate-in fade-in duration-1000">
+                {/* Pulsar Header */}
+                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div>
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase leading-none mb-3">
+                            Audit Ledger
+                        </h1>
+                        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                            Operational History & Security Trails
+                        </p>
                     </div>
-                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center gap-3">
-                            <Users className="h-8 w-8 opacity-80" />
-                            <div>
-                                <p className="text-sm opacity-80">Active Users</p>
-                                <p className="text-2xl font-bold">{stats.activeUsersLast24h}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-gradient-to-r from-emerald-500 to-emerald-600 rounded-xl p-4 text-white shadow-lg">
-                        <div className="flex items-center gap-3">
-                            <History className="h-8 w-8 opacity-80" />
-                            <div>
-                                <p className="text-sm opacity-80">Total Records</p>
-                                <p className="text-2xl font-bold">{pagination.total}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Filters */}
-            <div className="bg-white rounded-xl shadow-md p-4 mb-6">
-                <form onSubmit={handleSearch} className="flex flex-wrap gap-4">
-                    <div className="flex-1 min-w-[200px]">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                            <Input
-                                placeholder="Search logs..."
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                className="pl-10"
-                            />
-                        </div>
-                    </div>
-                    <div className="w-48">
-                        <select
-                            value={selectedAction}
-                            onChange={(e) => {
-                                setSelectedAction(e.target.value);
-                                setPagination(prev => ({ ...prev, page: 1 }));
-                            }}
-                            className="w-full h-10 px-3 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                        >
-                            <option value="">All Actions</option>
-                            {actionTypes.map(type => (
-                                <option key={type} value={type}>{type}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <Button type="submit">
-                        <Filter className="h-4 w-4 mr-2" />
-                        Apply Filters
+                    <Button
+                        onClick={() => fetchLogs()}
+                        variant="glass"
+                        disabled={loading}
+                        className="rounded-xl border-white/40 h-10 px-6 backdrop-blur-xl group"
+                    >
+                        <RefreshCw className={cn("h-4 w-4 mr-2 transition-transform duration-700", loading && "animate-spin")} />
+                        <span className="text-[10px] font-black uppercase tracking-widest">Refresh Stream</span>
                     </Button>
-                </form>
-            </div>
+                </div>
 
-            {/* Logs Table */}
-            <div className="bg-white rounded-xl shadow-md overflow-hidden">
-                {loading ? (
-                    <div className="p-8 text-center">
-                        <RefreshCw className="h-8 w-8 animate-spin mx-auto text-gray-400" />
-                        <p className="mt-2 text-gray-500">Loading logs...</p>
-                    </div>
-                ) : logs.length === 0 ? (
-                    <div className="p-8 text-center">
-                        <History className="h-12 w-12 mx-auto text-gray-300" />
-                        <p className="mt-2 text-gray-500">No audit logs found</p>
-                        <p className="text-sm text-gray-400">Activity will appear here as users interact with the system</p>
-                    </div>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Entity</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Details</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {logs.map((log) => {
-                                    const category = getActionCategory(log.action);
-                                    const config = actionConfig[category] || actionConfig.system;
-
-                                    return (
-                                        <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <Clock className="h-3.5 w-3.5 text-gray-400" />
-                                                    <div>
-                                                        <p className="text-gray-900">
-                                                            {format(new Date(log.createdAt), "MMM dd, HH:mm")}
-                                                        </p>
-                                                        <p className="text-xs text-gray-500">
-                                                            {formatDistanceToNow(new Date(log.createdAt), { addSuffix: true })}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap">
-                                                <div className={`inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-medium ${config.bgColor} ${config.color}`}>
-                                                    {config.icon}
-                                                    {getActionDisplay(log.action)}
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3">
-                                                <div className="flex items-center gap-2">
-                                                    <div className="h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
-                                                        <User className="h-4 w-4 text-gray-500" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-medium text-gray-900">{log.userName || 'System'}</p>
-                                                        <p className="text-xs text-gray-500">{log.userId}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-4 py-3 whitespace-nowrap text-sm">
-                                                {log.entityType ? (
-                                                    <div>
-                                                        <span className="text-gray-900 capitalize">{log.entityType}</span>
-                                                        {log.entityId && (
-                                                            <span className="text-gray-500 ml-1">#{log.entityId}</span>
-                                                        )}
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-gray-400">—</span>
-                                                )}
-                                            </td>
-                                            <td className="px-4 py-3 text-sm text-gray-600 max-w-xs">
-                                                {log.details ? (
-                                                    <details className="cursor-pointer">
-                                                        <summary className="text-indigo-600 hover:text-indigo-800">
-                                                            View details
-                                                        </summary>
-                                                        <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-auto max-h-32">
-                                                            {JSON.stringify(log.details, null, 2)}
-                                                        </pre>
-                                                    </details>
-                                                ) : (
-                                                    <span className="text-gray-400">—</span>
-                                                )}
-                                            </td>
-                                        </tr>
-                                    );
-                                })}
-                            </tbody>
-                        </table>
+                {/* Stats Grid */}
+                {stats && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {[
+                            { label: "24H ACTIVITY", value: stats.recentActivityCount, icon: Activity, color: "text-indigo-500", accent: "bg-indigo-500/10" },
+                            { label: "ACTIVE IDENTITIES", value: stats.activeUsersLast24h, icon: Users, color: "text-purple-500", accent: "bg-purple-500/10" },
+                            { label: "TOTAL LOG NODES", value: pagination.total, icon: History, color: "text-amber-500", accent: "bg-amber-500/10" }
+                        ].map((stat, idx) => (
+                            <GlassCard key={idx} className="p-6 border-white/20" intensity="medium">
+                                <div className="flex items-center gap-5">
+                                    <div className={cn("p-4 rounded-2xl shadow-lg shadow-transparent transition-all group-hover:shadow-[0_0_20px_-5px_currentColor]", stat.accent, stat.color)}>
+                                        <stat.icon className="h-6 w-6" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400">{stat.label}</p>
+                                        <p className="text-2xl font-black text-slate-900 mt-0.5 tracking-tight font-mono">{stat.value}</p>
+                                    </div>
+                                </div>
+                            </GlassCard>
+                        ))}
                     </div>
                 )}
 
-                {/* Pagination */}
+                {/* Filter Matrix */}
+                <GlassCard className="p-6" intensity="high">
+                    <div className="flex flex-wrap gap-4 items-center">
+                        <div className="flex-1 min-w-[300px] relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+                            <Input
+                                placeholder="SEARCH LOG NODES..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="pl-12 h-12 bg-white/50 border-white/40 rounded-xl font-black uppercase text-[10px] tracking-widest focus:ring-primary/20"
+                            />
+                        </div>
+                        <div className="w-64 relative">
+                            <select
+                                value={selectedAction}
+                                onChange={(e) => {
+                                    setSelectedAction(e.target.value);
+                                    setPagination(prev => ({ ...prev, page: 1 }));
+                                }}
+                                className="w-full h-12 px-4 bg-white/50 border border-white/40 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary/20 appearance-none transition-all cursor-pointer"
+                            >
+                                <option value="">ALL SIGNATURES</option>
+                                {actionTypes.map(type => (
+                                    <option key={type} value={type}>{type.toUpperCase()}</option>
+                                ))}
+                            </select>
+                            <Filter className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                        </div>
+                    </div>
+                </GlassCard>
+
+                {/* Ledger View */}
+                <div className="space-y-4">
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24 gap-4">
+                            <div className="h-10 w-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                            <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 animate-pulse">Syncing Ledger...</span>
+                        </div>
+                    ) : logs.length === 0 ? (
+                        <GlassCard className="p-20 flex flex-col items-center justify-center text-center opacity-50" intensity="low">
+                            <History className="h-12 w-12 text-slate-300 mb-4" />
+                            <p className="text-sm font-black uppercase tracking-widest text-slate-900">Zero Records Synchronized</p>
+                            <p className="text-[10px] mt-2 text-slate-400 uppercase tracking-wider">Operational activity is currently dormant.</p>
+                        </GlassCard>
+                    ) : (
+                        <div className="grid grid-cols-1 gap-4">
+                            {logs.map((log) => {
+                                const category = getActionCategory(log.action);
+                                const config = actionConfig[category] || actionConfig.system;
+                                const ActionIcon = config.icon;
+
+                                return (
+                                    <GlassCard key={log.id} className="p-6 group hover:translate-x-1 transition-all" intensity="medium">
+                                        <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+                                            {/* Time Column */}
+                                            <div className="w-40 shrink-0">
+                                                <div className="flex items-center gap-3 text-slate-900">
+                                                    <Clock className="h-4 w-4 text-slate-300" />
+                                                    <span className="text-sm font-black tracking-tighter uppercase">{format(new Date(log.createdAt), "MMM dd")}</span>
+                                                </div>
+                                                <p className="text-[10px] font-bold text-slate-400 mt-0.5 ml-7 uppercase">{format(new Date(log.createdAt), "HH:mm")}</p>
+                                            </div>
+
+                                            {/* Action Identity */}
+                                            <div className="w-64 shrink-0 flex items-center gap-4">
+                                                <div className={cn("p-3 rounded-2xl bg-gradient-to-br", config.gradient, config.color)}>
+                                                    <ActionIcon className="h-4 w-4" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <span className={cn("text-[10px] font-black uppercase tracking-widest", config.color)}>
+                                                        {getActionDisplay(log.action)}
+                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[9px] font-black uppercase text-slate-400 tracking-tighter">{log.userName || 'SYSTEM'}</span>
+                                                        <div className="h-1 w-1 rounded-full bg-slate-200" />
+                                                        <span className="text-[8px] font-mono text-slate-400 uppercase">#{log.userId?.slice(-4) || 'CORE'}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Entity Data */}
+                                            <div className="flex-1 flex items-center gap-4">
+                                                {log.entityType ? (
+                                                    <div className="px-4 py-2 bg-slate-900/5 border border-slate-900/10 rounded-xl flex items-center gap-3 w-fit">
+                                                        <span className="text-[10px] font-black text-slate-900 uppercase tracking-tighter">{log.entityType}</span>
+                                                        {log.entityId && (
+                                                            <>
+                                                                <ArrowRight className="h-3 w-3 text-slate-300" />
+                                                                <span className="text-[10px] font-mono text-slate-500 font-bold uppercase tracking-wider">{log.entityId}</span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-[10px] font-black text-slate-300 tracking-[0.4em] uppercase">NO_ENTITY_DATA</span>
+                                                )}
+                                            </div>
+
+                                            {/* Detail Expand */}
+                                            <div className="shrink-0">
+                                                {log.details ? (
+                                                    <details className="group/details">
+                                                        <summary className="list-none cursor-pointer">
+                                                            <div className="flex items-center gap-2 px-6 py-2 bg-white/50 border border-white/80 rounded-full text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition-all">
+                                                                <span className="text-[9px] font-black uppercase tracking-widest">Metadata</span>
+                                                                <ChevronRight className="h-3 w-3 transition-transform group-open/details:rotate-90" />
+                                                            </div>
+                                                        </summary>
+                                                        <div className="absolute left-0 right-0 mt-4 p-6 bg-slate-950/95 backdrop-blur-3xl rounded-3xl border border-white/10 z-50 text-emerald-400 font-mono text-[10px] overflow-auto max-h-64 shadow-2xl animate-in fade-in zoom-in duration-300">
+                                                            <div className="flex items-center gap-3 mb-4 border-b border-white/10 pb-4">
+                                                                <Cpu className="h-4 w-4 text-emerald-500" />
+                                                                <span className="text-[9px] font-black text-emerald-700 uppercase tracking-[0.3em]">Node Data Synthesis</span>
+                                                            </div>
+                                                            <pre className="whitespace-pre-wrap leading-relaxed opacity-80">
+                                                                {JSON.stringify(log.details, null, 2)}
+                                                            </pre>
+                                                        </div>
+                                                    </details>
+                                                ) : (
+                                                    <div className="h-8 w-8 rounded-full border border-dashed border-slate-200" />
+                                                )}
+                                            </div>
+                                        </div>
+                                    </GlassCard>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* Pagination Matrix */}
                 {pagination.totalPages > 1 && (
-                    <div className="px-4 py-3 border-t border-gray-200 flex items-center justify-between">
-                        <p className="text-sm text-gray-500">
-                            Page {pagination.page} of {pagination.totalPages} ({pagination.total} total)
+                    <div className="flex items-center justify-between pt-6 border-t border-slate-200/50">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            NODE {pagination.page} OF {pagination.totalPages} <span className="text-slate-200 mx-2">|</span> TOTAL {pagination.total} LOGS
                         </p>
-                        <div className="flex gap-2">
+                        <div className="flex gap-4">
                             <Button
-                                variant="outline"
+                                variant="glass"
                                 size="sm"
                                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                                 disabled={pagination.page === 1}
+                                className="rounded-xl border-white/40 font-black uppercase tracking-widest text-[10px] h-10 px-6 backdrop-blur-xl"
                             >
-                                <ChevronLeft className="h-4 w-4" />
-                                Previous
+                                <ChevronLeft className="h-4 w-4 mr-2" />
+                                Prev Pulse
                             </Button>
                             <Button
-                                variant="outline"
+                                variant="glass"
                                 size="sm"
                                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                                 disabled={pagination.page === pagination.totalPages}
+                                className="rounded-xl border-white/40 font-black uppercase tracking-widest text-[10px] h-10 px-6 backdrop-blur-xl"
                             >
-                                Next
-                                <ChevronRight className="h-4 w-4" />
+                                Next Pulse
+                                <ChevronRight className="h-4 w-4 ml-2" />
                             </Button>
                         </div>
                     </div>

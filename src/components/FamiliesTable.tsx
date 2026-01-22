@@ -9,15 +9,19 @@ import {
     ChevronRight,
     Filter,
     ArrowUpRight,
-    MessageSquare
+    MessageSquare,
+    Wallet
 } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
-import { formatCurrency } from "@/lib/utils";
+import { formatCurrency, cn } from "@/lib/utils";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useDebounce } from "@/hooks/use-debounce";
 import { toast } from "sonner";
 import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
+import { GlassCard } from "@/components/modern/Card";
+import { Button } from "@/components/modern/Button";
+import { Input } from "@/components/modern/Input";
 
 interface Family {
     id: number;
@@ -70,118 +74,133 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
     }, [debouncedSearch, router, searchParams]);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Filters Row */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div className="relative w-full md:max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                    <input
-                        type="text"
-                        placeholder="Search by father's name or phone..."
-                        className="w-full pl-10 pr-4 py-2 bg-slate-50 border-none rounded-lg focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
+            <GlassCard className="p-6" intensity="medium">
+                <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+                    <div className="relative w-full md:max-w-lg group">
+                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                        <Input
+                            placeholder="Identify family by father's name or contact..."
+                            className="pl-11"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
 
-                <div className="flex items-center gap-2 w-full md:w-auto">
-                    <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                        <Filter className="h-4 w-4" />
-                        More Filters
-                    </button>
-                    <Link
-                        href="/admission"
-                        className="flex-1 md:flex-none flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors"
-                    >
-                        <Users className="h-4 w-4" />
-                        New Admission
-                    </Link>
+                    <div className="flex items-center gap-3 w-full md:w-auto">
+                        <Button variant="glass" size="lg" className="rounded-2xl border-white/40">
+                            <Filter className="h-4 w-4 mr-2" />
+                            Filters
+                        </Button>
+                        <Link href="/admission" className="flex-1 md:flex-none">
+                            <Button variant="primary" size="lg" className="rounded-2xl shadow-primary/20 shadow-xl w-full">
+                                <Users className="h-4 w-4 mr-2" />
+                                New Admission
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
-            </div>
+            </GlassCard>
 
             {/* Families List/Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+            <GlassCard className="overflow-hidden border-white/20" intensity="low">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-50/50 border-b border-slate-200">
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Family ID</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Parent Details</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-center">Students</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider">Balance</th>
-                                <th className="px-6 py-4 text-xs font-semibold text-slate-500 uppercase tracking-wider text-right">Actions</th>
+                            <tr className="bg-white/30 dark:bg-slate-900/30 border-b border-white/10 dark:border-slate-800/50">
+                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Matrix ID</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">HOD Details</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">Nodes</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Financial Pulse</th>
+                                <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">Operations</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-200">
+                        <tbody className="divide-y divide-white/5 dark:divide-slate-800/50">
                             {families.length > 0 ? (
                                 families.map((family) => (
-                                    <tr key={family.id} className="hover:bg-slate-50 transition-colors group">
+                                    <tr key={family.id} className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 group">
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800">
-                                                #{family.id}
+                                            <span className="inline-flex items-center px-3 py-1 rounded-xl text-[10px] font-black bg-slate-100 dark:bg-slate-800/50 text-slate-500 uppercase tracking-widest border border-slate-200 dark:border-slate-700">
+                                                ID-{family.id.toString().padStart(4, '0')}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex flex-col">
-                                                <span className="text-sm font-semibold text-slate-900">{family.fatherName || "Not Provided"}</span>
-                                                <div className="flex items-center gap-1.5 mt-0.5 text-xs text-slate-500">
-                                                    <Phone className="h-3 w-3" />
+                                                <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                                                    {family.fatherName || "Anonymous"}
+                                                </span>
+                                                <div className="flex items-center gap-1.5 mt-0.5 text-xs font-bold text-muted-foreground/60 tracking-wider">
+                                                    <Phone className="h-3 w-3 opacity-40" />
                                                     {family.phone || "-"}
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-center">
-                                            <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-indigo-50 text-indigo-700 text-xs font-bold border border-indigo-100">
+                                            <div className="inline-flex items-center justify-center h-9 w-9 rounded-xl bg-primary/10 text-primary text-xs font-black border border-primary/20 shadow-sm">
                                                 {family.studentCount}
-                                            </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="flex flex-col">
-                                                <span className={`text-sm font-bold ${family.balance < 0 ? 'text-red-600' : 'text-emerald-600'}`}>
-                                                    {family.balance < 0 ? '-' : ''} {formatCurrency(Math.abs(family.balance))}
-                                                </span>
-                                                <span className="text-[10px] text-slate-400 font-medium uppercase tracking-tighter">
-                                                    {family.balance < 0 ? 'Outstanding Due' : 'Available Balance'}
-                                                </span>
+                                            <div className="flex items-center gap-3">
+                                                <div className={cn(
+                                                    "p-2 rounded-xl border shadow-sm",
+                                                    family.balance < 0
+                                                        ? 'bg-cta/10 border-cta/20 text-cta'
+                                                        : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'
+                                                )}>
+                                                    <Wallet className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className={cn(
+                                                        "text-sm font-black tracking-tight",
+                                                        family.balance < 0 ? 'text-cta' : 'text-emerald-500'
+                                                    )}>
+                                                        {family.balance < 0 ? '-' : ''} {formatCurrency(Math.abs(family.balance))}
+                                                    </span>
+                                                    <span className="text-[10px] font-black text-muted-foreground/50 uppercase tracking-wider">
+                                                        {family.balance < 0 ? 'Due' : 'Balance'}
+                                                    </span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <Link
                                                     href={`/families/${family.id}`}
-                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                                                    title="View Details"
+                                                    className="p-2.5 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-transparent hover:border-white/40 shadow-none hover:shadow-lg"
+                                                    title="View Matrix Details"
                                                 >
                                                     <ArrowUpRight className="h-4 w-4" />
                                                 </Link>
                                                 <button
                                                     onClick={() => toast.info("Reminder system coming in Phase 4")}
-                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                                                    title="Send Reminder"
+                                                    className="p-2.5 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-transparent hover:border-white/40 shadow-none hover:shadow-lg"
+                                                    title="Push Notification"
                                                 >
                                                     <MessageSquare className="h-4 w-4" />
                                                 </button>
-                                                <button
+                                                <Button
+                                                    size="sm"
+                                                    variant="glass"
+                                                    className="text-primary hover:bg-primary hover:text-white border-primary/20 px-4"
                                                     onClick={() => handlePayClick(family)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all border border-indigo-100"
                                                 >
-                                                    <CreditCard className="h-3.5 w-3.5" />
+                                                    <CreditCard className="h-3.5 w-3.5 mr-2" />
                                                     Pay
-                                                </button>
+                                                </Button>
                                             </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-20 text-center">
-                                        <div className="flex flex-col items-center justify-center">
-                                            <div className="h-16 w-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                                                <Users className="h-8 w-8 text-slate-300" />
-                                            </div>
-                                            <h3 className="text-lg font-semibold text-slate-900">No families found</h3>
-                                            <p className="text-slate-500 text-sm max-w-xs mx-auto mt-1">
-                                                Try adjusting your search or add a new family via student admission.
+                                    <td colSpan={5} className="px-6 py-24 text-center">
+                                        <div className="flex flex-col items-center justify-center opacity-40">
+                                            <Users className="h-16 w-16 text-muted-foreground mb-4" />
+                                            <h3 className="text-lg font-black uppercase tracking-widest text-foreground">Zero Matrix Links</h3>
+                                            <p className="text-muted-foreground text-xs max-w-xs mx-auto mt-2 font-bold leading-relaxed uppercase tracking-widest">
+                                                The search query yielded no results from the family node database.
                                             </p>
                                         </div>
                                     </td>
@@ -193,14 +212,16 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
 
                 {/* Pagination */}
                 {pagination && pagination.totalPages > 1 && (
-                    <PaginationControls
-                        currentPage={pagination.page}
-                        totalPages={pagination.totalPages}
-                        total={pagination.total}
-                        limit={pagination.limit}
-                    />
+                    <div className="p-6 border-t border-white/10 dark:border-slate-800/50 bg-white/10 dark:bg-slate-950/20">
+                        <PaginationControls
+                            currentPage={pagination.page}
+                            totalPages={pagination.totalPages}
+                            total={pagination.total}
+                            limit={pagination.limit}
+                        />
+                    </div>
                 )}
-            </div>
+            </GlassCard>
 
             {/* Quick Payment Dialog */}
             {selectedFamily && (

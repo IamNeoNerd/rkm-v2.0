@@ -2,10 +2,11 @@
 'use server';
 
 import { db } from "@/db";
-import { staff, transactions } from "@/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { staff, transactions, users } from "@/db/schema";
+import { eq, desc, sql, or } from "drizzle-orm";
 import { safeRevalidatePath } from "@/lib/server-utils";
 import { requireRole, AuthorizationError } from "@/lib/auth-guard";
+import bcrypt from "bcryptjs";
 
 export type StaffRole = "ADMIN" | "TEACHER" | "RECEPTIONIST" | "STAFF";
 
@@ -182,6 +183,7 @@ export async function updateStaff(
         role?: StaffRole;
         roleType?: string | null;
         baseSalary?: number;
+        password?: string;
     }
 ) {
     try {
@@ -208,6 +210,63 @@ export async function updateStaff(
             }
         }
 
+        // Check for duplicate email if email is being updated
+        if (data.email) {
+            const existingEmail = await db.query.staff.findFirst({
+                where: eq(staff.email, data.email.trim())
+            });
+            if (existingEmail && existingEmail.id !== staffId) {
+                return { success: false, error: "Another staff member with this email already exists." };
+            }
+        }
+
+        // Handle Password Update & User Synchronization
+        if (data.password) {
+            const staffRecord = await db.query.staff.findFirst({
+                where: eq(staff.id, staffId)
+            });
+
+            if (staffRecord) {
+                const phoneNumber = data.phone || staffRecord.phone;
+                const emailAddress = data.email || staffRecord.email;
+                const hashedPassword = await bcrypt.hash(data.password, 10);
+
+                // Try to find existing user by phone OR email
+                const [existingUser] = await db.select().from(users).where(
+                    or(
+                        eq(users.phone, phoneNumber),
+                        emailAddress ? eq(users.email, emailAddress) : sql`false`
+                    )
+                ).limit(1);
+
+                if (existingUser) {
+                    await db.update(users).set({
+                        password: hashedPassword,
+                        name: data.name || staffRecord.name,
+                        email: emailAddress || existingUser.email,
+                        phone: phoneNumber,
+                        role: (data.role || staffRecord.role).toLowerCase() === 'admin' ? 'admin' :
+                            (data.role || staffRecord.role).toLowerCase() === 'teacher' ? 'teacher' :
+                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'user',
+                        updatedAt: new Date()
+                    }).where(eq(users.id, existingUser.id));
+                } else {
+                    // Create new user for this staff member
+                    await db.insert(users).values({
+                        name: data.name || staffRecord.name,
+                        email: emailAddress || `${phoneNumber}@rkinstitute.com`,
+                        phone: phoneNumber,
+                        password: hashedPassword,
+                        role: (data.role || staffRecord.role).toLowerCase() === 'admin' ? 'admin' :
+                            (data.role || staffRecord.role).toLowerCase() === 'teacher' ? 'teacher' :
+                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'user',
+                        isVerified: true,
+                        updatedAt: new Date()
+                    });
+                }
+            }
+        }
+
         const [updated] = await db
             .update(staff)
             .set(updateData)
@@ -227,7 +286,8 @@ export async function updateStaff(
             return { success: false, error: error.message, code: error.code };
         }
         console.error("Error updating staff:", error);
-        return { success: false, error: "Failed to update staff member" };
+        const errorMessage = error instanceof Error ? error.message : "Failed to update staff member";
+        return { success: false, error: errorMessage };
     }
 }
 
@@ -290,5 +350,32 @@ export async function reactivateStaff(staffId: number) {
         }
         console.error("Error reactivating staff:", error);
         return { success: false, error: "Failed to reactivate staff member" };
+    }
+}
+
+/**
+ * Purge test data created by Playwright
+ */
+export async function purgeTestStaff() {
+    try {
+        await requireRole(["super-admin"]);
+
+        const deleted = await db.delete(staff)
+            .where(
+                or(
+                    sql`${staff.name} LIKE 'Test_%'`,
+                    sql`${staff.name} LIKE 'TestStaff_%'`
+                )
+            )
+            .returning();
+
+        safeRevalidatePath("/staff");
+        return { success: true, count: deleted.length };
+    } catch (error) {
+        if (error instanceof AuthorizationError) {
+            return { success: false, error: error.message };
+        }
+        console.error("Purage error", error);
+        return { success: false, error: "Failed to purge test personnel" };
     }
 }

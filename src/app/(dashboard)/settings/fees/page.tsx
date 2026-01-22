@@ -2,13 +2,14 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { getFeeStructures, createFeeStructure, updateFeeStructure, deleteFeeStructure } from "@/actions/session";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Button } from "@/components/modern/Button";
+import { Input } from "@/components/modern/Input";
 import { Label } from "@/components/ui/label";
+import { GlassCard } from "@/components/modern/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, IndianRupee, GraduationCap } from "lucide-react";
+import { Plus, Pencil, Trash2, IndianRupee, GraduationCap, Coins, Settings2, Save, Trash, X } from "lucide-react";
 import { toast } from "sonner";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
+import { cn } from "@/lib/utils";
 
 interface FeeStructure {
     id: number;
@@ -99,126 +100,150 @@ export default function FeesSettingsPage() {
 
     if (loading) {
         return (
-            <div className="p-6 max-w-4xl mx-auto">
-                <div className="animate-pulse space-y-4">
-                    <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-                    <div className="h-32 bg-gray-200 rounded"></div>
-                </div>
+            <div className="p-8 max-w-5xl mx-auto space-y-8 animate-pulse">
+                <div className="h-12 bg-slate-200 rounded-2xl w-1/3 opacity-50" />
+                <div className="h-96 bg-slate-100 rounded-3xl" />
             </div>
         );
     }
 
     return (
-        <SettingsPageLayout
-            title="Fee Structure"
-            description="Configure class-wise monthly and admission fees"
-            icon={<IndianRupee className="h-8 w-8 text-indigo-600" />}
-            maxWidth="lg"
-        >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-end gap-4 mb-6">
-                <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
-                    <DialogTrigger asChild>
-                        <Button className="flex items-center gap-2">
-                            <Plus className="h-4 w-4" />
-                            <span className="hidden sm:inline">Add Fee Structure</span>
-                            <span className="sm:hidden">Add</span>
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                            <DialogTitle>{editingId ? "Edit" : "Add"} Fee Structure</DialogTitle>
-                        </DialogHeader>
-                        <form onSubmit={handleSubmit} className="space-y-4">
-                            <div>
-                                <Label htmlFor="className">Class Name</Label>
-                                <Input
-                                    id="className"
-                                    value={formData.className}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, className: e.target.value }))}
-                                    placeholder="e.g., Class 10"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="monthlyFee">Monthly Fee (₹)</Label>
-                                <Input
-                                    id="monthlyFee"
-                                    type="number"
-                                    value={formData.monthlyFee}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, monthlyFee: e.target.value }))}
-                                    placeholder="e.g., 3000"
-                                    required
-                                    min="0"
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="admissionFee">Admission Fee (₹)</Label>
-                                <Input
-                                    id="admissionFee"
-                                    type="number"
-                                    value={formData.admissionFee}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, admissionFee: e.target.value }))}
-                                    placeholder="e.g., 1000"
-                                    min="0"
-                                />
-                            </div>
-                            <div className="flex justify-end gap-2">
-                                <Button type="button" variant="outline" onClick={() => setDialogOpen(false)}>
-                                    Cancel
-                                </Button>
-                                <Button type="submit">
-                                    {editingId ? "Update" : "Create"}
-                                </Button>
-                            </div>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+        <div className="p-8 max-w-5xl mx-auto space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            {/* Header Hub */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase leading-none mb-3 font-satoshi">
+                        Revenue Model
+                    </h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                        Class-wise Fee Structures & Admission Tier Matrix
+                    </p>
+                </div>
+                <div className="flex items-center gap-4">
+                    <Dialog open={dialogOpen} onOpenChange={(open) => { setDialogOpen(open); if (!open) resetForm(); }}>
+                        <DialogTrigger asChild>
+                            <Button variant="primary" className="h-12 px-8 text-[10px] font-black uppercase tracking-[0.2em] gap-2 shadow-xl">
+                                <Plus className="h-4 w-4" />
+                                Add Structure
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md bg-white/80 backdrop-blur-xl border-white/40 shadow-2xl rounded-[2rem]">
+                            <DialogHeader>
+                                <DialogTitle className="text-2xl font-black text-slate-900 uppercase tracking-tight">
+                                    {editingId ? "Edit" : "Add"} Structure
+                                </DialogTitle>
+                            </DialogHeader>
+                            <form onSubmit={handleSubmit} className="space-y-6 mt-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="className" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Class Nomenclature</Label>
+                                    <Input
+                                        id="className"
+                                        value={formData.className}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, className: e.target.value }))}
+                                        placeholder="e.g., Class 10"
+                                        className="h-12 bg-white/50 border-white/40 font-bold"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="monthlyFee" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Monthly Unit (₹)</Label>
+                                        <Input
+                                            id="monthlyFee"
+                                            type="number"
+                                            value={formData.monthlyFee}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, monthlyFee: e.target.value }))}
+                                            placeholder="3000"
+                                            className="h-12 bg-white/50 border-white/40 font-bold"
+                                            required
+                                            min="0"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="admissionFee" className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Admission Unit (₹)</Label>
+                                        <Input
+                                            id="admissionFee"
+                                            type="number"
+                                            value={formData.admissionFee}
+                                            onChange={(e) => setFormData(prev => ({ ...prev, admissionFee: e.target.value }))}
+                                            placeholder="1000"
+                                            className="h-12 bg-white/50 border-white/40 font-bold"
+                                            min="0"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex justify-end gap-3 pt-4">
+                                    <Button type="button" variant="ghost" className="uppercase tracking-widest text-[10px] font-black" onClick={() => setDialogOpen(false)}>
+                                        Abort
+                                    </Button>
+                                    <Button type="submit" variant="primary" className="px-8 uppercase tracking-widest text-[10px] font-black">
+                                        {editingId ? "Synchronize" : "Finalize"}
+                                    </Button>
+                                </div>
+                            </form>
+                        </DialogContent>
+                    </Dialog>
+                </div>
             </div>
 
-            {structures.length === 0 ? (
-                <div className="bg-white rounded-lg shadow p-8 text-center">
-                    <GraduationCap className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900">No fee structures defined</h3>
-                    <p className="text-gray-500 mt-1">Add your first fee structure to get started</p>
+            {/* List Visualization */}
+            <GlassCard className="overflow-hidden border-white/20" intensity="high">
+                <div className="p-8 border-b border-white/20 bg-slate-50/30 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-500/10 rounded-lg">
+                            <Coins className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <h3 className="text-[12px] font-black uppercase tracking-[0.2em] text-slate-900">Active Configurations</h3>
+                    </div>
                 </div>
-            ) : (
-                <div className="bg-white rounded-lg shadow overflow-hidden">
+
+                {structures.length === 0 ? (
+                    <div className="p-20 text-center">
+                        <div className="relative inline-block mb-6">
+                            <GraduationCap className="h-20 w-20 text-slate-200" />
+                            <Settings2 className="h-8 w-8 text-slate-400 absolute bottom-0 right-0 animate-spin-slow" />
+                        </div>
+                        <h3 className="text-xl font-black text-slate-900 uppercase tracking-tight">No fee structures defined</h3>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2">Initialize your revenue model by adding a class structure.</p>
+                    </div>
+                ) : (
                     <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
-                                    <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Monthly Fee</th>
-                                    <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Admission Fee</th>
-                                    <th className="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                        <table className="w-full border-collapse">
+                            <thead>
+                                <tr className="bg-slate-50/50 border-b border-white/20">
+                                    <th className="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Class Tier</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Monthly Payload</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] hidden sm:table-cell">Admission Entry</th>
+                                    <th className="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Operations</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody className="divide-y divide-white/10">
                                 {structures.map((structure) => (
-                                    <tr key={structure.id} className="hover:bg-gray-50">
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
-                                            <span className="font-medium text-gray-900">{structure.className}</span>
+                                    <tr key={structure.id} className="group hover:bg-white/40 transition-all duration-300">
+                                        <td className="px-8 py-6">
+                                            <span className="text-lg font-black text-slate-900 uppercase tracking-tight">{structure.className}</span>
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-gray-900 font-semibold">
-                                            ₹{structure.monthlyFee.toLocaleString('en-IN')}
+                                        <td className="px-8 py-6 text-right">
+                                            <span className="text-lg font-black text-emerald-600 font-mono tracking-tighter">₹{structure.monthlyFee.toLocaleString('en-IN')}</span>
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-gray-600 hidden sm:table-cell">
-                                            ₹{structure.admissionFee.toLocaleString('en-IN')}
+                                        <td className="px-8 py-6 text-right hidden sm:table-cell">
+                                            <span className="text-sm font-bold text-slate-500 font-mono">₹{structure.admissionFee.toLocaleString('en-IN')}</span>
                                         </td>
-                                        <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right">
-                                            <div className="flex justify-end gap-2">
+                                        <td className="px-8 py-6 text-right">
+                                            <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
                                                 <Button
-                                                    variant="ghost"
+                                                    variant="glass"
                                                     size="sm"
                                                     onClick={() => openEdit(structure)}
+                                                    className="h-10 w-10 p-0 rounded-xl hover:bg-white"
                                                 >
-                                                    <Pencil className="h-4 w-4" />
+                                                    <Pencil className="h-4 w-4 text-slate-600" />
                                                 </Button>
                                                 <Button
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => handleDelete(structure.id)}
-                                                    className="text-red-600 hover:text-red-700"
+                                                    className="h-10 w-10 p-0 rounded-xl text-rose-500 hover:text-rose-600 hover:bg-rose-50"
                                                 >
                                                     <Trash2 className="h-4 w-4" />
                                                 </Button>
@@ -229,8 +254,25 @@ export default function FeesSettingsPage() {
                             </tbody>
                         </table>
                     </div>
-                </div>
-            )}
-        </SettingsPageLayout>
+                )}
+            </GlassCard>
+
+            {/* Matrix Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <GlassCard className="p-8 border-l-4 border-l-emerald-500" intensity="medium">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Revenue Node Count</h4>
+                    <p className="text-3xl font-black text-slate-900 tracking-tight">{structures.length} <span className="text-sm font-bold text-slate-400 uppercase">Tiers Active</span></p>
+                </GlassCard>
+                <GlassCard className="p-8 border-r-4 border-r-indigo-500" intensity="medium">
+                    <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-2">Average Monthly Unit</h4>
+                    <p className="text-3xl font-black text-slate-900 tracking-tight">
+                        ₹{structures.length > 0
+                            ? (structures.reduce((acc, s) => acc + s.monthlyFee, 0) / structures.length).toLocaleString('en-IN', { maximumFractionDigits: 0 })
+                            : 0
+                        }
+                    </p>
+                </GlassCard>
+            </div>
+        </div>
     );
 }

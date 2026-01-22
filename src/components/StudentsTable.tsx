@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { Users, Phone, GraduationCap, Filter, X, IndianRupee } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Users, Phone, GraduationCap, Filter, X, IndianRupee, Search } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
 import Link from "next/link";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { GlassCard } from "@/components/modern/Card";
+import { Button } from "@/components/modern/Button";
+import { Input } from "@/components/modern/Input";
 import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 type Student = {
     id: number;
@@ -89,14 +90,11 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
         router.push(`?${params.toString()}`);
     };
 
-    // Since we are doing server-side filtering, students prop already contains filtered students
     const filteredStudents = students;
-
     const hasActiveFilters = searchTerm || classFilter !== "all" || statusFilter !== "all";
 
     const clearFilters = () => {
         setSearchTerm("");
-        // Reset URL to base path
         router.push(window.location.pathname);
     };
 
@@ -106,53 +104,59 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
     };
 
     return (
-        <>
+        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Filter Controls */}
-            <div className="bg-white rounded-lg shadow-sm p-4 mb-4 space-y-4">
-                <div className="flex items-center gap-2 text-gray-700 font-medium">
-                    <Filter className="h-4 w-4" />
-                    <span>Filters</span>
+            <GlassCard className="p-6" intensity="medium">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-primary/10 rounded-xl">
+                            <Filter className="h-5 w-5 text-primary" />
+                        </div>
+                        <h2 className="text-sm font-black uppercase tracking-widest text-foreground">
+                            Refine Database
+                        </h2>
+                    </div>
                     {hasActiveFilters && (
                         <Button
-                            variant="ghost"
+                            variant="glass"
                             size="sm"
                             onClick={clearFilters}
-                            className="ml-auto text-red-600 hover:text-red-700"
+                            className="text-red-500 hover:text-red-600 border-red-500/20"
                         >
-                            <X className="h-4 w-4 mr-1" />
-                            Clear All
+                            <X className="h-4 w-4 mr-2" />
+                            Clear Matrix
                         </Button>
                     )}
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Search */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Search
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
+                            Search Pulsar
                         </label>
-                        <Input
-                            placeholder="Name, father, or phone..."
-                            value={searchTerm}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
-                            className="w-full"
-                        />
+                        <div className="relative group">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+                            <Input
+                                placeholder="Name, father, or phone..."
+                                value={searchTerm}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+                                className="pl-11"
+                            />
+                        </div>
                     </div>
 
                     {/* Class Filter */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Class
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
+                            Academic Tier
                         </label>
                         <select
                             value={classFilter}
                             onChange={(e) => handleClassChange(e.target.value)}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full bg-white/40 dark:bg-slate-900/40 border-2 border-white/40 dark:border-slate-800 rounded-2xl py-3 px-4 text-xs font-bold uppercase tracking-widest transition-all outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 appearance-none"
                         >
-                            <option value="all">All Classes</option>
-                            {/* Unique classes should ideally be fetched from settings/sessions, but for now we can still extract from current data or just show common ones. 
-                                Actually, in a paginated world, we might need a separate action to get all unique classes. 
-                                For now, I'll keep the client-side extraction but it's imperfect. */}
+                            <option value="all">All Tiers</option>
                             {uniqueClasses.map((cls: string) => (
                                 <option key={cls} value={cls}>{cls}</option>
                             ))}
@@ -160,133 +164,134 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                     </div>
 
                     {/* Status Filter */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Status
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">
+                            Enrollment Status
                         </label>
                         <select
                             value={statusFilter}
                             onChange={(e) => handleStatusChange(e.target.value)}
-                            className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="w-full bg-white/40 dark:bg-slate-900/40 border-2 border-white/40 dark:border-slate-800 rounded-2xl py-3 px-4 text-xs font-bold uppercase tracking-widest transition-all outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 appearance-none"
                         >
-                            <option value="all">All Statuses</option>
-                            <option value="active">Active Only</option>
-                            <option value="inactive">Inactive Only</option>
+                            <option value="all">All States</option>
+                            <option value="active">Active Pulses</option>
+                            <option value="inactive">Dormant</option>
                         </select>
                     </div>
                 </div>
 
                 {/* Filter Results Count */}
-                <div className="text-sm text-gray-600">
-                    Showing <span className="font-semibold">{filteredStudents.length}</span> of{" "}
-                    <span className="font-semibold">{students.length}</span> students
+                <div className="mt-6 pt-6 border-t border-white/10 dark:border-slate-800/50 flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                    <div>
+                        Showing <span className="text-primary">{filteredStudents.length}</span> entities
+                    </div>
                 </div>
-            </div>
+            </GlassCard>
 
             {/* Students Table */}
-            {filteredStudents.length === 0 ? (
-                <div className="bg-white rounded-lg shadow p-12 text-center">
-                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No students found</h3>
-                    <p className="text-gray-600">Try adjusting your filters</p>
-                    {hasActiveFilters && (
-                        <Button
-                            variant="outline"
-                            onClick={clearFilters}
-                            className="mt-4"
-                        >
-                            Clear Filters
-                        </Button>
-                    )}
-                </div>
-            ) : (
-                <div className="bg-white rounded-lg shadow overflow-hidden overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                        {/* ... table content ... */}
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Student Name
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Class
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Father Name
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Phone
-                                </th>
-                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Status
-                                </th>
-                                <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {filteredStudents.map((student) => (
-                                <tr key={student.id} className="hover:bg-gray-50">
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <Link href={`/students/${student.id}`}>
-                                            <div className="text-sm font-medium text-indigo-600 hover:text-indigo-900 cursor-pointer">
-                                                {student.name}
-                                            </div>
-                                        </Link>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center text-sm text-gray-700">
-                                            <GraduationCap className="h-4 w-4 mr-2 text-indigo-600" />
-                                            {student.class}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                        {student.fatherName || "N/A"}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <div className="flex items-center text-sm text-gray-700">
-                                            <Phone className="h-4 w-4 mr-2 text-gray-400" />
-                                            {student.phone || "N/A"}
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <span
-                                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${student.isActive
-                                                ? "bg-green-100 text-green-800"
-                                                : "bg-gray-100 text-gray-800"
-                                                }`}
-                                        >
-                                            {student.isActive ? "Active" : "Inactive"}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="text-green-600 border-green-200 hover:bg-green-50 hover:text-green-700"
-                                            onClick={() => handlePayClick(student)}
-                                        >
-                                            <IndianRupee className="h-3 w-3 mr-1" />
-                                            Pay
-                                        </Button>
-                                    </td>
+            <GlassCard className="overflow-hidden border-white/20" intensity="low">
+                {filteredStudents.length === 0 ? (
+                    <div className="py-24 text-center">
+                        <Users className="h-16 w-16 text-muted-foreground/20 mx-auto mb-4" />
+                        <h3 className="text-lg font-black text-foreground">No Records Detected</h3>
+                        <p className="text-sm text-muted-foreground max-w-xs mx-auto mt-2">
+                            The requested search parameters returned zero results from the pulsar database.
+                        </p>
+                        {hasActiveFilters && (
+                            <Button
+                                variant="glass"
+                                onClick={clearFilters}
+                                className="mt-6"
+                            >
+                                Reset Search Parameters
+                            </Button>
+                        )}
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-white/30 dark:bg-slate-900/30 border-b border-white/10 dark:border-slate-800/50">
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Student Identity</th>
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Tier</th>
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Paternal Link</th>
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Contact</th>
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Status</th>
+                                    <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] text-right">Operations</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody className="divide-y divide-white/5 dark:divide-slate-800/50">
+                                {filteredStudents.map((student) => (
+                                    <tr key={student.id} className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 group">
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <Link href={`/students/${student.id}`} className="block">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20 group-hover:scale-110 transition-transform">
+                                                        {student.name.substring(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                                                        {student.name}
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                                                <GraduationCap className="h-4 w-4 text-primary opacity-60" />
+                                                {student.class}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
+                                            {student.fatherName || "N/A"}
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                                                <Phone className="h-3.5 w-3.5 opacity-40" />
+                                                {student.phone || "N/A"}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap">
+                                            <span
+                                                className={cn(
+                                                    "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border",
+                                                    student.isActive
+                                                        ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                                                        : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                                                )}
+                                            >
+                                                {student.isActive ? "Active" : "Dormant"}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 whitespace-nowrap text-right">
+                                            <Button
+                                                size="sm"
+                                                variant="glass"
+                                                className="text-primary hover:bg-primary hover:text-white border-primary/20"
+                                                onClick={() => handlePayClick(student)}
+                                            >
+                                                <IndianRupee className="h-3.5 w-3.5 mr-2" />
+                                                Collect
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
 
-                    {/* Pagination Controls */}
-                    {pagination && (
+                {/* Pagination Controls */}
+                {pagination && (
+                    <div className="p-6 border-t border-white/10 dark:border-slate-800/50 bg-white/10 dark:bg-slate-950/20">
                         <PaginationControls
                             currentPage={pagination.page}
                             totalPages={pagination.totalPages}
                             total={pagination.total}
                             limit={pagination.limit}
                         />
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+            </GlassCard>
 
             {/* Quick Payment Dialog */}
             {selectedStudent && (
@@ -302,7 +307,7 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                     currentDue={selectedStudent.balance ? Math.abs(selectedStudent.balance) : 0}
                 />
             )}
-        </>
+        </div>
     );
 }
 

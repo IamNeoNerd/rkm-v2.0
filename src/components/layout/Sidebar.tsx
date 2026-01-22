@@ -29,11 +29,13 @@ import { type LucideIcon } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { type FeatureKey } from "@/lib/permissions"
 
 interface SidebarNavItem {
     title: string;
     href: string;
     icon: LucideIcon;
+    feature?: FeatureKey;
     role?: string;
     children?: SidebarNavItem[];
 }
@@ -43,61 +45,73 @@ const sidebarNavItems: SidebarNavItem[] = [
         title: "Dashboard",
         href: "/",
         icon: LayoutDashboard,
+        feature: "dashboard",
     },
     {
         title: "New Admission",
         href: "/admission",
         icon: UserPlus,
+        feature: "admissions",
     },
     {
         title: "Students",
         href: "/students",
         icon: Users,
+        feature: "students",
     },
     {
         title: "Families",
         href: "/families",
         icon: UsersRound,
+        feature: "families",
     },
     {
         title: "Academics",
         href: "/academics",
         icon: GraduationCap,
+        feature: "academics",
     },
     {
         title: "Attendance",
         href: "/attendance",
         icon: Calendar,
+        feature: "attendance",
     },
     {
         title: "Billing",
         href: "/fees",
         icon: IndianRupee,
+        feature: "fees",
         children: [
             {
                 title: "Collect Fee",
                 href: "/fees",
                 icon: Receipt,
+                feature: "fees",
             },
             {
                 title: "Bulk Collect",
                 href: "/fees/bulk",
                 icon: UsersRound,
+                feature: "fees",
             },
             {
                 title: "Transactions",
                 href: "/reports/transactions",
                 icon: History,
+                feature: "reports",
             },
             {
                 title: "Dues Report",
                 href: "/reports/dues",
                 icon: FileText,
+                feature: "reports",
             },
             {
                 title: "Finance Report",
                 href: "/reports/finance",
                 icon: TrendingUp,
+                feature: "reports",
             },
         ]
     },
@@ -105,47 +119,62 @@ const sidebarNavItems: SidebarNavItem[] = [
         title: "Staff",
         href: "/staff",
         icon: UserCog,
+        feature: "staff",
     },
     {
         title: "Settings",
         href: "/settings",
         icon: Settings,
-        role: "super-admin",
+        feature: "settings",
         children: [
             {
                 title: "User Management",
                 href: "/settings/users",
                 icon: UsersRound,
+                feature: "users",
             },
             {
                 title: "Fee Structure",
                 href: "/settings/fees",
                 icon: IndianRupee,
+                feature: "settings",
             },
             {
                 title: "Academic Sessions",
                 href: "/settings/sessions",
                 icon: Calendar,
+                feature: "settings",
             },
             {
                 title: "Authentication",
                 href: "/settings/auth",
                 icon: Shield,
+                feature: "settings",
             },
             {
                 title: "Activity Logs",
                 href: "/settings/audit-logs",
                 icon: History,
+                feature: "settings",
             },
             {
                 title: "Notifications",
                 href: "/settings/notifications",
                 icon: Bell,
+                feature: "settings",
             },
             {
                 title: "My Profile",
                 href: "/settings/profile",
                 icon: User,
+                feature: "settings",
+            },
+            {
+                title: "RBAC Matrix",
+                href: "/settings/permissions",
+                icon: Shield,
+                role: "super-admin",
+                feature: "settings",
             },
         ]
     },
@@ -170,7 +199,18 @@ export function Sidebar({ className }: SidebarProps) {
     }
 
     const filteredItems = sidebarNavItems.filter(item => {
+        // Super-admin bypass
+        if (userRole === "super-admin") return true
+
+        // Role-based filtering (legacy / explicit)
         if (item.role && item.role !== userRole) return false
+
+        // Feature-based filtering (Dynamic RBAC)
+        if (item.feature) {
+            const hasAccess = session?.user?.permissions?.[item.feature]?.canView ?? false
+            if (!hasAccess) return false
+        }
+
         return true
     })
 

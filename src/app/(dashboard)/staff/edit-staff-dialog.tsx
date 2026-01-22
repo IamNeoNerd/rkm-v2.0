@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
-import { Pencil } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { User, Phone, Mail, Shield, IndianRupee, Zap, Edit3, Save, KeyRound, Eye, EyeOff } from "lucide-react";
 import { updateStaff, StaffRole } from "@/actions/staff";
+import { getStaffRoleTypes } from "@/actions/staff-roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,32 +16,62 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { Label } from "@/components/ui/label";
 
-type StaffMember = {
+interface CustomRoleType {
     id: number;
     name: string;
-    phone: string;
-    email: string | null;
-    role: "ADMIN" | "TEACHER" | "RECEPTIONIST" | "STAFF";
-    roleType?: string | null;
-    baseSalary: number;
-};
+}
 
-export function EditStaffDialog({ staff }: { staff: StaffMember }) {
-    const router = useRouter();
+interface EditStaffDialogProps {
+    staff: {
+        id: number;
+        name: string;
+        phone: string;
+        email: string | null;
+        role: string;
+        roleType: string | null;
+        baseSalary: number;
+    };
+}
+
+export function EditStaffDialog({ staff }: EditStaffDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [customRoleTypes, setCustomRoleTypes] = useState<CustomRoleType[]>([]);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: staff.name,
         phone: staff.phone,
         email: staff.email || "",
         role: staff.role as StaffRole,
+        roleType: staff.roleType || "",
         baseSalary: staff.baseSalary.toString(),
+        password: "",
+        confirmPassword: "",
     });
+
+    const loadRoleTypes = useCallback(async () => {
+        const res = await getStaffRoleTypes();
+        if (res.success && res.roleTypes) {
+            setCustomRoleTypes(res.roleTypes);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (open) {
+            loadRoleTypes();
+        }
+    }, [open, loadRoleTypes]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (formData.password && formData.password !== formData.confirmPassword) {
+            toast.error("Passwords do not match. Please enter the same password in both fields.");
+            return;
+        }
+
         setLoading(true);
 
         const res = await updateStaff(staff.id, {
@@ -48,88 +79,206 @@ export function EditStaffDialog({ staff }: { staff: StaffMember }) {
             phone: formData.phone,
             email: formData.email || undefined,
             role: formData.role,
-            baseSalary: parseInt(formData.baseSalary) || 0
+            roleType: formData.roleType === "" ? null : formData.roleType,
+            baseSalary: parseInt(formData.baseSalary) || 0,
+            password: formData.password || undefined
         });
 
         setLoading(false);
 
         if (res.success) {
-            toast.success("Staff member updated successfully");
+            toast.success("Personnel node recalibrated");
             setOpen(false);
-            router.refresh();
+            // Reset passwords on success
+            setFormData(prev => ({ ...prev, password: "", confirmPassword: "" }));
         } else {
-            toast.error(res.error || "Failed to update staff");
+            toast.error(res.error || "Recalibration failed");
         }
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                    <Pencil className="h-4 w-4 text-blue-600" />
+                <Button variant="ghost" size="icon" className="h-9 w-9 bg-white/50 border border-white/80 rounded-xl hover:bg-white hover:border-indigo-200 hover:text-indigo-600 transition-all shadow-sm">
+                    <Edit3 className="h-4 w-4" />
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Edit Staff Member</DialogTitle>
-                    <DialogDescription>
-                        Update {staff.name}&apos;s information.
+            <DialogContent className="sm:max-w-xl bg-slate-50/80 backdrop-blur-3xl border-white/20 p-0 overflow-hidden rounded-[32px] shadow-2xl">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl" />
+
+                <DialogHeader className="p-8 pb-4 relative z-10">
+                    <div className="flex items-center gap-4 mb-2">
+                        <div className="h-10 w-10 bg-indigo-500 text-white rounded-xl flex items-center justify-center shadow-lg">
+                            <Edit3 className="h-5 w-5" />
+                        </div>
+                        <DialogTitle className="text-3xl font-black text-slate-900 tracking-tighter uppercase leading-none">
+                            Recalibrate Node
+                        </DialogTitle>
+                    </div>
+                    <DialogDescription className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400">
+                        Synthesizing operational parameters for ID #{staff.id.toString().padStart(4, '0')}
                     </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={handleSubmit} className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <label className="text-right text-sm font-medium">Name</label>
-                        <Input
-                            required
-                            className="col-span-3"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        />
+
+                <form onSubmit={handleSubmit} className="p-8 pt-0 space-y-8 relative z-10">
+                    <div className="space-y-6">
+                        {/* Primary Identity Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <User className="h-3 w-3 text-indigo-500" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Identity Data Shift</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Legal Name</Label>
+                                    <Input
+                                        required
+                                        className="bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-bold uppercase text-[10px] tracking-widest"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Mobile Node</Label>
+                                    <Input
+                                        required
+                                        className="bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-mono text-[10px] font-bold"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Digital Identity (Email)</Label>
+                                <Input
+                                    type="email"
+                                    className="bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-bold uppercase text-[10px] tracking-widest"
+                                    value={formData.email}
+                                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Operational Clearance Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Shield className="h-3 w-3 text-amber-500" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Clearance Reconfiguration</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor={`role-${staff.id}`} className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">System Role Vector</Label>
+                                    <select
+                                        id={`role-${staff.id}`}
+                                        className="w-full h-12 px-4 bg-white/50 border border-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 appearance-none cursor-pointer"
+                                        value={formData.role}
+                                        onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
+                                    >
+                                        <option value="STAFF">STAFF (NO ACCESS)</option>
+                                        <option value="TEACHER">TEACHER</option>
+                                        <option value="RECEPTIONIST">RECEPTIONIST</option>
+                                        <option value="ADMIN">ADMINISTRATOR</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`specialty-${staff.id}`} className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Functional Specialty</Label>
+                                    <select
+                                        id={`specialty-${staff.id}`}
+                                        className="w-full h-12 px-4 bg-white/50 border border-white rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 appearance-none cursor-pointer"
+                                        value={formData.roleType}
+                                        onChange={(e) => setFormData({ ...formData, roleType: e.target.value })}
+                                    >
+                                        <option value="">CORE PROTOCOL</option>
+                                        {customRoleTypes.map((rt) => (
+                                            <option key={rt.id} value={rt.name}>{rt.name.toUpperCase()}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Security & Access Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <KeyRound className="h-3 w-3 text-rose-500" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Security Credentials</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="space-y-2 relative">
+                                    <Label htmlFor={`password-${staff.id}`} className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">New Password</Label>
+                                    <div className="relative">
+                                        <Input
+                                            id={`password-${staff.id}`}
+                                            type={showPassword ? "text" : "password"}
+                                            className="bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-mono text-[10px] font-bold pr-10"
+                                            placeholder="LEAVE BLANK TO UNCHANGED"
+                                            value={formData.password}
+                                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                                        >
+                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor={`confirm-${staff.id}`} className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Confirm Protocol</Label>
+                                    <Input
+                                        id={`confirm-${staff.id}`}
+                                        type={showPassword ? "text" : "password"}
+                                        className="bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-mono text-[10px] font-bold"
+                                        placeholder="REPEAT TO VALIDATE"
+                                        value={formData.confirmPassword}
+                                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Financial Ledger Section */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2 mb-2">
+                                <IndianRupee className="h-3 w-3 text-emerald-500" />
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">Ledger Recalibration</span>
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-[8px] font-black uppercase tracking-widest text-slate-500 ml-1">Base Retainer Salary</Label>
+                                <div className="relative">
+                                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-300" />
+                                    <Input
+                                        type="number"
+                                        required
+                                        className="pl-12 bg-white/50 border-white h-12 focus:ring-indigo-500/20 rounded-xl font-mono text-sm font-bold"
+                                        value={formData.baseSalary}
+                                        onChange={(e) => setFormData({ ...formData, baseSalary: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <label className="text-right text-sm font-medium">Phone</label>
-                        <Input
-                            required
-                            className="col-span-3"
-                            value={formData.phone}
-                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <label className="text-right text-sm font-medium">Email</label>
-                        <Input
-                            type="email"
-                            className="col-span-3"
-                            value={formData.email}
-                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <label className="text-right text-sm font-medium">Role</label>
-                        <select
-                            className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                            value={formData.role}
-                            onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
-                        >
-                            <option value="STAFF">Staff (No System Access)</option>
-                            <option value="TEACHER">Teacher</option>
-                            <option value="RECEPTIONIST">Receptionist</option>
-                            <option value="ADMIN">Admin</option>
-                        </select>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <label className="text-right text-sm font-medium">Salary</label>
-                        <Input
-                            type="number"
-                            required
-                            className="col-span-3"
-                            value={formData.baseSalary}
-                            onChange={(e) => setFormData({ ...formData, baseSalary: e.target.value })}
-                        />
-                    </div>
+
                     <DialogFooter>
-                        <Button type="submit" disabled={loading}>
-                            {loading ? "Saving..." : "Save Changes"}
+                        <Button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-2xl h-16 shadow-2xl transition-all hover:scale-[1.01] overflow-hidden group/submit"
+                        >
+                            <div className="flex items-center gap-3 relative z-10">
+                                {loading ? (
+                                    <>
+                                        <Zap className="h-5 w-5 text-amber-400 animate-pulse" />
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">Synchronizing...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Save className="h-5 w-5 text-indigo-400" />
+                                        <span className="text-[11px] font-black uppercase tracking-[0.2em]">Commit Changes to Matrix</span>
+                                    </>
+                                )}
+                            </div>
                         </Button>
                     </DialogFooter>
                 </form>

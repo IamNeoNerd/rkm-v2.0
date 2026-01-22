@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { UserPlus, Loader2, Users, CheckCircle } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { UserPlus, Loader2, Users, CheckCircle, Phone, GraduationCap, MapPin, IndianRupee, ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "@/components/modern/Button";
+import { Input } from "@/components/modern/Input";
+import { GlassCard } from "@/components/modern/Card";
 import { toast } from "sonner";
 import { registerAdmission } from "@/actions/cashier";
+import { cn } from "@/lib/utils";
 
 export default function CashierAdmissionPage() {
     const [loading, setLoading] = useState(false);
@@ -29,12 +31,12 @@ export default function CashierAdmissionPage() {
         e.preventDefault();
 
         if (!formData.fatherName || !formData.phone || !formData.studentName || !formData.studentClass) {
-            toast.error("Please fill in all required fields");
+            toast.error("Required neural fields are empty");
             return;
         }
 
         if (formData.phone.length !== 10) {
-            toast.error("Please enter a valid 10-digit phone number");
+            toast.error("Invalid mobile identifier (10 digits required)");
             return;
         }
 
@@ -46,9 +48,8 @@ export default function CashierAdmissionPage() {
         setLoading(false);
 
         if (result.success) {
-            toast.success(result.message);
+            toast.success("Identity Registered Successfully");
             setSuccess({ studentName: formData.studentName, studentId: result.studentId! });
-            // Reset form
             setFormData({
                 fatherName: "",
                 motherName: "",
@@ -59,155 +60,203 @@ export default function CashierAdmissionPage() {
                 admissionFee: "",
             });
         } else {
-            toast.error(result.error || "Failed to register admission");
+            toast.error(result.error || "Neural Registration Failed");
         }
-    }
-
-    function handleNewAdmission() {
-        setSuccess(null);
     }
 
     if (success) {
         return (
-            <div className="space-y-6">
-                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-8 text-center">
-                    <CheckCircle className="h-16 w-16 text-emerald-400 mx-auto mb-4" />
-                    <h2 className="text-2xl font-bold text-white mb-2">Admission Successful!</h2>
-                    <p className="text-slate-300">
-                        {success.studentName} has been registered successfully.
-                    </p>
-                    <p className="text-slate-400 text-sm mt-2">
-                        Student ID: #{success.studentId}
-                    </p>
-                    <Button
-                        onClick={handleNewAdmission}
-                        className="mt-6 bg-emerald-600 hover:bg-emerald-700"
-                    >
-                        <UserPlus className="h-4 w-4 mr-2" />
-                        New Admission
-                    </Button>
-                </div>
+            <div className="max-w-2xl mx-auto py-12 animate-in zoom-in-95 duration-500">
+                <GlassCard className="p-12 text-center relative overflow-hidden border-emerald-500/30" intensity="high">
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-emerald-500/10 blur-[60px] rounded-full" />
+
+                    <div className="relative">
+                        <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-500/40">
+                            <CheckCircle className="h-12 w-12 text-white" />
+                        </div>
+
+                        <h2 className="text-4xl font-black text-slate-900 tracking-tighter uppercase mb-4 italic">Registration Complete</h2>
+                        <p className="text-slate-500 font-medium mb-8">
+                            <span className="text-slate-900 font-bold">{success.studentName}</span> has been integrated into the institutional matrix.
+                        </p>
+
+                        <div className="inline-flex items-center gap-2 px-6 py-3 rounded-2xl bg-slate-900 text-white font-black text-sm tracking-widest uppercase mb-10">
+                            Identity Core: #{success.studentId}
+                        </div>
+
+                        <div className="flex flex-col gap-3">
+                            <Button
+                                onClick={() => setSuccess(null)}
+                                className="w-full bg-slate-900 text-white hover:bg-slate-800 h-14 rounded-2xl font-black uppercase tracking-widest text-xs"
+                            >
+                                <UserPlus className="h-4 w-4 mr-2" />
+                                Initialize Next Enrollment
+                            </Button>
+                            <Button
+                                variant="outline"
+                                className="w-full border-slate-200 hover:bg-slate-50 h-14 rounded-2xl font-black uppercase tracking-widest text-xs"
+                                asChild
+                            >
+                                <a href="/cashier">Return to Terminal</a>
+                            </Button>
+                        </div>
+                    </div>
+                </GlassCard>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-                    <UserPlus className="h-6 w-6 text-amber-400" />
-                    New Admission
-                </h1>
-                <p className="text-slate-400 mt-1">Register a new student</p>
+        <div className="space-y-12 max-w-4xl mx-auto py-4">
+            {/* Page Header */}
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+                <div>
+                    <h1 className="text-4xl font-black text-slate-900 tracking-tighter uppercase italic leading-none mb-3">
+                        Enrollment Matrix
+                    </h1>
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 px-2 py-1 rounded-md bg-amber-50 text-[10px] font-black text-amber-600 uppercase tracking-widest border border-amber-100">
+                            <Sparkles className="h-3 w-3" />
+                            Secure Intake Node
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Parent Information */}
-                <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <Users className="h-5 w-5 text-amber-400" />
-                        Parent Information
-                    </h2>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Father&apos;s Name *</label>
-                            <Input
-                                value={formData.fatherName}
-                                onChange={(e) => handleChange('fatherName', e.target.value)}
-                                placeholder="Enter father's name"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
+            <form onSubmit={handleSubmit} className="space-y-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div className="space-y-10">
+                        {/* Parent Identity */}
+                        <div className="space-y-6">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
+                                <Users className="h-3 w-3" /> Guardian Node Identity
+                            </h2>
+                            <GlassCard className="p-8 space-y-6 border-white/60 shadow-xl" intensity="medium">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Father's Legal Name</label>
+                                    <Input
+                                        value={formData.fatherName}
+                                        onChange={(e) => handleChange('fatherName', e.target.value)}
+                                        placeholder="Full Name"
+                                        className="h-12 font-bold"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mother's Legal Name</label>
+                                    <Input
+                                        value={formData.motherName}
+                                        onChange={(e) => handleChange('motherName', e.target.value)}
+                                        placeholder="Optional"
+                                        className="h-12 font-bold"
+                                    />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1 text-amber-600">Primary Mobile</label>
+                                        <div className="relative">
+                                            <Input
+                                                type="tel"
+                                                value={formData.phone}
+                                                onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
+                                                placeholder="10-digit"
+                                                className="h-12 pl-10 font-black tracking-widest"
+                                                required
+                                            />
+                                            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Location Map</label>
+                                        <div className="relative">
+                                            <Input
+                                                value={formData.address}
+                                                onChange={(e) => handleChange('address', e.target.value)}
+                                                placeholder="City/Area"
+                                                className="h-12 pl-10 font-bold"
+                                            />
+                                            <MapPin className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </GlassCard>
                         </div>
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Mother&apos;s Name</label>
-                            <Input
-                                value={formData.motherName}
-                                onChange={(e) => handleChange('motherName', e.target.value)}
-                                placeholder="Enter mother's name"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
+                    </div>
+
+                    <div className="space-y-10">
+                        {/* Student Identity */}
+                        <div className="space-y-6">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
+                                <GraduationCap className="h-3 w-3" /> Student Entity Matrix
+                            </h2>
+                            <GlassCard className="p-8 space-y-6 border-white/60 shadow-xl" intensity="medium">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Integrated Name</label>
+                                    <Input
+                                        value={formData.studentName}
+                                        onChange={(e) => handleChange('studentName', e.target.value)}
+                                        placeholder="Enter Student Name"
+                                        className="h-12 font-bold"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Grade Allocation</label>
+                                    <div className="relative">
+                                        <select
+                                            className="w-full h-12 pl-4 pr-10 rounded-xl bg-white/50 border border-slate-200 outline-none focus:ring-2 focus:ring-slate-900 transition-all font-black uppercase text-xs tracking-widest appearance-none"
+                                            value={formData.studentClass}
+                                            onChange={(e) => handleChange('studentClass', e.target.value)}
+                                            required
+                                        >
+                                            <option value="">Select Grade</option>
+                                            {['8', '9', '10', '11', '12'].map(c => <option key={c} value={c}>Class {c}</option>)}
+                                        </select>
+                                    </div>
+                                </div>
+                            </GlassCard>
                         </div>
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Phone Number *</label>
-                            <Input
-                                type="tel"
-                                value={formData.phone}
-                                onChange={(e) => handleChange('phone', e.target.value.replace(/\D/g, '').slice(0, 10))}
-                                placeholder="10-digit phone number"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Address</label>
-                            <Input
-                                value={formData.address}
-                                onChange={(e) => handleChange('address', e.target.value)}
-                                placeholder="Enter address"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
+
+                        {/* Revenue Section */}
+                        <div className="space-y-6">
+                            <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
+                                <IndianRupee className="h-3 w-3" /> Financial Onboarding
+                            </h2>
+                            <GlassCard className="p-8 border-amber-500/20 bg-amber-50/20 shadow-xl" intensity="low">
+                                <div className="space-y-3">
+                                    <label className="text-[10px] font-black text-amber-700 uppercase tracking-widest ml-1">Initial Admission Fee</label>
+                                    <div className="relative group">
+                                        <Input
+                                            type="number"
+                                            value={formData.admissionFee}
+                                            onChange={(e) => handleChange('admissionFee', e.target.value)}
+                                            placeholder="Leave blank for zero"
+                                            className="h-14 pl-12 font-black text-xl tracking-tight bg-white group-hover:bg-amber-50 transition-colors"
+                                        />
+                                        <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 h-6 w-6 text-amber-500" />
+                                    </div>
+                                    <p className="text-[10px] text-amber-800/60 font-medium italic">Quantum value recorded immediately upon submission</p>
+                                </div>
+                            </GlassCard>
                         </div>
                     </div>
                 </div>
 
-                {/* Student Information */}
-                <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <UserPlus className="h-5 w-5 text-amber-400" />
-                        Student Information
-                    </h2>
-                    <div className="grid sm:grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Student Name *</label>
-                            <Input
-                                value={formData.studentName}
-                                onChange={(e) => handleChange('studentName', e.target.value)}
-                                placeholder="Enter student's name"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm text-slate-400 mb-1">Class *</label>
-                            <Input
-                                value={formData.studentClass}
-                                onChange={(e) => handleChange('studentClass', e.target.value)}
-                                placeholder="e.g., Class 10, JEE Prep"
-                                className="bg-slate-700 border-slate-600 text-white"
-                            />
-                        </div>
-                    </div>
-                </div>
-
-                {/* Payment Section */}
-                <div className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold text-white mb-4">Admission Fee (Optional)</h2>
-                    <div className="max-w-xs">
-                        <label className="block text-sm text-slate-400 mb-1">Amount (₹)</label>
-                        <Input
-                            type="number"
-                            value={formData.admissionFee}
-                            onChange={(e) => handleChange('admissionFee', e.target.value)}
-                            placeholder="Enter admission fee if paid"
-                            className="bg-slate-700 border-slate-600 text-white"
-                        />
-                        <p className="text-slate-500 text-xs mt-1">
-                            Leave blank if fee is not collected now
-                        </p>
-                    </div>
-                </div>
-
-                {/* Submit Button */}
-                <div className="flex justify-end">
+                {/* Secure Process Button */}
+                <div className="pt-6 border-t border-slate-200/50 flex justify-end">
                     <Button
                         type="submit"
                         disabled={loading}
-                        className="bg-amber-600 hover:bg-amber-700 px-8"
+                        className="h-16 px-12 bg-slate-900 text-white hover:bg-slate-800 rounded-2xl font-black uppercase tracking-[0.2em] text-xs shadow-2xl shadow-slate-900/20 flex items-center gap-3 group transition-all transform active:scale-95"
                     >
                         {loading ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                            <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
-                            <UserPlus className="h-4 w-4 mr-2" />
+                            <>
+                                <span>Commit Enrollment</span>
+                                <ArrowRight className="h-4 w-4 group-hover:translate-x-2 transition-transform" />
+                            </>
                         )}
-                        Register Admission
                     </Button>
                 </div>
             </form>

@@ -1,10 +1,7 @@
-import { Sidebar } from "@/components/layout/Sidebar"
-import { MobileNav } from "@/components/layout/MobileNav"
 import { ErrorBoundary } from "@/components/ErrorBoundary"
-import { CommandPalette } from "@/components/CommandPalette"
-import { NotificationBell } from "@/components/NotificationBell"
 import { SkipLink } from "@/components/SkipLink"
-import { UserNav } from "@/components/layout/UserNav";
+import { FloatingNav } from "@/components/modern/FloatingNav";
+import { TopBar } from "@/components/modern/TopBar";
 
 export default function DashboardLayout({
     children,
@@ -12,49 +9,42 @@ export default function DashboardLayout({
     children: React.ReactNode
 }) {
     return (
-        <div className="flex min-h-screen bg-slate-50">
+        <div className="min-h-screen bg-background selection:bg-primary/20 selection:text-primary">
             {/* Skip link for keyboard accessibility */}
             <SkipLink />
 
-            {/* Sidebar: Desktop only (Large screens+) */}
-            <nav
-                className="hidden border-r bg-white lg:block lg:w-72 fixed h-full z-10"
-                aria-label="Main navigation"
-            >
-                <Sidebar className="h-full" />
-            </nav>
+            {/* Premium Floating Navigation */}
+            <FloatingNav />
 
-            <div className="flex flex-1 flex-col lg:pl-72 w-full">
-                {/* Unified Header: Works on all viewports */}
-                <header
-                    className="sticky top-0 z-20 flex h-16 lg:h-14 items-center justify-between border-b bg-white px-4 lg:px-6"
-                    role="banner"
-                >
-                    {/* Left side: Mobile nav + branding (mobile/tablet only) */}
-                    <div className="flex items-center gap-2 lg:hidden">
-                        <MobileNav />
-                        <span className="font-semibold text-lg text-indigo-600">RK Institute ERP</span>
-                    </div>
+            {/* Premium Top Navigation Bar */}
+            <TopBar />
 
-                    {/* Right side: Notification bell + Command palette (all viewports) */}
-                    <div className="flex items-center gap-4 ml-auto">
-                        <NotificationBell />
-                        <CommandPalette />
-                        <UserNav />
-                    </div>
-                </header>
-
-                {/* Main Content */}
+            {/* Main Content Area */}
+            <div className="flex flex-1 flex-col transition-all duration-500">
                 <main
                     id="main-content"
-                    className="flex-1 p-4 md:p-8 overflow-y-auto"
+                    className="flex-1 w-full pt-28 lg:pl-32 pr-4 md:pr-8 min-h-screen"
                     role="main"
                     tabIndex={-1}
                 >
                     <ErrorBoundary>
-                        {children}
+                        <div className="max-w-7xl mx-auto">
+                            {children}
+                        </div>
                     </ErrorBoundary>
                 </main>
+
+                {/* Subtle Decorative Footer */}
+                <footer className="py-12 lg:pl-32 pr-4 md:pr-8 opacity-20 hover:opacity-100 transition-opacity duration-700">
+                    <div className="max-w-7xl mx-auto flex justify-between items-center border-t border-border pt-8">
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground"> RKM 3.0 // PULSAR PHASE </p>
+                        <div className="flex gap-4">
+                            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-secondary" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-cta" />
+                        </div>
+                    </div>
+                </footer>
             </div>
         </div>
     )

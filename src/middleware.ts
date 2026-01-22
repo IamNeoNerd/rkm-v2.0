@@ -1,5 +1,6 @@
 import { auth } from "@/auth";
 import { NextResponse } from "next/server";
+import { type FeatureKey } from "@/lib/permissions";
 
 export default auth((req) => {
     const { nextUrl } = req;
@@ -33,18 +34,44 @@ export default auth((req) => {
     // Check verification status for protected routes
     const isVerified = req.auth?.user?.isVerified;
     const role = req.auth?.user?.role;
+    const permissions = req.auth?.user?.permissions;
 
     if (!isVerified && pathname !== "/verify") {
         return NextResponse.redirect(new URL("/verify", nextUrl));
     }
 
-    // Role-based route protection
-    if (pathname.startsWith("/teacher") && role !== "teacher" && role !== "super-admin") {
-        return NextResponse.redirect(new URL("/", nextUrl));
-    }
+    // Dynamic Role-based route protection (RBAC)
+    if (role !== "super-admin") {
+        // Feature to Route mapping
+        const featureRoutes: { prefix: string; feature: string }[] = [
+            { prefix: "/teacher", feature: "attendance" }, // Teachers primarily use attendance
+            { prefix: "/cashier", feature: "fees" },    // Cashiers use fees
+            { prefix: "/staff", feature: "staff" },
+            { prefix: "/students", feature: "students" },
+            { prefix: "/families", feature: "families" },
+            { prefix: "/fees", feature: "fees" },
+            { prefix: "/academics", feature: "academics" },
+            { prefix: "/attendance", feature: "attendance" },
+            { prefix: "/reports", feature: "reports" },
+            { prefix: "/settings", feature: "settings" },
+            { prefix: "/admission", feature: "admissions" },
+        ];
 
-    if (pathname.startsWith("/cashier") && role !== "cashier" && role !== "super-admin" && role !== "admin") {
-        return NextResponse.redirect(new URL("/", nextUrl));
+        // Find match for current path
+        const match = featureRoutes.find(fr => pathname.startsWith(fr.prefix));
+
+        if (match) {
+            const hasAccess = permissions?.[match.feature as FeatureKey]?.canView;
+            if (!hasAccess) {
+                console.warn(`[MIDDLEWARE] Access denied for role ${role} to ${pathname} (Feature: ${match.feature})`);
+                return NextResponse.redirect(new URL("/", nextUrl));
+            }
+        }
+
+        // Special restriction for RBAC matrix (Super-admin only)
+        if (pathname.startsWith("/settings/permissions")) {
+            return NextResponse.redirect(new URL("/", nextUrl));
+        }
     }
 
     return NextResponse.next();
