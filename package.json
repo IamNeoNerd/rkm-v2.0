@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yes | drizzle-kit push && next build",
-    "vercel-build": "yes | drizzle-kit push && next build",
+    "build": "next build",
+    "vercel-build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
