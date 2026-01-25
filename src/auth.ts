@@ -48,7 +48,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     pages: {
         signIn: "/login",
     },
-    debug: true,
+    debug: false,
     trustHost: true,
     providers: [
         GoogleProvider({
@@ -235,7 +235,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             return token;
         },
         async session({ session, token }) {
-            console.log("[AUTH] Session callback", { tokenRole: token?.role });
             if (token && session.user) {
                 session.user.role = token.role as string;
                 session.user.isVerified = token.isVerified as boolean;

@@ -7,18 +7,10 @@ import { Input } from "@/components/modern/Input";
 import { GlassCard } from "@/components/modern/Card";
 import { calculateTotalDue, processPayment, getRecentTransactions, searchFamilies } from "@/actions/billing";
 import { format } from "date-fns";
-import { ReceiptModal } from "@/components/ReceiptModal";
+import { ReceiptDialog, type ReceiptData } from "@/components/ReceiptDialog";
 import { cn } from "@/lib/utils";
 
-type ReceiptData = {
-    receiptNumber: string;
-    date: Date;
-    familyName: string;
-    familyId: number;
-    amount: number;
-    paymentMode: string;
-    newBalance: number;
-};
+
 
 type Transaction = {
     id: number;
@@ -112,12 +104,13 @@ export default function FeesPage() {
 
             setReceiptData({
                 receiptNumber: result.receiptNumber || 'N/A',
+                transactionId: 0,
                 date: new Date(),
                 familyName: selectedFamily?.fatherName || 'Unknown',
-                familyId: parseInt(familyId),
+                familyPhone: selectedFamily?.phone || 'N/A',
                 amount: parseFloat(paymentAmount),
-                paymentMode: paymentMode,
-                newBalance: result.newBalance,
+                mode: paymentMode,
+                balance: Math.abs(result.newBalance),
             });
             setShowReceipt(true);
 
@@ -456,8 +449,9 @@ export default function FeesPage() {
 
             {/* Receipt Modal */}
             {showReceipt && receiptData && (
-                <ReceiptModal
-                    receipt={receiptData}
+                <ReceiptDialog
+                    data={receiptData}
+                    open={showReceipt}
                     onClose={() => setShowReceipt(false)}
                 />
             )}

@@ -171,6 +171,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                             studentClass={student.class}
                             familyId={student.familyId}
                             fatherName={student.fatherName || "Family"}
+                            familyPhone={student.phone || "N/A"}
                             balance={balance}
                         />
                     </GlassCard>

@@ -365,6 +365,7 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                     }}
                     familyId={selectedStudent.familyId || 0}
                     familyName={selectedStudent.fatherName || "Family"}
+                    familyPhone={selectedStudent.phone || "N/A"}
                     studentName={selectedStudent.name}
                     currentDue={selectedStudent.balance ? Math.abs(selectedStudent.balance) : 0}
                 />

@@ -64,13 +64,17 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
     // Update URL when debounced search changes
     useEffect(() => {
         const params = new URLSearchParams(searchParams.toString());
-        if (debouncedSearch) {
-            params.set("search", debouncedSearch);
-        } else {
-            params.delete("search");
+        const currentSearch = searchParams.get("search") || "";
+
+        if (debouncedSearch !== currentSearch) {
+            if (debouncedSearch) {
+                params.set("search", debouncedSearch);
+            } else {
+                params.delete("search");
+            }
+            params.set("page", "1"); // Reset to first page on search
+            router.push(`?${params.toString()}`);
         }
-        params.set("page", "1"); // Reset to first page on search
-        router.push(`?${params.toString()}`);
     }, [debouncedSearch, router, searchParams]);
 
     return (
@@ -294,6 +298,7 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
                     }}
                     familyId={selectedFamily.id}
                     familyName={selectedFamily.fatherName || "Family"}
+                    familyPhone={selectedFamily.phone || "N/A"}
                     currentDue={selectedFamily.balance < 0 ? Math.abs(selectedFamily.balance) : 0}
                     onSuccess={handlePaymentSuccess}
                 />

@@ -7,12 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { processPayment } from "@/actions/billing";
 import { toast } from "sonner";
+import { ReceiptDialog } from "./ReceiptDialog";
 
 interface QuickPaymentDialogProps {
     open: boolean;
     onClose: () => void;
     familyId: number;
     familyName: string;
+    familyPhone: string;
     studentName?: string;
     currentDue?: number;
     onSuccess?: () => void;
@@ -25,6 +27,7 @@ export function QuickPaymentDialog({
     onClose,
     familyId,
     familyName,
+    familyPhone,
     studentName,
     currentDue = 0,
     onSuccess,
@@ -34,6 +37,8 @@ export function QuickPaymentDialog({
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [receiptNumber, setReceiptNumber] = useState<string | null>(null);
+    const [newBalance, setNewBalance] = useState<number | null>(null);
+    const [showReceipt, setShowReceipt] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,7 +65,8 @@ export function QuickPaymentDialog({
         }
 
         setSuccess(true);
-        setReceiptNumber("receiptNumber" in result ? result.receiptNumber : null);
+        setReceiptNumber(result.receiptNumber);
+        setNewBalance(result.newBalance);
         toast.success("Payment recorded successfully!");
         onSuccess?.();
     };
@@ -70,12 +76,13 @@ export function QuickPaymentDialog({
         setMode("CASH");
         setSuccess(false);
         setReceiptNumber(null);
+        setNewBalance(null);
+        setShowReceipt(false);
         onClose();
     };
 
     const handlePrint = () => {
-        // TODO: Open receipt dialog with print functionality
-        toast.info("Receipt printing coming soon");
+        setShowReceipt(true);
     };
 
     const formatCurrency = (value: number) =>
@@ -212,6 +219,24 @@ export function QuickPaymentDialog({
                     </form>
                 )}
             </DialogContent>
+
+            {receiptNumber && (
+                <ReceiptDialog
+                    open={showReceipt}
+                    onClose={() => setShowReceipt(false)}
+                    data={{
+                        receiptNumber,
+                        transactionId: 0, // Placeholder
+                        familyName,
+                        familyPhone,
+                        studentName,
+                        amount: parseFloat(amount),
+                        mode,
+                        date: new Date(),
+                        balance: newBalance !== null ? Math.abs(newBalance) : undefined
+                    }}
+                />
+            )}
         </Dialog>
     );
 }

@@ -32,106 +32,147 @@ export const PrintReceipt = forwardRef<HTMLDivElement, PrintReceiptProps>(
         return (
             <div
                 ref={ref}
-                className="print-receipt bg-white p-8 max-w-md mx-auto"
-                style={{ fontFamily: "system-ui, sans-serif" }}
+                className="print-receipt bg-white p-6 sm:p-8 max-w-[148mm] mx-auto overflow-hidden"
+                style={{
+                    fontFamily: "Inter, system-ui, sans-serif",
+                    breakInside: "avoid",
+                    pageBreakAfter: "avoid"
+                }}
             >
-                {/* Header */}
-                <div className="text-center border-b-2 border-gray-800 pb-4 mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900">RK Institute</h1>
-                    <p className="text-sm text-gray-600">Excellence in Education</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                        123 Main Street, City • Phone: 9876543210
+                {/* Institutional Header */}
+                <div className="text-center border-b-2 border-slate-900 pb-4 mb-6 relative">
+                    <h1 className="text-2xl font-black text-slate-900 tracking-tight uppercase">
+                        RK Institute of Learning
+                    </h1>
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 mt-1">
+                        "Excellent in Holistic Development"
                     </p>
+                    <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                        <span>Academics</span>
+                        <span className="opacity-30">•</span>
+                        <span>Computer Education</span>
+                        <span className="opacity-30">•</span>
+                        <span>Yoga</span>
+                        <span className="opacity-30">•</span>
+                        <span>Library Facility</span>
+                    </div>
+                    <div className="mt-3 space-y-0.5">
+                        <p className="text-[10px] text-slate-600 font-medium">
+                            Swaroop Nagar, Kushak Road, Delhi-42
+                        </p>
+                        <p className="text-[10px] text-slate-600 font-bold">
+                            Mob: +91-7678357731, 7903952008 • Web: rkinstitute.in
+                        </p>
+                    </div>
                 </div>
 
-                {/* Receipt Title */}
-                <div className="text-center mb-6">
-                    <h2 className="text-lg font-semibold text-gray-800 uppercase tracking-wide">
-                        Fee Receipt
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                        Receipt No: <span className="font-mono font-bold">{data.receiptNumber}</span>
-                    </p>
-                </div>
-
-                {/* Receipt Details */}
-                <div className="space-y-3 mb-6">
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-gray-600">Date</span>
-                        <span className="font-medium">
+                {/* Receipt Metadata */}
+                <div className="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] mb-1">
+                            Fee Payment Receipt
+                        </h2>
+                        <p className="text-sm font-black text-slate-900 font-mono">
+                            No: {data.receiptNumber}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                            Date
+                        </p>
+                        <p className="text-xs font-bold text-slate-800">
                             {format(new Date(data.date), "dd MMM yyyy, hh:mm a")}
-                        </span>
+                        </p>
                     </div>
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-gray-600">Received From</span>
-                        <span className="font-medium">{data.familyName}</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-gray-600">Phone</span>
-                        <span className="font-mono">{data.familyPhone}</span>
-                    </div>
-                    {data.studentName && (
-                        <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span className="text-gray-600">Student</span>
-                            <span className="font-medium">{data.studentName}</span>
+                </div>
+
+                {/* Main Content Grid */}
+                <div className="space-y-4 mb-8">
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Received From</span>
+                            <p className="text-sm font-black text-slate-900 uppercase">{data.familyName}</p>
                         </div>
-                    )}
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                        <span className="text-gray-600">Payment Mode</span>
-                        <span className="font-medium uppercase">{data.mode}</span>
+                        <div className="space-y-1 text-right">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contact Phone</span>
+                            <p className="text-sm font-mono font-bold text-slate-900">{data.familyPhone}</p>
+                        </div>
                     </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Student Name</span>
+                            <p className="text-sm font-bold text-slate-800">{data.studentName || "N/A"}</p>
+                        </div>
+                        <div className="space-y-1 text-right">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Payment Mode</span>
+                            <p className="text-sm font-black text-indigo-600 uppercase tracking-wider">{data.mode}</p>
+                        </div>
+                    </div>
+
                     {data.description && (
-                        <div className="flex justify-between py-2 border-b border-gray-200">
-                            <span className="text-gray-600">Description</span>
-                            <span className="font-medium">{data.description}</span>
+                        <div className="pt-2 border-t border-slate-100">
+                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Note</span>
+                            <p className="text-xs text-slate-600 mt-1 leading-relaxed italic">
+                                {data.description}
+                            </p>
                         </div>
                     )}
                 </div>
 
-                {/* Amount Box */}
-                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-4 mb-6">
-                    <div className="flex justify-between items-center">
-                        <span className="text-lg text-gray-700">Amount Paid</span>
-                        <span className="text-2xl font-bold text-green-700">
+                {/* Financial Summary Box */}
+                <div className="bg-slate-50 border-2 border-slate-900 rounded-2xl p-6 mb-8 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-[0.03] rotate-12">
+                        <h1 className="text-6xl font-black">RK</h1>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4">
+                        <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Paid Amount</span>
+                        <span className="text-3xl font-black text-slate-900">
                             {formatCurrency(data.amount)}
                         </span>
                     </div>
+
                     {data.balance !== undefined && (
-                        <div className="flex justify-between items-center mt-2 pt-2 border-t border-green-200">
-                            <span className="text-sm text-gray-600">Balance Due</span>
-                            <span className={`font-semibold ${data.balance > 0 ? "text-red-600" : "text-green-600"}`}>
-                                {data.balance > 0 ? formatCurrency(data.balance) : "NIL"}
+                        <div className="flex justify-between items-center pt-4 border-t-2 border-slate-200">
+                            <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Balance Dues</span>
+                            <span className={`text-base font-black ${data.balance > 0 ? "text-red-600" : "text-emerald-600"}`}>
+                                {data.balance > 0 ? formatCurrency(data.balance) : "PAID FULL"}
                             </span>
                         </div>
                     )}
                 </div>
 
-                {/* Amount in Words */}
-                <div className="bg-gray-50 rounded p-3 mb-6">
-                    <p className="text-xs text-gray-500 uppercase">Amount in Words</p>
-                    <p className="font-medium text-gray-800">
+                {/* Transaction Verbatim */}
+                <div className="bg-slate-900 text-white rounded-xl p-4 mb-8">
+                    <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-400 mb-1">In Words</p>
+                    <p className="text-xs font-bold uppercase italic tracking-wider">
                         Rupees {numberToWords(data.amount)} Only
                     </p>
                 </div>
 
-                {/* Footer */}
-                <div className="border-t-2 border-gray-800 pt-6 mt-6">
-                    <div className="flex justify-between">
-                        <div className="text-center">
-                            <p className="text-xs text-gray-500 mb-8">Payer Signature</p>
-                            <div className="border-t border-gray-400 w-32"></div>
+                {/* Signature Panel */}
+                <div className="grid grid-cols-2 gap-12 mt-12 pt-8 border-t border-slate-200 text-center">
+                    <div>
+                        <div className="h-12 flex items-end justify-center">
+                            <div className="w-full border-b border-slate-400" />
                         </div>
-                        <div className="text-center">
-                            <p className="text-xs text-gray-500 mb-8">Authorized Signature</p>
-                            <div className="border-t border-gray-400 w-32"></div>
+                        <p className="text-[9px] font-black uppercase text-slate-500 mt-2 tracking-widest">Parent's Signature</p>
+                    </div>
+                    <div>
+                        <div className="h-12 flex items-end justify-center">
+                            <div className="w-full border-b border-slate-400" />
                         </div>
+                        <p className="text-[9px] font-black uppercase text-slate-500 mt-2 tracking-widest">Principal / Manager</p>
                     </div>
                 </div>
 
-                {/* Print Note */}
-                <p className="text-center text-xs text-gray-400 mt-6">
-                    This is a computer generated receipt. • Printed on {format(new Date(), "dd/MM/yyyy")}
-                </p>
+                {/* System Footer */}
+                <div className="mt-12 pt-6 border-t border-slate-100 text-center">
+                    <p className="text-[8px] font-bold text-slate-400 uppercase tracking-[0.4em]">
+                        Computer Generated Receipt • Printed on {format(new Date(), "dd/MM/yyyy")}
+                    </p>
+                </div>
             </div>
         );
     }
@@ -191,6 +232,15 @@ function numberToWords(num: number): string {
  */
 export const printStyles = `
 @media print {
+    @page {
+        size: A5 portrait;
+        margin: 0;
+    }
+    body {
+        margin: 0;
+        padding: 0;
+        -webkit-print-color-adjust: exact;
+    }
     body * {
         visibility: hidden;
     }
@@ -202,11 +252,19 @@ export const printStyles = `
         position: absolute;
         left: 0;
         top: 0;
-        width: 100%;
+        width: 148mm;
+        height: auto;
+        min-height: 210mm;
+        padding: 20px !important;
+        margin: 0 !important;
+        background: white !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        page-break-inside: avoid !important;
     }
-    @page {
-        size: A5;
-        margin: 1cm;
+    .no-print {
+        display: none !important;
     }
 }
 `;

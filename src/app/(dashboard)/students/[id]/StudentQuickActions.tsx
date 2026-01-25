@@ -13,6 +13,7 @@ interface StudentQuickActionsProps {
     studentClass: string;
     familyId: number;
     fatherName: string;
+    familyPhone: string;
     balance: number;
 }
 
@@ -22,6 +23,7 @@ export function StudentQuickActions({
     studentClass,
     familyId,
     fatherName,
+    familyPhone,
     balance,
 }: StudentQuickActionsProps) {
     const [paymentOpen, setPaymentOpen] = useState(false);
@@ -61,6 +63,7 @@ export function StudentQuickActions({
                 onClose={() => setPaymentOpen(false)}
                 familyId={familyId}
                 familyName={fatherName}
+                familyPhone={familyPhone}
                 studentName={studentName}
                 currentDue={currentDue}
                 onSuccess={() => {
