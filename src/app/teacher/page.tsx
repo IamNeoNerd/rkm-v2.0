@@ -113,7 +113,7 @@ export default async function TeacherDashboard() {
                     </GlassCard>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {batches.map((batch) => (
+                        {batches.map((batch: any) => (
                             <Link
                                 key={batch.id}
                                 href={`/teacher/batches/${batch.id}`}

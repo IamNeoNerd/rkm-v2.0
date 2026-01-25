@@ -58,7 +58,7 @@ export async function getPublicBrowseInfo() {
             success: true,
             data: {
                 currentSession: currentSession?.name || "Not Set",
-                batches: batchList.map(b => ({
+                batches: batchList.map((b: any) => ({
                     id: b.id,
                     name: b.name,
                     schedule: b.schedule,

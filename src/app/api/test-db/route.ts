@@ -38,7 +38,7 @@ export async function GET() {
             success: true,
             databaseUrl: process.env.DATABASE_URL?.replace(/:[^:]*@/, ':***@'),
             userCount: allUsers.length,
-            users: allUsers.map(u => ({
+            users: allUsers.map((u: any) => ({
                 email: u.email,
                 name: u.name,
                 role: u.role,

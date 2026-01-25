@@ -36,7 +36,7 @@ export async function voidTransaction(transactionId: string) {
             return { error: "Transaction is already voided" };
         }
 
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             // 3. Set is_void = true
             await tx
                 .update(transactions)

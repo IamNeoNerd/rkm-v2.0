@@ -135,7 +135,7 @@ export async function getParentFamilyData() {
                 }
             },
             transactions: {
-                orderBy: (t, { desc }) => [desc(t.createdAt)],
+                orderBy: (t: any, { desc }: any) => [desc(t.createdAt)],
                 limit: 20,
             }
         },
@@ -153,12 +153,12 @@ export async function getParentFamilyData() {
             // Serialize dates
             createdAt: family.createdAt?.toISOString() || null,
             updatedAt: family.updatedAt?.toISOString() || null,
-            students: family.students.map(s => ({
+            students: family.students.map((s: any) => ({
                 ...s,
                 createdAt: s.createdAt?.toISOString() || null,
                 updatedAt: s.updatedAt?.toISOString() || null,
             })),
-            transactions: family.transactions.map(t => ({
+            transactions: family.transactions.map((t: any) => ({
                 ...t,
                 createdAt: t.createdAt?.toISOString() || null,
             })),

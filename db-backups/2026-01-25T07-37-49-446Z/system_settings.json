@@ -1,0 +1,14 @@
+[
+  {
+    "key": "institute_name",
+    "value": "RK Institute ERP",
+    "description": null,
+    "updated_at": "2026-01-19 12:04:29.899668"
+  },
+  {
+    "key": "auth_settings",
+    "value": "{\"allowCredentials\":true,\"allowGoogle\":true}",
+    "description": null,
+    "updated_at": "2026-01-19 12:04:29.899668"
+  }
+]

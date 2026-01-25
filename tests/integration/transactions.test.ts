@@ -116,7 +116,7 @@ describe('Database Transaction Integration', () => {
 
         const txn = await db.query.transactions.findFirst({
             where: eq(transactions.familyId, familyRecord.id),
-            orderBy: (transactions, { desc }) => [desc(transactions.createdAt)]
+            orderBy: (transactions: any, { desc }: any) => [desc(transactions.createdAt)]
         });
         expect(txn?.amount).toBe(paymentAmount);
     });

@@ -1,0 +1,50 @@
+[
+  {
+    "id": 3,
+    "name": "2024-25",
+    "start_date": "2024-04-01",
+    "end_date": "2025-03-31",
+    "is_current": false,
+    "created_at": "2026-01-19 12:04:30.203781"
+  },
+  {
+    "id": 4,
+    "name": "2025-26",
+    "start_date": "2025-04-01",
+    "end_date": "2026-03-31",
+    "is_current": false,
+    "created_at": "2026-01-19 12:04:30.203781"
+  },
+  {
+    "id": 5,
+    "name": "CS_1769125636077",
+    "start_date": "2025-04-01",
+    "end_date": "2026-03-31",
+    "is_current": false,
+    "created_at": "2026-01-22 23:47:18.180628"
+  },
+  {
+    "id": 6,
+    "name": "NS_1769125636077",
+    "start_date": "2026-04-01",
+    "end_date": "2027-03-31",
+    "is_current": false,
+    "created_at": "2026-01-22 23:47:18.506914"
+  },
+  {
+    "id": 7,
+    "name": "CS_1769242162203",
+    "start_date": "2025-04-01",
+    "end_date": "2026-03-31",
+    "is_current": true,
+    "created_at": "2026-01-24 08:09:26.235536"
+  },
+  {
+    "id": 8,
+    "name": "NS_1769242162203",
+    "start_date": "2026-04-01",
+    "end_date": "2027-03-31",
+    "is_current": false,
+    "created_at": "2026-01-24 08:09:26.52467"
+  }
+]

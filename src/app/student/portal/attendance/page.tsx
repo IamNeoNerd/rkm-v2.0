@@ -34,7 +34,7 @@ export default async function AttendancePage() {
     }
 
     // Adapt attendance records for the calendar
-    const attendanceRecords = studentData.attendance.map(a => ({
+    const attendanceRecords = studentData.attendance.map((a: any) => ({
         date: a.date,
         status: a.status
     }));

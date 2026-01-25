@@ -50,7 +50,7 @@ export async function getAuthSettingsInternal(): Promise<AuthSettings> {
             .where(inArray(systemSettings.key, keys));
 
         const settingsMap = new Map<string, string>();
-        results.forEach(row => settingsMap.set(row.key, row.value));
+        results.forEach((row: any) => settingsMap.set(row.key, row.value));
 
         const settings: AuthSettings = {
             googleEnabled: settingsMap.has("auth_google_enabled")

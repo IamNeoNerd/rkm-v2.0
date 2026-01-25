@@ -47,7 +47,7 @@ async function getStandardFeeForClass(className: string): Promise<number> {
 
         // Build cache
         feeStructureCache = new Map();
-        structures.forEach(s => {
+        structures.forEach((s: any) => {
             feeStructureCache!.set(s.className, s.monthlyFee);
         });
 
@@ -70,13 +70,13 @@ export async function calculateTotalDue(familyId: string) {
         .from(students)
         .where(eq(students.familyId, parseInt(familyId))); // Assuming familyId is string but needs int parshing or schema uses serial which is int
 
-    const activeStudents = familyStudents.filter((s) => s.isActive);
+    const activeStudents = familyStudents.filter((s: any) => s.isActive);
 
     if (activeStudents.length === 0) {
         return 0;
     }
 
-    const studentIds = activeStudents.map((s) => s.id);
+    const studentIds = activeStudents.map((s: any) => s.id);
 
     // 2. Fetch all active batch enrollments for these students
     const studentEnrollments = await db
@@ -119,8 +119,8 @@ export async function calculateTotalDue(familyId: string) {
 
         // Batch Fees for this student
         const studentBatchFees = activeEnrollments
-            .filter((e) => e.studentId === student.id)
-            .reduce((sum, e) => sum + e.batchFee, 0);
+            .filter((e: any) => e.studentId === student.id)
+            .reduce((sum: number, e: any) => sum + e.batchFee, 0);
 
         totalDue += baseFee + studentBatchFees;
     }
@@ -154,7 +154,7 @@ export async function processPayment(data: { familyId: string; studentId?: strin
         const { generateReceiptNumber } = await import('@/lib/receipt-generator');
         const receiptNumber = await generateReceiptNumber();
 
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // Step A: Insert transaction with audit trail
             await tx.insert(transactions).values({
                 type: 'CREDIT',
@@ -342,11 +342,11 @@ export async function searchFamilies(query: string) {
         // Combine and deduplicate
         const familyMap = new Map();
 
-        matchingFamilies.forEach(f => {
+        matchingFamilies.forEach((f: any) => {
             familyMap.set(f.id, { ...f, matchedBy: 'family' });
         });
 
-        matchingByStudent.forEach(f => {
+        matchingByStudent.forEach((f: any) => {
             if (!familyMap.has(f.id)) {
                 familyMap.set(f.id, {
                     id: f.id,

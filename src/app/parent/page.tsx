@@ -78,7 +78,7 @@ export default async function ParentPortal() {
                 balance: family.balance,
             }}
             students={childrenData}
-            transactions={transactionsData.map(t => ({
+            transactions={transactionsData.map((t: any) => ({
                 ...t,
                 createdAt: t.createdAt!,
             }))}

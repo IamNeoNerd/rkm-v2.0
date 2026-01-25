@@ -41,7 +41,7 @@ export async function markAttendance(
         // Insert new attendance records
         if (records.length > 0) {
             await db.insert(attendance).values(
-                records.map(r => ({
+                records.map((r: AttendanceRecord) => ({
                     batchId,
                     studentId: r.studentId,
                     date: dateStr,
@@ -186,9 +186,9 @@ export async function getStudentAttendance(studentId: number, daysBack: number =
         // Calculate summary
         const summary = {
             total: records.length,
-            present: records.filter(r => r.status === "Present").length,
-            absent: records.filter(r => r.status === "Absent").length,
-            late: records.filter(r => r.status === "Late").length,
+            present: records.filter((r: { status: string | null }) => r.status === "Present").length,
+            absent: records.filter((r: { status: string | null }) => r.status === "Absent").length,
+            late: records.filter((r: { status: string | null }) => r.status === "Late").length,
             percentage: 0,
         };
 

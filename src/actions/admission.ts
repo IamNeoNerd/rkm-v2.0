@@ -1,5 +1,4 @@
-
-'use server';
+"use server";
 
 import { db } from "@/db";
 import { families, students, transactions } from "@/db/schema";
@@ -35,7 +34,7 @@ export async function processAdmission(data: AdmissionData) {
             initialPayment: data.initialPayment,
         };
 
-        const result = await db.transaction(async (tx) => {
+        const result = await db.transaction(async (tx: any) => {
             // 1. Check or Create Family
             let familyId: number;
             const existingFamily = await tx.query.families.findFirst({

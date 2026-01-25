@@ -147,7 +147,7 @@ export async function getUserNotifications(options?: {
 
         const total = Number(totalResult?.count || 0);
 
-        const parsedNotifications: Notification[] = results.map(n => ({
+        const parsedNotifications: Notification[] = results.map((n: any) => ({
             ...n,
             data: n.data ? JSON.parse(n.data) : null,
         }));
@@ -255,12 +255,12 @@ export async function sendFeeReminders() {
             .where(eq(users.role, 'admin'));
 
         if (admins.length > 0) {
-            const adminIds = admins.map(a => a.id);
+            const adminIds = admins.map((a: any) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "FEE_REMINDER",
                 "Outstanding Dues Report",
-                `${familiesWithDue.length} families have outstanding fees totaling ₹${Math.abs(familiesWithDue.reduce((sum, f) => sum + f.balance, 0))
+                `${familiesWithDue.length} families have outstanding fees totaling ₹${Math.abs(familiesWithDue.reduce((sum: number, f: any) => sum + f.balance, 0))
                 }`,
                 { familyCount: familiesWithDue.length }
             );
@@ -269,7 +269,7 @@ export async function sendFeeReminders() {
         return {
             success: true,
             familiesNotified: familiesWithDue.length,
-            totalDue: Math.abs(familiesWithDue.reduce((sum, f) => sum + f.balance, 0))
+            totalDue: Math.abs(familiesWithDue.reduce((sum: number, f: any) => sum + f.balance, 0))
         };
     } catch (error) {
         logger.error("Failed to send fee reminders", error);
@@ -293,7 +293,7 @@ export async function notifyPaymentReceived(
             .where(sql`${users.role} IN ('admin', 'super-admin')`);
 
         if (admins.length > 0) {
-            const adminIds = admins.map(a => a.id);
+            const adminIds = admins.map((a: any) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "PAYMENT_RECEIVED",
@@ -326,7 +326,7 @@ export async function notifyAttendanceAlert(
             .where(sql`${users.role} IN ('admin', 'super-admin')`);
 
         if (admins.length > 0) {
-            const adminIds = admins.map(a => a.id);
+            const adminIds = admins.map((a: any) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "ATTENDANCE_ALERT",
@@ -359,7 +359,7 @@ export async function sendSystemNotification(
             .where(eq(users.isVerified, true));
 
         if (allUsers.length > 0) {
-            const userIds = allUsers.map(u => u.id);
+            const userIds = allUsers.map((u: any) => u.id);
             await createBulkNotifications(
                 userIds,
                 "SYSTEM_ALERT",

@@ -1,0 +1,102 @@
+[
+  {
+    "id": 9,
+    "session_id": 4,
+    "class_name": "5",
+    "monthly_fee": 1000,
+    "admission_fee": 2500,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 10,
+    "session_id": 4,
+    "class_name": "6",
+    "monthly_fee": 1200,
+    "admission_fee": 3000,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 11,
+    "session_id": 4,
+    "class_name": "7",
+    "monthly_fee": 1400,
+    "admission_fee": 3500,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 12,
+    "session_id": 4,
+    "class_name": "8",
+    "monthly_fee": 1600,
+    "admission_fee": 4000,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 13,
+    "session_id": 4,
+    "class_name": "9",
+    "monthly_fee": 1800,
+    "admission_fee": 4500,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 14,
+    "session_id": 4,
+    "class_name": "10",
+    "monthly_fee": 2000,
+    "admission_fee": 5000,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 15,
+    "session_id": 4,
+    "class_name": "11",
+    "monthly_fee": 2200,
+    "admission_fee": 5500,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 16,
+    "session_id": 4,
+    "class_name": "12",
+    "monthly_fee": 2400,
+    "admission_fee": 6000,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:30.514423",
+    "updated_at": "2026-01-19 12:04:30.514423"
+  },
+  {
+    "id": 17,
+    "session_id": 5,
+    "class_name": "Class 5",
+    "monthly_fee": 2000,
+    "admission_fee": 500,
+    "is_active": true,
+    "created_at": "2026-01-22 23:47:18.762942",
+    "updated_at": "2026-01-22 23:47:18.762942"
+  },
+  {
+    "id": 18,
+    "session_id": 7,
+    "class_name": "Class 5",
+    "monthly_fee": 2000,
+    "admission_fee": 500,
+    "is_active": true,
+    "created_at": "2026-01-24 08:09:26.830471",
+    "updated_at": "2026-01-24 08:09:26.830471"
+  }
+]

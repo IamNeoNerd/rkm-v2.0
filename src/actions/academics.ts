@@ -84,8 +84,8 @@ export async function enrollStudentInBatch(studentId: string, batchId: string) {
                 );
 
             const existingSchedules = activeStudentEnrollments
-                .filter(e => e.batchId !== bId && e.batchSchedule)
-                .map(e => e.batchSchedule as string);
+                .filter((e: { batchId: number; batchSchedule: string | null }) => e.batchId !== bId && e.batchSchedule)
+                .map((e: { batchId: number; batchSchedule: string | null }) => e.batchSchedule as string);
 
             const result = checkTimeConflict(batch.schedule, existingSchedules);
 

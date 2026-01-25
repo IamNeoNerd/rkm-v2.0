@@ -54,7 +54,7 @@ export default async function TeacherBatchesPage() {
                 </GlassCard>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {batches.map((batch) => (
+                    {batches.map((batch: any) => (
                         <GlassCard
                             key={batch.id}
                             className="p-8 border-white/60 shadow-xl overflow-hidden relative group hover:shadow-2xl hover:-translate-y-2 transition-all duration-500"

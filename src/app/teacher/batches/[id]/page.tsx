@@ -107,7 +107,7 @@ export default async function TeacherBatchDetailPage({
                     </GlassCard>
                 ) : (
                     <div className="grid gap-4">
-                        {students.map((student) => (
+                        {students.map((student: any) => (
                             <GlassCard
                                 key={student.id}
                                 className={cn(

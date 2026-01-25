@@ -42,7 +42,7 @@ export async function createSession(data: CreateSessionData) {
             return { success: false, error: `Session "${name}" already exists` };
         }
 
-        const newSession = await db.transaction(async (tx) => {
+        const newSession = await db.transaction(async (tx: any) => {
             if (isCurrent) {
                 await tx.update(academicSessions).set({ isCurrent: false });
             }
@@ -134,7 +134,7 @@ export async function activateSession(sessionId: number) {
         }
 
         // Deactivate all sessions and activate the selected one
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             // Deactivate all
             await tx
                 .update(academicSessions)
@@ -261,7 +261,7 @@ export async function transitionToNewSession(
             changes: {},
         };
 
-        await db.transaction(async (tx) => {
+        await db.transaction(async (tx: any) => {
             // 1. Promote students to next class
             if (options.promoteStudents) {
                 const classProgression: Record<string, string> = {

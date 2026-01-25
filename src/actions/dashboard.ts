@@ -254,7 +254,7 @@ export async function getTeacherLoadData() {
         .groupBy(staff.name)
         .orderBy(desc(count(batches.id)));
 
-    return result.map(r => ({ name: r.name, total: Number(r.count) }));
+    return result.map((r: any) => ({ name: r.name, total: Number(r.count) }));
 }
 
 export async function getBatchActivityData() {
@@ -270,7 +270,7 @@ export async function getBatchActivityData() {
         .groupBy(batches.id)
         .orderBy(desc(count(enrollments.studentId)));
 
-    return result.map(r => ({ name: r.name, total: Number(r.count) }));
+    return result.map((r: any) => ({ name: r.name, total: Number(r.count) }));
 }
 
 export async function getSettlementModeData() {

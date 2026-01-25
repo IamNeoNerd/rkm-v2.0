@@ -174,7 +174,7 @@ export default async function FamilyDetailPage({ params }: FamilyPageProps) {
                                 </GlassCard>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    {students.map((student) => (
+                                    {students.map((student: any) => (
                                         <Link
                                             key={student.id}
                                             href={`/students/${student.id}`}
@@ -221,7 +221,7 @@ export default async function FamilyDetailPage({ params }: FamilyPageProps) {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5 dark:divide-slate-800/50">
-                                                {transactions.map((txn) => (
+                                                {transactions.map((txn: any) => (
                                                     <tr key={txn.id} className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300">
                                                         <td className="px-6 py-4">
                                                             <div className="flex flex-col">

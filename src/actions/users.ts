@@ -25,7 +25,7 @@ export async function getUsers() {
         }).from(users);
 
         // Serialize dates for SSR compatibility
-        const serializedUsers = userList.map(u => ({
+        const serializedUsers = userList.map((u: any) => ({
             ...u,
             createdAt: u.createdAt?.toISOString() || null,
         }));

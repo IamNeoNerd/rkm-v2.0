@@ -34,8 +34,8 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
         .innerJoin(families, eq(students.familyId, families.id))
         .where(eq(enrollments.batchId, parseInt(id)));
 
-    const activeStudents = enrolledStudents.filter(s => s.isActive);
-    const inactiveStudents = enrolledStudents.filter(s => !s.isActive);
+    const activeStudents = enrolledStudents.filter((s: any) => s.isActive);
+    const inactiveStudents = enrolledStudents.filter((s: any) => !s.isActive);
 
     return (
         <div className="p-8 max-w-7xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -147,7 +147,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/10">
-                                {activeStudents.map((student) => (
+                                {activeStudents.map((student: any) => (
                                     <tr key={student.studentId} className="group hover:bg-white/40 transition-colors duration-200">
                                         <td className="px-8 py-6">
                                             <Link href={`/students/${student.studentId}`}>
@@ -200,7 +200,7 @@ export default async function BatchDetailPage({ params }: { params: Promise<{ id
                         <h3 className="text-sm font-black text-slate-500 uppercase tracking-widest">Inactive Records ({inactiveStudents.length})</h3>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {inactiveStudents.map((student) => (
+                        {inactiveStudents.map((student: any) => (
                             <div key={student.studentId} className="flex justify-between items-center p-4 bg-white/40 border border-white/20 rounded-2xl group hover:border-slate-200 transition-all">
                                 <div>
                                     <div className="text-sm font-bold text-slate-600">{student.studentName}</div>

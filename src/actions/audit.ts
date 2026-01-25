@@ -107,7 +107,7 @@ export async function getAuditLogs(filters: AuditLogFilters = {}) {
         .offset(offset);
 
     // Parse details JSON for each log
-    const parsedLogs: AuditLogEntry[] = logs.map(log => ({
+    const parsedLogs: AuditLogEntry[] = logs.map((log: any) => ({
         ...log,
         details: log.details ? JSON.parse(log.details) : null,
     }));
@@ -174,7 +174,7 @@ export async function getAuditActionTypes() {
         .from(auditLogs)
         .orderBy(auditLogs.action);
 
-    return actions.map(a => a.action);
+    return actions.map((a: any) => a.action);
 }
 
 // Get distinct entity types for filter dropdown
@@ -188,5 +188,5 @@ export async function getAuditEntityTypes() {
         .where(sql`${auditLogs.entityType} IS NOT NULL`)
         .orderBy(auditLogs.entityType);
 
-    return types.map(t => t.entityType).filter(Boolean) as string[];
+    return types.map((t: any) => t.entityType).filter(Boolean) as string[];
 }

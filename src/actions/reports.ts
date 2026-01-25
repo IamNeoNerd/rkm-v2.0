@@ -18,12 +18,12 @@ export async function getPendingDues() {
         status: families.status,
     }).from(families);
 
-    const duesReport = allFamilies.map(f => ({
+    const duesReport = allFamilies.map((f: any) => ({
         ...f,
         outstanding: f.balance < 0 ? Math.abs(f.balance) : 0
-    })).filter(f => f.outstanding > 0);
+    })).filter((f: any) => f.outstanding > 0);
 
-    const totalOutstanding = duesReport.reduce((acc, curr) => acc + curr.outstanding, 0);
+    const totalOutstanding = duesReport.reduce((acc: number, curr: any) => acc + curr.outstanding, 0);
 
     return {
         duesReport,
@@ -86,14 +86,14 @@ export async function getDuesAgingReport() {
         .groupBy(transactions.familyId);
 
     const lastPaymentMap = new Map(
-        lastPayments.map(p => [p.familyId, p.lastPayment])
+        lastPayments.map((p: any) => [p.familyId, p.lastPayment])
     );
 
     const now = new Date();
 
-    const report = familiesWithDue.map(family => {
+    const report = familiesWithDue.map((family: any) => {
         const lastPaymentDate = lastPaymentMap.get(family.id);
-        const lastPayment = lastPaymentDate ? new Date(lastPaymentDate) : null;
+        const lastPayment = lastPaymentDate ? new Date(lastPaymentDate as string) : null;
 
         let agingBucket: '0-30' | '31-60' | '61-90' | '90+' = '0-30';
         let daysSincePayment = 0;
@@ -120,23 +120,26 @@ export async function getDuesAgingReport() {
     });
 
     // Calculate summary
-    const summary = {
+    const summary: Record<string, { count: number, total: number }> = {
         '0-30': { count: 0, total: 0 },
         '31-60': { count: 0, total: 0 },
         '61-90': { count: 0, total: 0 },
         '90+': { count: 0, total: 0 },
     };
 
-    report.forEach(r => {
-        summary[r.agingBucket].count++;
-        summary[r.agingBucket].total += r.dueAmount;
+    report.forEach((r: any) => {
+        const bucket = r.agingBucket as string;
+        if (summary[bucket]) {
+            summary[bucket].count++;
+            summary[bucket].total += r.dueAmount;
+        }
     });
 
     return {
         success: true,
         report,
-        summary,
-        totalDue: report.reduce((sum, r) => sum + r.dueAmount, 0),
+        summary: summary as any,
+        totalDue: report.reduce((sum: number, r: any) => sum + r.dueAmount, 0),
         totalFamilies: report.length,
     };
 }

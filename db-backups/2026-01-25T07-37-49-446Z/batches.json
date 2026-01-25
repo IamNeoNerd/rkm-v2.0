@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "name": "Maths Foundation",
+    "fee": 1500,
+    "schedule": "Mon-Wed-Fri 4PM",
+    "teacher_id": 7,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:31.341969",
+    "updated_at": "2026-01-19 12:04:31.341969"
+  },
+  {
+    "id": 2,
+    "name": "Physics JEE",
+    "fee": 2500,
+    "schedule": "Tue-Thu-Sat 5PM",
+    "teacher_id": 8,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:31.341969",
+    "updated_at": "2026-01-19 12:04:31.341969"
+  },
+  {
+    "id": 3,
+    "name": "Chemistry Advanced",
+    "fee": 2200,
+    "schedule": "Mon-Wed-Fri 6PM",
+    "teacher_id": 9,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:31.341969",
+    "updated_at": "2026-01-19 12:04:31.341969"
+  },
+  {
+    "id": 4,
+    "name": "Biology NEET",
+    "fee": 2000,
+    "schedule": "Tue-Thu-Sat 3PM",
+    "teacher_id": 11,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:31.341969",
+    "updated_at": "2026-01-19 12:04:31.341969"
+  },
+  {
+    "id": 5,
+    "name": "English Grammar",
+    "fee": 1000,
+    "schedule": "Sat-Sun 10AM",
+    "teacher_id": 12,
+    "is_active": true,
+    "created_at": "2026-01-19 12:04:31.341969",
+    "updated_at": "2026-01-19 12:04:31.341969"
+  },
+  {
+    "id": 6,
+    "name": "RollBatch_1769125636077",
+    "fee": 500,
+    "schedule": null,
+    "teacher_id": 29,
+    "is_active": true,
+    "created_at": "2026-01-22 23:47:19.858858",
+    "updated_at": "2026-01-22 23:47:19.858858"
+  },
+  {
+    "id": 7,
+    "name": "RollBatch_1769242162203",
+    "fee": 500,
+    "schedule": null,
+    "teacher_id": 30,
+    "is_active": true,
+    "created_at": "2026-01-24 08:09:27.955227",
+    "updated_at": "2026-01-24 08:09:27.955227"
+  }
+]

@@ -1,0 +1,257 @@
+
+> rk-institute-erp@0.1.0 lint
+> eslint
+
+
+D:\RKM3.0\scripts\seed-production-ready.ts
+   19:32  warning  'users' is defined but never used                 @typescript-eslint/no-unused-vars
+   22:80  warning  'subMonths' is defined but never used             @typescript-eslint/no-unused-vars
+   26:7   warning  'warn' is assigned a value but never used         @typescript-eslint/no-unused-vars
+  103:16  warning  'prevSession' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\auth-settings.ts
+  5:10  warning  'eq' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\billing.ts
+  82:11  warning  'studentEnrollments' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\finance.ts
+    4:46  warning  'students' is defined but never used  @typescript-eslint/no-unused-vars
+    5:36  warning  'desc' is defined but never used      @typescript-eslint/no-unused-vars
+  411:72  warning  'month' is defined but never used     @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\identity.ts
+  5:19  warning  'and' is defined but never used     @typescript-eslint/no-unused-vars
+  5:24  warning  'isNull' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\notifications.ts
+  4:42  warning  'students' is defined but never used  @typescript-eslint/no-unused-vars
+  5:37  warning  'lte' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\reports.ts
+  4:20  warning  'students' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\session.ts
+    4:66  warning  'families' is defined but never used         @typescript-eslint/no-unused-vars
+    4:76  warning  'transactions' is defined but never used     @typescript-eslint/no-unused-vars
+    7:43  warning  'requireAuth' is defined but never used      @typescript-eslint/no-unused-vars
+  177:44  warning  'newSessionId' is defined but never used     @typescript-eslint/no-unused-vars
+  317:23  warning  'result' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\student.ts
+  5:14  warning  'sql' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\teacher.ts
+  5:19  warning  'desc' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\actions\users.ts
+  5:14  warning  'ne' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\academics\academics-client.tsx
+   4:57  warning  'ArrowRight' is defined but never used  @typescript-eslint/no-unused-vars
+  11:10  warning  'cn' is defined but never used          @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\batches\[id]\page.tsx
+  3:14  warning  'and' is defined but never used  @typescript-eslint/no-unused-vars
+  9:10  warning  'cn' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\families\[id]\EditFamilyDialog.tsx
+  40:12  warning  'userName' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\families\[id]\page.tsx
+  6:5  warning  'CreditCard' is defined but never used   @typescript-eslint/no-unused-vars
+  7:5  warning  'IndianRupee' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\page.tsx
+  10:10  warning  'DashboardClient' is defined but never used    @typescript-eslint/no-unused-vars
+  38:10  warning  'families' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\reports\dues\page.tsx
+  8:23  warning  'formatDateForExport' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\reports\finance\page.tsx
+  101:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\audit-logs\audit-logs-client.tsx
+  23:5   warning  'Zap' is defined but never used                  @typescript-eslint/no-unused-vars
+  28:18  warning  'formatDistanceToNow' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\auth\page.tsx
+   8:19  warning  'Save' is defined but never used                @typescript-eslint/no-unused-vars
+   8:58  warning  'Key' is defined but never used                 @typescript-eslint/no-unused-vars
+  10:10  warning  'SettingsPageLayout' is defined but never used  @typescript-eslint/no-unused-vars
+  25:10  warning  'cn' is defined but never used                  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\fees\page.tsx
+  10:32  warning  'IndianRupee' is defined but never used  @typescript-eslint/no-unused-vars
+  10:78  warning  'Save' is defined but never used         @typescript-eslint/no-unused-vars
+  10:84  warning  'Trash' is defined but never used        @typescript-eslint/no-unused-vars
+  10:91  warning  'X' is defined but never used            @typescript-eslint/no-unused-vars
+  12:10  warning  'cn' is defined but never used           @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\page.tsx
+  3:17  warning  'SettingsIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  4:5   warning  'Database' is defined but never used      @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\profile\page.tsx
+   8:57  warning  'Unlock' is defined but never used  @typescript-eslint/no-unused-vars
+  12:10  warning  'cn' is defined but never used      @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\settings\sessions\session-transition-dialog.tsx
+  100:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+  120:18  warning  'error' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\staff\add-staff-dialog.tsx
+   4:22  warning  'Phone' is defined but never used      @typescript-eslint/no-unused-vars
+   4:29  warning  'Mail' is defined but never used       @typescript-eslint/no-unused-vars
+   4:43  warning  'UserCog' is defined but never used    @typescript-eslint/no-unused-vars
+   4:70  warning  'X' is defined but never used          @typescript-eslint/no-unused-vars
+  19:10  warning  'GlassCard' is defined but never used  @typescript-eslint/no-unused-vars
+  20:10  warning  'cn' is defined but never used         @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\staff\edit-staff-dialog.tsx
+  4:16  warning  'Phone' is defined but never used  @typescript-eslint/no-unused-vars
+  4:23  warning  'Mail' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\staff\staff-client.tsx
+  10:5   warning  'Plus' is defined but never used            @typescript-eslint/no-unused-vars
+  12:5   warning  'Shield' is defined but never used          @typescript-eslint/no-unused-vars
+  16:5   warning  'Hash' is defined but never used            @typescript-eslint/no-unused-vars
+  17:5   warning  'MoreVertical' is defined but never used    @typescript-eslint/no-unused-vars
+  18:5   warning  'Zap' is defined but never used             @typescript-eslint/no-unused-vars
+  20:5   warning  'CheckCircle2' is defined but never used    @typescript-eslint/no-unused-vars
+  21:5   warning  'XCircle' is defined but never used         @typescript-eslint/no-unused-vars
+  22:5   warning  'Edit3' is defined but never used           @typescript-eslint/no-unused-vars
+  25:10  warning  'toast' is defined but never used           @typescript-eslint/no-unused-vars
+  34:10  warning  'purgeTestStaff' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\staff\staff-role-types-manager.tsx
+   7:45  warning  'Zap' is defined but never used  @typescript-eslint/no-unused-vars
+  10:10  warning  'cn' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\student\[id]\page.tsx
+   3:10  warning  'useState' is defined but never used      @typescript-eslint/no-unused-vars
+   4:36  warning  'Clock' is defined but never used         @typescript-eslint/no-unused-vars
+   4:43  warning  'AlertCircle' is defined but never used   @typescript-eslint/no-unused-vars
+   4:56  warning  'CheckCircle2' is defined but never used  @typescript-eslint/no-unused-vars
+  40:54  warning  '_params' is defined but never used       @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\(dashboard)\students\[id]\page.tsx
+  3:17  warning  'Phone' is defined but never used       @typescript-eslint/no-unused-vars
+  3:39  warning  'Home' is defined but never used        @typescript-eslint/no-unused-vars
+  3:75  warning  'CreditCard' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\cashier\admission\page.tsx
+  10:10  warning  'cn' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\cashier\fees\page.tsx
+  4:23  warning  'Search' is defined but never used    @typescript-eslint/no-unused-vars
+  4:46  warning  'Receipt' is defined but never used   @typescript-eslint/no-unused-vars
+  4:99  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\cashier\layout.tsx
+  11:5   warning  'User' is defined but never used    @typescript-eslint/no-unused-vars
+  16:10  warning  'Button' is defined but never used  @typescript-eslint/no-unused-vars
+  17:10  warning  'cn' is defined but never used      @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\cashier\page.tsx
+  18:10  warning  'cn' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\login\page.tsx
+   9:74  warning  'Github' is defined but never used                       @typescript-eslint/no-unused-vars
+  30:19  warning  'setPhone' is assigned a value but never used            @typescript-eslint/no-unused-vars
+  33:12  warning  'studentId' is assigned a value but never used           @typescript-eslint/no-unused-vars
+  33:23  warning  'setStudentId' is assigned a value but never used        @typescript-eslint/no-unused-vars
+  73:11  warning  'handleParentSubmit' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\parent\layout.tsx
+  1:31  warning  'User' is defined but never used      @typescript-eslint/no-unused-vars
+  1:45  warning  'Sparkles' is defined but never used  @typescript-eslint/no-unused-vars
+  3:10  warning  'Button' is defined but never used    @typescript-eslint/no-unused-vars
+  4:10  warning  'cn' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\student\portal\page.tsx
+   4:5   warning  'GraduationCap' is defined but never used  @typescript-eslint/no-unused-vars
+  19:20  warning  'enrollments' is defined but never used    @typescript-eslint/no-unused-vars
+  19:33  warning  'batches' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\teacher\attendance\page.tsx
+  2:10  warning  'Calendar' is defined but never used  @typescript-eslint/no-unused-vars
+  2:43  warning  'Clock' is defined but never used     @typescript-eslint/no-unused-vars
+  5:10  warning  'cn' is defined but never used        @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\teacher\batches\[id]\attendance\page.tsx
+  36:8   warning  React Hook useEffect has a missing dependency: 'loadData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  77:18  warning  'err' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\teacher\batches\[id]\page.tsx
+  2:86  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\teacher\batches\page.tsx
+  2:47  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  2:71  warning  'Sparkles' is defined but never used      @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\app\teacher\layout.tsx
+  11:5   warning  'User' is defined but never used  @typescript-eslint/no-unused-vars
+  17:10  warning  'cn' is defined but never used    @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\FamiliesTable.tsx
+   9:5  warning  'ChevronRight' is defined but never used  @typescript-eslint/no-unused-vars
+  11:5  warning  'ArrowUpRight' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\NotificationBell.tsx
+  4:16  warning  'Check' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\QuickPaymentDialog.tsx
+  4:23  warning  'CreditCard' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\UsersTable.tsx
+  18:10  warning  'cn' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\layout\Sidebar.tsx
+  24:5  warning  'Key' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\modals\FeeCollectionModal.tsx
+  16:10  warning  'Label' is defined but never used    @typescript-eslint/no-unused-vars
+  17:10  warning  'Student' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\modern\TopBar.tsx
+  7:10  warning  'CommandPalette' is defined but never used  @typescript-eslint/no-unused-vars
+  8:10  warning  'cn' is defined but never used              @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\notifications\NotificationSettings.tsx
+   15:5   warning  'Filter' is defined but never used  @typescript-eslint/no-unused-vars
+   69:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+   94:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+  111:18  warning  'error' is defined but never used   @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\parent\AttendanceCalendar.tsx
+  41:11  warning  'rows' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\parent\StudentDetails.tsx
+   9:5   warning  'SheetDescription' is defined but never used  @typescript-eslint/no-unused-vars
+  11:25  warning  'Calendar' is defined but never used          @typescript-eslint/no-unused-vars
+  11:71  warning  'Sparkles' is defined but never used          @typescript-eslint/no-unused-vars
+  11:81  warning  'ChevronRight' is defined but never used      @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\components\settings\SettingsPageLayout.tsx
+  4:40  warning  'LucideIcon' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\src\lib\accessibility.ts
+  124:14  warning  'title' is defined but never used    @typescript-eslint/no-unused-vars
+  130:13  warning  'message' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\tests\e2e\admission.spec.ts
+  7:41  warning  'waitForToast' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\tests\e2e\operations.spec.ts
+  7:24  warning  'waitForPageLoad' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\tests\e2e\utils\devices.ts
+  7:16  warning  'BrowserContext' is defined but never used  @typescript-eslint/no-unused-vars
+
+D:\RKM3.0\tests\integration\transactions.test.ts
+  41:14  warning  'count' is defined but never used  @typescript-eslint/no-unused-vars
+
+✖ 134 problems (0 errors, 134 warnings)
+

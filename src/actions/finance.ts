@@ -354,7 +354,7 @@ export async function getExpenseReport(options?: {
         return {
             success: true,
             categories: results.sort((a, b) => b.totalAmount - a.totalAmount),
-            expenseHeads: expenseHeads.map(e => ({
+            expenseHeads: expenseHeads.map((e: any) => ({
                 head: e.expenseHead || 'Uncategorized',
                 amount: Number(e.totalAmount) || 0,
                 count: e.transactionCount,
