@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { transactions, batches, enrollments, students, families, staff } from "@/db/schema";
+import { transactions, batches, enrollments, students, families, staff, feeStructures } from "@/db/schema";
 import { eq, sql, sum, count, and, desc, gte, lte } from "drizzle-orm";
 import { requireAuth, requireRole, AuthorizationError } from "@/lib/auth-guard";
 import { logger } from "@/lib/logger";
@@ -24,11 +24,11 @@ export async function getBatchWiseRevenue() {
     try {
         await requireAuth();
 
-        // Get all active batches with enrollment counts
-        const batchData = await db
+        // 1. Get all active batches with instructor names
+        const allBatches = await db
             .select({
-                batchId: batches.id,
-                batchName: batches.name,
+                id: batches.id,
+                name: batches.name,
                 fee: batches.fee,
                 teacherId: batches.teacherId,
                 teacherName: staff.name,
@@ -37,36 +37,126 @@ export async function getBatchWiseRevenue() {
             .leftJoin(staff, eq(batches.teacherId, staff.id))
             .where(eq(batches.isActive, true));
 
-        // Get enrollment counts per batch
-        const enrollmentCounts = await db
+        // 2. Get all active enrollments with student data
+        const allEnrollments = await db
             .select({
+                studentId: enrollments.studentId,
                 batchId: enrollments.batchId,
-                count: count(),
+                familyId: students.familyId,
+                baseFeeOverride: students.baseFeeOverride,
+                className: students.class,
             })
             .from(enrollments)
-            .where(eq(enrollments.isActive, true))
-            .groupBy(enrollments.batchId);
+            .innerJoin(students, eq(enrollments.studentId, students.id))
+            .where(and(eq(enrollments.isActive, true), eq(students.isActive, true)));
 
-        const enrollmentMap = new Map(
-            enrollmentCounts.map(e => [e.batchId, e.count])
-        );
+        // 3. Get all active fee structures (for base fee calculations)
+        const feeStructuresData = await db
+            .select({
+                className: feeStructures.className,
+                monthlyFee: feeStructures.monthlyFee,
+            })
+            .from(feeStructures)
+            .where(eq(feeStructures.isActive, true));
 
-        const results: BatchRevenueData[] = batchData.map(batch => {
-            const activeEnrollments = enrollmentMap.get(batch.batchId) || 0;
+        const baseFeeMap = new Map(feeStructuresData.map((f: { className: string; monthlyFee: number }) => [f.className, f.monthlyFee]));
+
+        // 4. Get all active fee transactions
+        const feeTransactions = await db
+            .select({
+                amount: transactions.amount,
+                studentId: transactions.studentId,
+                familyId: transactions.familyId,
+            })
+            .from(transactions)
+            .where(and(
+                eq(transactions.type, 'CREDIT'),
+                eq(transactions.category, 'FEE'),
+                eq(transactions.isVoid, false)
+            ));
+
+        // 5. Pre-calculate mapping for distribution
+        // studentId -> { totalFees: number, batchFees: Map<batchId, fee> }
+        const studentFeeProfile = new Map<number, { total: number; class: number; batches: Map<number, number> }>();
+        const familyStudents = new Map<number, number[]>();
+
+        // Initialize profiles
+        allEnrollments.forEach((e: any) => {
+            if (!studentFeeProfile.has(e.studentId)) {
+                const classFee = e.baseFeeOverride !== null ? e.baseFeeOverride : (baseFeeMap.get(e.className) || 0);
+                studentFeeProfile.set(e.studentId, {
+                    total: classFee,
+                    class: classFee,
+                    batches: new Map<number, number>()
+                });
+            }
+            if (!familyStudents.has(e.familyId)) familyStudents.set(e.familyId, []);
+            if (!familyStudents.get(e.familyId)!.includes(e.studentId)) {
+                familyStudents.get(e.familyId)!.push(e.studentId);
+            }
+
+            const profile = studentFeeProfile.get(e.studentId)!;
+            const batch = allBatches.find((b: any) => b.id === e.batchId);
+            if (batch) {
+                profile.batches.set(batch.id, batch.fee);
+                profile.total += batch.fee;
+            }
+        });
+
+        // 6. Distribute revenue
+        const batchCollections = new Map<number, number>();
+        allBatches.forEach((b: any) => batchCollections.set(b.id, 0));
+
+        feeTransactions.forEach((txn: any) => {
+            const amount = Number(txn.amount);
+
+            if (txn.studentId && studentFeeProfile.has(txn.studentId)) {
+                // Single student payment
+                const profile = studentFeeProfile.get(txn.studentId)!;
+                if (profile.total > 0) {
+                    profile.batches.forEach((fee: number, bid: number) => {
+                        const share = (fee / profile.total) * amount;
+                        batchCollections.set(bid, (batchCollections.get(bid) || 0) + share);
+                    });
+                }
+            } else if (txn.familyId && familyStudents.has(txn.familyId)) {
+                // Family level payment - distribute across all students in family
+                const sIds = familyStudents.get(txn.familyId)!;
+                let familyTotalWeight = 0;
+                sIds.forEach((sid: number) => {
+                    familyTotalWeight += studentFeeProfile.get(sid)?.total || 0;
+                });
+
+                if (familyTotalWeight > 0) {
+                    sIds.forEach((sid: number) => {
+                        const profile = studentFeeProfile.get(sid)!;
+                        profile.batches.forEach((fee: number, bid: number) => {
+                            const share = (fee / familyTotalWeight) * amount;
+                            batchCollections.set(bid, (batchCollections.get(bid) || 0) + share);
+                        });
+                    });
+                }
+            }
+        });
+
+        // 7. Compile results
+        const results: BatchRevenueData[] = allBatches.map((batch: any) => {
+            const activeEnrollments = allEnrollments.filter((e: any) => e.batchId === batch.id).length;
+            const collected = Math.round(batchCollections.get(batch.id) || 0);
             return {
-                batchId: batch.batchId,
-                batchName: batch.batchName,
+                batchId: batch.id,
+                batchName: batch.name,
                 teacherName: batch.teacherName,
                 fee: batch.fee,
                 activeEnrollments,
                 projectedMonthlyRevenue: batch.fee * activeEnrollments,
-                totalCollected: 0, // Would need separate tracking
+                totalCollected: collected,
             };
         });
 
-        // Calculate totals
-        const totalProjectedRevenue = results.reduce((sum, b) => sum + b.projectedMonthlyRevenue, 0);
-        const totalEnrollments = results.reduce((sum, b) => sum + b.activeEnrollments, 0);
+        const totalProjectedRevenue = results.reduce((sum: number, b: BatchRevenueData) => sum + b.projectedMonthlyRevenue, 0);
+        const totalCollected = results.reduce((sum: number, b: BatchRevenueData) => sum + b.totalCollected, 0);
+        const totalEnrollments = results.reduce((sum: number, b: BatchRevenueData) => sum + b.activeEnrollments, 0);
 
         return {
             success: true,
@@ -75,6 +165,8 @@ export async function getBatchWiseRevenue() {
                 totalBatches: results.length,
                 totalEnrollments,
                 totalProjectedMonthlyRevenue: totalProjectedRevenue,
+                totalActualCollected: totalCollected,
+                efficiency: totalProjectedRevenue > 0 ? Math.round((totalCollected / totalProjectedRevenue) * 100) : 0
             },
         };
 
@@ -145,23 +237,23 @@ export async function getStaffSalaryReport(options?: {
             .groupBy(transactions.staffId);
 
         const paymentMap = new Map(
-            salaryPayments.map(p => [p.staffId, {
+            salaryPayments.map((p: any) => [p.staffId, {
                 totalPaid: Number(p.totalPaid) || 0,
                 paymentCount: p.paymentCount,
                 lastPayment: p.lastPayment ? new Date(p.lastPayment) : null,
             }])
         );
 
-        const results: StaffSalaryData[] = staffList.map(s => {
-            const payments = paymentMap.get(s.id);
+        const results: StaffSalaryData[] = staffList.map((s: any) => {
+            const payments: any = paymentMap.get(s.id) || { totalPaid: 0, paymentCount: 0, lastPayment: null };
             return {
                 staffId: s.id,
                 name: s.name,
                 role: s.role,
                 baseSalary: s.baseSalary,
-                totalPaid: payments?.totalPaid || 0,
-                lastPaymentDate: payments?.lastPayment || null,
-                paymentCount: payments?.paymentCount || 0,
+                totalPaid: payments.totalPaid,
+                lastPaymentDate: payments.lastPayment,
+                paymentCount: payments.paymentCount,
             };
         });
 
@@ -232,9 +324,9 @@ export async function getExpenseReport(options?: {
             .where(and(...conditions))
             .groupBy(transactions.category);
 
-        const totalExpenses = expenses.reduce((sum, e) => sum + (Number(e.totalAmount) || 0), 0);
+        const totalExpenses = expenses.reduce((sum: number, e: any) => sum + (Number(e.totalAmount) || 0), 0);
 
-        const results: ExpenseCategory[] = expenses.map(e => ({
+        const results: ExpenseCategory[] = expenses.map((e: any) => ({
             category: e.category,
             totalAmount: Number(e.totalAmount) || 0,
             transactionCount: e.transactionCount,
@@ -408,7 +500,7 @@ export async function getProfitLossSummary(options?: {
             }
         }
 
-        const monthlyBreakdown = Array.from(monthlyPL.entries()).map(([month, data]) => ({
+        const monthlyBreakdown = Array.from(monthlyPL.entries()).map(([month, data]: [string, any]) => ({
             period: data.name,
             revenue: data.revenue,
             salaryExpense: data.salary,

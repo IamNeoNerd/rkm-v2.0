@@ -13,6 +13,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { GlassCard } from "@/components/modern/Card";
 import { Button } from "@/components/modern/Button";
 import Link from "next/link";
+import { getTeacherDashboardMetrics } from "@/actions/dashboard";
 
 export default async function StaffDashboard() {
     const session = await auth();
@@ -27,6 +28,16 @@ export default async function StaffDashboard() {
     }
 
     const { role, name } = session.user;
+    const metricsResult = await getTeacherDashboardMetrics();
+    const defaultMetrics = {
+        assignedNodes: 0,
+        activeSessions: 0,
+        performance: "0%",
+        role: role
+    };
+    const metrics = metricsResult.success && metricsResult.metrics
+        ? metricsResult.metrics
+        : defaultMetrics;
 
     return (
         <div className="flex-1 space-y-10 p-4 md:p-8">
@@ -49,21 +60,21 @@ export default async function StaffDashboard() {
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                     title="Assigned Nodes"
-                    value="12"
+                    value={metrics.assignedNodes.toString()}
                     icon={<Users className="h-5 w-5 text-primary" />}
                     description="Students in your batch"
                 />
                 <StatCard
                     title="Active Sessions"
-                    value="4"
+                    value={metrics.activeSessions.toString()}
                     icon={<Calendar className="h-5 w-5 text-secondary" />}
-                    description="Classes today"
+                    description="Classes currently active"
                 />
                 <StatCard
                     title="Performance"
-                    value="98%"
+                    value={metrics.performance}
                     icon={<Star className="h-5 w-5 text-amber-500" />}
-                    description="Rating this month"
+                    description="Protocol Efficiency"
                 />
                 <StatCard
                     title="Tier"

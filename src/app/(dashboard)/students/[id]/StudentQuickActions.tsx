@@ -64,6 +64,7 @@ export function StudentQuickActions({
                 familyId={familyId}
                 familyName={fatherName}
                 familyPhone={familyPhone}
+                studentId={studentDbId}
                 studentName={studentName}
                 currentDue={currentDue}
                 onSuccess={() => {

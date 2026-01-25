@@ -32,7 +32,9 @@ export function EditFamilyDialog({
 
     // Identity fields
     const [passkey, setPasskey] = useState("");
+    const [existingPassword, setExistingPassword] = useState<string | null>(null);
     const [showPasskey, setShowPasskey] = useState(false);
+    const [showExisting, setShowExisting] = useState(false);
     const [copied, setCopied] = useState(false);
 
     // Status flags
@@ -48,6 +50,9 @@ export function EditFamilyDialog({
                 getFamilyIdentityStatus(familyId).then((status) => {
                     setHasLinkedUser(status.hasLinkedUser);
                     setUserName(status.userName);
+                    if (status.displayPassword) {
+                        setExistingPassword(status.displayPassword);
+                    }
                     setIsFetching(false);
                 });
             }, 0);
@@ -180,9 +185,26 @@ export function EditFamilyDialog({
                                 </div>
                             </div>
                             {hasLinkedUser && (
-                                <p className="text-[10px] text-amber-600 font-bold">
-                                    ⚠️ This parent already has login access. Entering a new passkey will reset their password.
-                                </p>
+                                <div className="p-3 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/50 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[10px] text-amber-600 font-bold uppercase tracking-widest">
+                                            Current DB Passkey
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowExisting(!showExisting)}
+                                            className="text-[10px] font-bold text-amber-700 hover:underline"
+                                        >
+                                            {showExisting ? "Hide" : "Reveal"}
+                                        </button>
+                                    </div>
+                                    <p className="text-sm font-mono font-bold text-amber-900 dark:text-amber-200">
+                                        {showExisting ? (existingPassword || "Not Found") : "••••••••"}
+                                    </p>
+                                    <p className="text-[10px] text-amber-600/70 leading-tight">
+                                        Entering a new passkey above will reset their access immediately.
+                                    </p>
+                                </div>
                             )}
                         </div>
 

@@ -8,6 +8,9 @@ import {
     Search, Users, GraduationCap, Receipt, Settings, FileText,
     UserPlus, History, ArrowRight, Command
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+import { GlassCard } from "./modern/Card";
 
 interface SearchItem {
     title: string;
@@ -17,17 +20,14 @@ interface SearchItem {
 }
 
 const searchItems: SearchItem[] = [
-    { title: "Dashboard", href: "/", icon: <Search className="h-4 w-4" />, category: "Navigation" },
+    { title: "Dashboard", href: "/", icon: <Command className="h-4 w-4" />, category: "Navigation" },
     { title: "New Admission", href: "/admission", icon: <UserPlus className="h-4 w-4" />, category: "Actions" },
     { title: "Students", href: "/students", icon: <Users className="h-4 w-4" />, category: "Navigation" },
     { title: "Staff", href: "/staff", icon: <Users className="h-4 w-4" />, category: "Navigation" },
     { title: "Academics", href: "/academics", icon: <GraduationCap className="h-4 w-4" />, category: "Navigation" },
     { title: "Fee Collection", href: "/fees", icon: <Receipt className="h-4 w-4" />, category: "Actions" },
-    { title: "Bulk Fee Collection", href: "/fees/bulk", icon: <Users className="h-4 w-4" />, category: "Actions" },
     { title: "Transactions", href: "/reports/transactions", icon: <History className="h-4 w-4" />, category: "Reports" },
     { title: "Dues Report", href: "/reports/dues", icon: <FileText className="h-4 w-4" />, category: "Reports" },
-    { title: "Fee Structure", href: "/settings/fees", icon: <Settings className="h-4 w-4" />, category: "Settings" },
-    { title: "Academic Sessions", href: "/settings/sessions", icon: <Settings className="h-4 w-4" />, category: "Settings" },
     { title: "Settings", href: "/settings", icon: <Settings className="h-4 w-4" />, category: "Settings" },
 ];
 
@@ -52,20 +52,26 @@ export function CommandPalette() {
     const flatItems = useMemo(() => Object.values(groupedItems).flat(), [groupedItems]);
 
     useEffect(() => {
-        const down = (e: KeyboardEvent) => {
+        const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault();
                 setOpen((prev) => !prev);
             }
         };
 
-        document.addEventListener("keydown", down);
-        return () => document.removeEventListener("keydown", down);
+        const handleCommandTrigger = () => setOpen(true);
+
+        document.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("toggle-command-palette", handleCommandTrigger);
+        return () => {
+            document.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("toggle-command-palette", handleCommandTrigger);
+        };
     }, []);
 
     useEffect(() => {
         if (open && inputRef.current) {
-            inputRef.current.focus();
+            setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [open]);
 
@@ -93,33 +99,12 @@ export function CommandPalette() {
     };
 
     return (
-        <>
-            {/* Trigger Button */}
-            <button
-                onClick={() => setOpen(true)}
-                className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-sm text-gray-500 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-            >
-                <Search className="h-4 w-4" />
-                <span>Search...</span>
-                <kbd className="hidden lg:inline-flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium bg-white rounded border">
-                    <Command className="h-3 w-3" />K
-                </kbd>
-            </button>
-
-            {/* Mobile Trigger */}
-            <button
-                onClick={() => setOpen(true)}
-                className="sm:hidden p-2 text-gray-500 hover:text-gray-700 rounded-lg"
-            >
-                <Search className="h-5 w-5" />
-            </button>
-
-            {/* Command Palette Dialog */}
-            <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
-                    <div className="flex items-center border-b px-3">
-                        <Search className="h-4 w-4 text-gray-400 mr-2" />
-                        <Input
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-transparent border-none shadow-none">
+                <GlassCard className="border-white/40 shadow-2xl backdrop-blur-3xl overflow-hidden rounded-3xl" intensity="high">
+                    <div className="flex items-center px-6 py-4 border-b border-white/10">
+                        <Search className="h-5 w-5 text-primary mr-3" strokeWidth={2.5} />
+                        <input
                             ref={inputRef}
                             value={search}
                             onChange={(e) => {
@@ -127,63 +112,71 @@ export function CommandPalette() {
                                 setSelectedIndex(0);
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="Search for pages, actions..."
-                            className="border-0 focus-visible:ring-0 py-3"
+                            placeholder="PULSAR COMMAND... (SEARCH NODES)"
+                            className="bg-transparent border-none focus:ring-0 w-full text-xs font-black uppercase tracking-widest placeholder:text-slate-400 outline-none"
                         />
                     </div>
 
-                    <div className="max-h-80 overflow-y-auto">
+                    <div className="max-h-[60vh] overflow-y-auto custom-scrollbar">
                         {Object.entries(groupedItems).length === 0 ? (
-                            <div className="p-4 text-center text-gray-500">
-                                No results found
+                            <div className="p-12 text-center opacity-30 text-xs font-black uppercase tracking-widest">
+                                No nodes found in database
                             </div>
                         ) : (
                             Object.entries(groupedItems).map(([category, items]) => (
-                                <div key={category}>
-                                    <div className="px-3 py-2 text-xs font-medium text-gray-400 uppercase bg-gray-50">
+                                <div key={category} className="mb-2">
+                                    <div className="px-6 py-3 text-[10px] font-black text-primary/60 uppercase tracking-widest">
                                         {category}
                                     </div>
-                                    {items.map((item) => {
-                                        const index = flatItems.indexOf(item);
-                                        return (
-                                            <button
-                                                key={item.href}
-                                                onClick={() => handleSelect(item.href)}
-                                                className={`w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-gray-100 ${index === selectedIndex ? 'bg-indigo-50 text-indigo-600' : ''
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <span className={index === selectedIndex ? 'text-indigo-600' : 'text-gray-400'}>
-                                                        {item.icon}
-                                                    </span>
-                                                    <span className="font-medium">{item.title}</span>
-                                                </div>
-                                                <ArrowRight className={`h-4 w-4 ${index === selectedIndex ? 'text-indigo-600' : 'text-gray-300'
-                                                    }`} />
-                                            </button>
-                                        );
-                                    })}
+                                    <div className="px-3">
+                                        {items.map((item) => {
+                                            const index = flatItems.indexOf(item);
+                                            const isActive = index === selectedIndex;
+                                            return (
+                                                <button
+                                                    key={item.href}
+                                                    onClick={() => handleSelect(item.href)}
+                                                    className={cn(
+                                                        "w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300",
+                                                        isActive
+                                                            ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                                            : "text-slate-600 hover:bg-white/40"
+                                                    )}
+                                                >
+                                                    <div className="flex items-center gap-4">
+                                                        <span className={isActive ? "text-white" : "text-primary"}>
+                                                            {item.icon}
+                                                        </span>
+                                                        <span className="text-xs font-black uppercase tracking-tight">{item.title}</span>
+                                                    </div>
+                                                    <ArrowRight className={cn("h-4 w-4 transition-transform", isActive ? "translate-x-0 opacity-100" : "-translate-x-2 opacity-0")} />
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             ))
                         )}
                     </div>
 
-                    <div className="flex items-center justify-between px-3 py-2 text-xs text-gray-400 bg-gray-50 border-t">
-                        <div className="flex items-center gap-2">
-                            <kbd className="px-1.5 py-0.5 bg-white rounded border">↑↓</kbd>
-                            <span>Navigate</span>
+                    <div className="flex items-center justify-between px-6 py-4 bg-white/5 border-t border-white/10">
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-1.5 opacity-40">
+                                <kbd className="px-1.5 py-0.5 bg-white/10 rounded border border-white/20 text-[10px] font-black">↑↓</kbd>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Navigate</span>
+                            </div>
+                            <div className="flex items-center gap-1.5 opacity-40">
+                                <kbd className="px-1.5 py-0.5 bg-white/10 rounded border border-white/20 text-[10px] font-black">↵</kbd>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Select</span>
+                            </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <kbd className="px-1.5 py-0.5 bg-white rounded border">↵</kbd>
-                            <span>Select</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <kbd className="px-1.5 py-0.5 bg-white rounded border">Esc</kbd>
-                            <span>Close</span>
+                        <div className="flex items-center gap-1.5 opacity-40">
+                            <kbd className="px-1.5 py-0.5 bg-white/10 rounded border border-white/20 text-[10px] font-black">Esc</kbd>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Close</span>
                         </div>
                     </div>
-                </DialogContent>
-            </Dialog>
-        </>
+                </GlassCard>
+            </DialogContent>
+        </Dialog>
     );
 }

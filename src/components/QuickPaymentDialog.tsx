@@ -15,6 +15,7 @@ interface QuickPaymentDialogProps {
     familyId: number;
     familyName: string;
     familyPhone: string;
+    studentId?: number;
     studentName?: string;
     currentDue?: number;
     onSuccess?: () => void;
@@ -28,6 +29,7 @@ export function QuickPaymentDialog({
     familyId,
     familyName,
     familyPhone,
+    studentId,
     studentName,
     currentDue = 0,
     onSuccess,
@@ -53,6 +55,7 @@ export function QuickPaymentDialog({
 
         const result = await processPayment({
             familyId: familyId.toString(),
+            studentId: studentId?.toString(),
             amount: amountNum,
             mode,
         });

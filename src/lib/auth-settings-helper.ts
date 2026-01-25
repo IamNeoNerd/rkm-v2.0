@@ -72,8 +72,16 @@ export async function getAuthSettingsInternal(): Promise<AuthSettings> {
 
         return settings;
     } catch (error) {
-        console.error("Failed to fetch auth settings:", error);
-        // Return defaults on error
+        console.error("[AUTH_SETTINGS] CRITICAL_FETCH_FAILURE // Node: system_settings");
+        console.error("[AUTH_SETTINGS] Detailed Error:", error);
+
+        if (!process.env.DATABASE_URL) {
+            console.error("[AUTH_SETTINGS] ERROR_CODE: ENV_VAR_MISSING // Target: DATABASE_URL");
+        } else {
+            console.error("[AUTH_SETTINGS] ERROR_CODE: DB_QUERY_REJECTED // Target: system_settings mapping");
+        }
+
+        // Return defaults on error to allow system to at least attempt fallback auth
         return DEFAULT_SETTINGS;
     }
 }

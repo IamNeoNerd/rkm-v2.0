@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { enrollments, batches } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { enrollments, batches, staff } from "@/db/schema";
+import { eq, and, sql, count } from "drizzle-orm";
 // import { revalidatePath } from "next/cache"; 
 import { safeRevalidatePath } from "@/lib/server-utils";
 import { checkTimeConflict } from "@/lib/scheduling";
@@ -121,9 +121,29 @@ export async function enrollStudentInBatch(studentId: string, batchId: string) {
 
 export async function getAllBatches() {
     try {
+        const studentCounts = db
+            .select({
+                batchId: enrollments.batchId,
+                count: count().as("count"),
+            })
+            .from(enrollments)
+            .where(eq(enrollments.isActive, true))
+            .groupBy(enrollments.batchId)
+            .as("student_counts");
+
         const allBatches = await db
-            .select()
+            .select({
+                id: batches.id,
+                name: batches.name,
+                fee: batches.fee,
+                schedule: batches.schedule,
+                teacherId: batches.teacherId,
+                teacherName: staff.name,
+                studentCount: sql<number>`COALESCE(${studentCounts.count}, 0)`,
+            })
             .from(batches)
+            .leftJoin(staff, eq(batches.teacherId, staff.id))
+            .leftJoin(studentCounts, eq(batches.id, studentCounts.batchId))
             .orderBy(batches.name);
 
         return { batches: allBatches };

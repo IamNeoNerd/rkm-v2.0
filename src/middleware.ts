@@ -13,7 +13,6 @@ export default auth((req) => {
         "/verify",
         "/browse",
         "/api/auth",
-        "/parent", // Public parent portal with phone lookup
     ];
 
     // Check if current path starts with any public route

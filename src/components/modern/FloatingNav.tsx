@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     LayoutDashboard,
     Users,
@@ -16,20 +16,15 @@ import {
     History,
     UsersRound,
     Calendar,
-    ChevronRight,
     IndianRupee,
-    TrendingUp,
-    Shield,
-    Bell,
-    User,
     Menu,
-    X
+    ChevronLeft,
+    ChevronRight,
 } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 import { type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { GlassCard } from "./Card";
-import { Button } from "./Button";
 import { type FeatureKey, type PermissionCheck } from "@/lib/permissions";
 import {
     Sheet,
@@ -77,6 +72,7 @@ const navItems: NavItem[] = [
 
 export function FloatingNav() {
     const pathname = usePathname();
+    const router = useRouter();
     const { data: session } = useSession();
     const [isExpanded, setIsExpanded] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -159,7 +155,10 @@ export function FloatingNav() {
                                             : "text-muted-foreground hover:bg-white/50 dark:hover:bg-slate-800/50 hover:text-foreground"
                                     )}
                                 >
-                                    <item.icon className={cn("h-5 w-5 shrink-0 transition-transform duration-300", isActive ? "" : "group-hover/item:scale-110")} />
+                                    <item.icon
+                                        strokeWidth={2.5}
+                                        className={cn("h-5 w-5 shrink-0 transition-transform duration-300", isActive ? "" : "group-hover/item:scale-110")}
+                                    />
                                     <span className={cn(
                                         "font-bold text-xs uppercase tracking-widest transition-all duration-500 whitespace-nowrap overflow-hidden",
                                         isExpanded ? "opacity-100 w-auto" : "opacity-0 w-0"
@@ -195,74 +194,103 @@ export function FloatingNav() {
                 </GlassCard>
             </div>
 
-            {/* Mobile Bottom Bar with Sheet Menu */}
-            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[90%] max-w-sm">
-                <GlassCard className="flex items-center justify-around py-4 px-2 border-white/40 shadow-2xl backdrop-blur-2xl rounded-3xl" intensity="medium">
-                    {filteredItems.slice(0, 4).map((item) => {
-                        const isActive = pathname === item.href;
-                        return (
-                            <Link key={item.href} href={item.href} className={cn("p-2 rounded-xl transition-all", isActive ? "bg-primary text-white shadow-lg" : "text-muted-foreground")}>
-                                <item.icon className="h-6 w-6" />
-                            </Link>
-                        );
-                    })}
+            {/* Mobile Bottom Bar: Wide Integrated Tactical Dock */}
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[95%] max-w-lg">
+                <GlassCard className="flex items-center justify-between py-2 sm:py-3 px-2 sm:px-3 border-white/20 shadow-2xl backdrop-blur-[32px] rounded-[2.5rem]" intensity="high">
+                    {/* Back Button (Tactical End Node) */}
+                    <button
+                        onClick={() => router.back()}
+                        className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl sm:rounded-2xl border border-white/10 active:scale-90 transition-all group"
+                    >
+                        <ChevronLeft strokeWidth={3} className="h-4 sm:h-5 w-4 sm:w-5 group-hover:-translate-x-0.5 transition-transform" />
+                    </button>
 
-                    {/* Mobile Menu Sheet Trigger */}
-                    <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-                        <SheetTrigger asChild>
-                            <button className="p-2 text-muted-foreground rounded-xl hover:bg-white/50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer">
-                                <Menu className="h-6 w-6" />
-                            </button>
-                        </SheetTrigger>
-                        <SheetContent side="bottom" className="h-[70vh] rounded-t-3xl bg-background/95 backdrop-blur-xl border-t border-white/20">
-                            <SheetHeader className="pb-4 border-b border-white/10">
-                                <SheetTitle className="text-lg font-black uppercase tracking-widest text-foreground">
-                                    Navigation
-                                </SheetTitle>
-                            </SheetHeader>
-
-                            {/* Mobile Navigation Grid */}
-                            <nav className="grid grid-cols-3 gap-4 py-6 overflow-y-auto max-h-[calc(70vh-120px)]">
-                                {filteredItems.map((item) => {
-                                    const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
-                                    return (
-                                        <Link
-                                            key={item.href}
-                                            href={item.href}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className={cn(
-                                                "flex flex-col items-center gap-2 p-4 rounded-2xl transition-all duration-300",
-                                                isActive
-                                                    ? "bg-primary text-white shadow-lg"
-                                                    : "bg-white/30 dark:bg-slate-800/30 text-muted-foreground hover:bg-white/60 dark:hover:bg-slate-800/60"
-                                            )}
-                                        >
-                                            <item.icon className="h-6 w-6" />
-                                            <span className="text-[10px] font-black uppercase tracking-wider text-center">
-                                                {item.title}
-                                            </span>
-                                        </Link>
-                                    );
-                                })}
-                            </nav>
-
-                            {/* Logout Button */}
-                            <div className="absolute bottom-6 left-4 right-4">
-                                <button
-                                    onClick={() => {
-                                        setMobileMenuOpen(false);
-                                        signOut({ callbackUrl: "/login" });
-                                    }}
-                                    className="flex items-center justify-center gap-3 w-full p-4 rounded-2xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all border border-red-500/20"
+                    <div className="flex items-center justify-center flex-1 mx-1 sm:mx-2 gap-1 md:gap-4">
+                        {filteredItems.slice(0, 4).map((item) => {
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={cn(
+                                        "p-2 sm:p-3 rounded-xl sm:rounded-2xl transition-all duration-300",
+                                        isActive
+                                            ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110"
+                                            : "text-slate-400 hover:bg-white/10 active:scale-90"
+                                    )}
                                 >
-                                    <LogOut className="h-5 w-5" />
-                                    <span className="font-black text-xs uppercase tracking-widest">
-                                        Sign Out
-                                    </span>
+                                    <item.icon strokeWidth={2.5} className="h-4.5 sm:h-5 w-4.5 sm:w-5" />
+                                </Link>
+                            );
+                        })}
+
+                        {/* Mobile Menu Sheet Trigger */}
+                        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                            <SheetTrigger asChild>
+                                <button className="p-3 text-slate-400 rounded-2xl hover:bg-white/10 active:scale-90 transition-all cursor-pointer">
+                                    <Menu strokeWidth={2.5} className="h-5 w-5" />
                                 </button>
-                            </div>
-                        </SheetContent>
-                    </Sheet>
+                            </SheetTrigger>
+                            <SheetContent side="bottom" className="h-[70vh] rounded-t-[3rem] bg-background/80 backdrop-blur-[40px] border-t border-white/20 p-0 overflow-hidden">
+                                <div className="px-8 pt-8 pb-4">
+                                    <SheetHeader className="pb-4 border-b border-white/10">
+                                        <SheetTitle className="text-xl font-black uppercase tracking-[0.2em] text-foreground">
+                                            Command Center
+                                        </SheetTitle>
+                                    </SheetHeader>
+                                </div>
+
+                                {/* Mobile Navigation Grid */}
+                                <nav className="grid grid-cols-3 gap-4 p-8 overflow-y-auto max-h-[calc(70vh-160px)] custom-scrollbar">
+                                    {filteredItems.map((item) => {
+                                        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                                        return (
+                                            <Link
+                                                key={item.href}
+                                                href={item.href}
+                                                onClick={() => setMobileMenuOpen(false)}
+                                                className={cn(
+                                                    "flex flex-col items-center gap-3 p-5 rounded-3xl transition-all duration-300 border",
+                                                    isActive
+                                                        ? "bg-primary text-white shadow-xl border-primary shadow-primary/20 scale-105"
+                                                        : "bg-white/5 border-white/5 text-slate-400 hover:bg-white/10"
+                                                )}
+                                            >
+                                                <item.icon strokeWidth={2.5} className="h-6 w-6" />
+                                                <span className="text-[9px] font-black uppercase tracking-widest text-center">
+                                                    {item.title}
+                                                </span>
+                                            </Link>
+                                        );
+                                    })}
+                                </nav>
+
+                                {/* Logout Button */}
+                                <div className="p-8 mt-auto">
+                                    <button
+                                        onClick={() => {
+                                            setMobileMenuOpen(false);
+                                            signOut({ callbackUrl: "/login" });
+                                        }}
+                                        className="flex items-center justify-center gap-3 w-full p-5 rounded-3xl bg-red-500/10 text-red-500 hover:bg-red-500/20 transition-all border border-red-500/10"
+                                    >
+                                        <LogOut className="h-5 w-5" />
+                                        <span className="font-black text-xs uppercase tracking-widest">
+                                            Deactivate Session
+                                        </span>
+                                    </button>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    </div>
+
+                    {/* Forward Button (Tactical End Node) */}
+                    <button
+                        onClick={() => router.forward()}
+                        className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl sm:rounded-2xl border border-white/10 active:scale-90 transition-all group"
+                    >
+                        <ChevronRight strokeWidth={3} className="h-4 sm:h-5 w-4 sm:w-5 group-hover:translate-x-0.5 transition-transform" />
+                    </button>
                 </GlassCard>
             </div>
         </>

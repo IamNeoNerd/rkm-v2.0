@@ -7,7 +7,6 @@ import {
     CardTitle
 } from "@/components/ui/card";
 import {
-    Wallet,
     TrendingUp,
     AlertCircle,
     ArrowUpRight,

@@ -10,11 +10,7 @@ const requiredEnvVars = [
     'AUTH_SECRET',
 ] as const;
 
-const optionalEnvVars = [
-    'AUTH_GOOGLE_ID',
-    'AUTH_GOOGLE_SECRET',
-    'NEXTAUTH_URL',
-] as const;
+
 
 type EnvVarConfig = {
     name: string;
@@ -118,4 +114,3 @@ export function ensureValidEnv(): void {
 
 // Export for type safety
 export type RequiredEnvVar = typeof requiredEnvVars[number];
-export type OptionalEnvVar = typeof optionalEnvVars[number];

@@ -9,14 +9,19 @@ interface StatCardProps {
     trend?: string;
     trendUp?: boolean;
     className?: string;
+    href?: string;
 }
 
-export function StatCard({ title, value, description, icon, trend, trendUp, className }: StatCardProps) {
+export function StatCard({ title, value, description, icon, trend, trendUp, className, href }: StatCardProps) {
     const testId = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-    return (
+    const CardContent = (
         <GlassCard
-            className={cn("p-6 flex flex-col justify-between group", className)}
+            className={cn(
+                "p-6 flex flex-col justify-between group transition-all duration-300",
+                href && "hover:border-primary/40 hover:shadow-primary/5 cursor-pointer active:scale-[0.98]",
+                className
+            )}
             data-testid={`stat-card-${testId}`}
             intensity="medium"
         >
@@ -30,7 +35,7 @@ export function StatCard({ title, value, description, icon, trend, trendUp, clas
                     </div>
                 </div>
                 {icon && (
-                    <div className="bg-white/50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-white/20 shadow-sm opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
+                    <div className="bg-white/50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-white/20 shadow-sm opacity-80 group-hover:opacity-100 group-hover:scale-110 group-hover:bg-primary/10 group-hover:text-primary transition-all duration-300">
                         {icon}
                     </div>
                 )}
@@ -54,5 +59,15 @@ export function StatCard({ title, value, description, icon, trend, trendUp, clas
                 </div>
             )}
         </GlassCard>
-    )
+    );
+
+    if (href) {
+        return (
+            <a href={href} className="block no-underline">
+                {CardContent}
+            </a>
+        );
+    }
+
+    return CardContent;
 }

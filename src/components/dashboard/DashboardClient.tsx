@@ -43,7 +43,7 @@ export function DashboardClient({ initialFamilies }: DashboardClientProps) {
                 setModalOpen(false);
                 router.refresh(); // Refresh server component data
             }
-        } catch (e) {
+        } catch {
             toast.error("System error during payment.");
         }
     };

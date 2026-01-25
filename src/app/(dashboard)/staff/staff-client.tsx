@@ -170,119 +170,195 @@ export default function StaffClient({ initialStaff, isSuperAdmin }: StaffClientP
                         </Button>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto custom-scrollbar">
-                        <table className="w-full text-left border-collapse min-w-[1000px]">
-                            <thead>
-                                <tr className="bg-slate-900/5 dark:bg-slate-900/40 border-b border-slate-900/10 dark:border-white/10">
-                                    <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Personnel Identity</th>
-                                    <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Security clearance</th>
-                                    <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Communication Node</th>
-                                    <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Retainer (Salary)</th>
-                                    <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
-                                    <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Operations</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-900/5 dark:divide-white/5">
-                                {filteredStaff.map((employee) => (
-                                    <React.Fragment key={employee.id}>
-                                        <tr className="hover:bg-white/60 dark:hover:bg-slate-800/40 transition-all duration-300 group">
-                                            <td className="px-8 py-5 whitespace-nowrap">
-                                                <div className="flex items-center gap-4">
-                                                    <div className={cn(
-                                                        "h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6",
-                                                        employee.isActive ? "bg-indigo-500" : "bg-slate-400 grayscale"
-                                                    )}>
-                                                        {employee.name.substring(0, 1).toUpperCase()}
-                                                    </div>
-                                                    <div>
+                    <>
+                        {/* Mobile Progressive Card Layout */}
+                        <div className="md:hidden space-y-4 p-4">
+                            {filteredStaff.map((employee) => (
+                                <GlassCard key={employee.id} className="p-5 border-white/40 shadow-xl relative overflow-hidden group" intensity="medium">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-4">
+                                            <div className={cn(
+                                                "h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shadow-lg",
+                                                employee.isActive ? "bg-indigo-500" : "bg-slate-400 grayscale"
+                                            )}>
+                                                {employee.name.substring(0, 1).toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <p className={cn("text-sm font-black tracking-tight", employee.isActive ? "text-slate-900" : "text-slate-500")}>
+                                                    {employee.name}
+                                                </p>
+                                                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-0.5">ID: #{employee.id.toString().padStart(4, '0')}</p>
+                                            </div>
+                                        </div>
+                                        <div className={cn(
+                                            "px-2 py-0.5 text-[8px] font-black uppercase tracking-widest rounded-md border",
+                                            employee.isActive ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-slate-50 text-slate-400 border-slate-100"
+                                        )}>
+                                            {employee.isActive ? "Operational" : "Offline"}
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-2 gap-4 py-4 border-y border-white/10 dark:border-slate-800/50">
+                                        <div className="space-y-1">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Security clearance</p>
+                                            <p className="text-[10px] font-black text-slate-700 uppercase">{employee.role}</p>
+                                            {employee.roleType && (
+                                                <p className="text-[7px] font-black bg-amber-50 text-amber-600 px-1 rounded uppercase w-fit">{employee.roleType}</p>
+                                            )}
+                                        </div>
+                                        <div className="space-y-1">
+                                            <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Monthly Retainer</p>
+                                            <p className="text-[10px] font-black text-slate-900 font-mono italic">₹{employee.baseSalary.toLocaleString()}</p>
+                                        </div>
+                                        <div className="col-span-2 space-y-1.5 mt-1">
+                                            <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-slate-600">
+                                                <Phone className="h-3 w-3 text-slate-400" />
+                                                {employee.phone}
+                                            </div>
+                                            {employee.email && (
+                                                <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                                    <Mail className="h-3 w-3 text-slate-300" />
+                                                    {employee.email.toLowerCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center justify-between mt-4">
+                                        <div className="flex items-center gap-3 text-[9px] font-black text-slate-300 uppercase tracking-widest italic">
+                                            <Calendar className="h-3.5 w-3.5" />
+                                            Joined: {employee.createdAt ? format(new Date(employee.createdAt), "MMM yyyy") : "---"}
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <EditStaffDialog staff={employee} />
+                                            {isSuperAdmin && (
+                                                <DeactivateStaffButton
+                                                    staffId={employee.id}
+                                                    name={employee.name}
+                                                    isActive={employee.isActive}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                </GlassCard>
+                            ))}
+                        </div>
+
+                        {/* Desktop Table Layout */}
+                        <div className="hidden md:block overflow-x-auto custom-scrollbar">
+                            <table className="w-full text-left border-collapse min-w-[1000px]">
+                                <thead>
+                                    <tr className="bg-slate-900/5 dark:bg-slate-900/40 border-b border-slate-900/10 dark:border-white/10">
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Personnel Identity</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Security clearance</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Communication Node</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Retainer (Salary)</th>
+                                        <th className="px-6 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em]">Status</th>
+                                        <th className="px-8 py-5 text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] text-right">Operations</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-900/5 dark:divide-white/5">
+                                    {filteredStaff.map((employee) => (
+                                        <React.Fragment key={employee.id}>
+                                            <tr className="hover:bg-white/60 dark:hover:bg-slate-800/40 transition-all duration-300 group">
+                                                <td className="px-8 py-5 whitespace-nowrap">
+                                                    <div className="flex items-center gap-4">
                                                         <div className={cn(
-                                                            "text-sm font-black tracking-tight",
-                                                            employee.isActive ? "text-slate-900" : "text-slate-500"
+                                                            "h-12 w-12 rounded-2xl flex items-center justify-center text-sm font-black text-white shadow-xl transition-transform group-hover:scale-110 group-hover:rotate-6",
+                                                            employee.isActive ? "bg-indigo-500" : "bg-slate-400 grayscale"
                                                         )}>
-                                                            {employee.name}
+                                                            {employee.name.substring(0, 1).toUpperCase()}
                                                         </div>
-                                                        <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
-                                                            ID: #{employee.id.toString().padStart(4, '0')}
+                                                        <div>
+                                                            <div className={cn(
+                                                                "text-sm font-black tracking-tight",
+                                                                employee.isActive ? "text-slate-900" : "text-slate-500"
+                                                            )}>
+                                                                {employee.name}
+                                                            </div>
+                                                            <div className="text-[9px] font-black text-slate-400 uppercase tracking-widest mt-1">
+                                                                ID: #{employee.id.toString().padStart(4, '0')}
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <div className="flex flex-col gap-1.5">
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-                                                        <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">
-                                                            {employee.role}
+                                                </td>
+                                                <td className="px-6 py-5 whitespace-nowrap">
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                                                            <span className="text-[10px] font-black text-slate-700 uppercase tracking-widest">
+                                                                {employee.role}
+                                                            </span>
+                                                        </div>
+                                                        {employee.roleType && (
+                                                            <span className="ml-3.5 px-2 py-0.5 w-fit text-[8px] font-black uppercase tracking-tighter bg-amber-50 text-amber-600 border border-amber-100 rounded-md">
+                                                                {employee.roleType}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 whitespace-nowrap">
+                                                    <div className="space-y-1.5">
+                                                        <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-slate-600">
+                                                            <Phone className="h-3 w-3 text-slate-400" />
+                                                            {employee.phone}
+                                                        </div>
+                                                        {employee.email && (
+                                                            <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                                                                <Mail className="h-3 w-3 text-slate-300" />
+                                                                {employee.email.toUpperCase()}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 whitespace-nowrap">
+                                                    <div className="flex items-center gap-2 p-2 bg-slate-900 rounded-xl w-fit border border-white/10 group-hover:border-indigo-500/30 transition-colors">
+                                                        <IndianRupee className="h-3 w-3 text-amber-500" />
+                                                        <span className="text-sm font-black text-white font-mono italic tracking-tighter">
+                                                            ₹{employee.baseSalary.toLocaleString()}
                                                         </span>
                                                     </div>
-                                                    {employee.roleType && (
-                                                        <span className="ml-3.5 px-2 py-0.5 w-fit text-[8px] font-black uppercase tracking-tighter bg-amber-50 text-amber-600 border border-amber-100 rounded-md">
-                                                            {employee.roleType}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <div className="space-y-1.5">
-                                                    <div className="flex items-center gap-2 text-[10px] font-mono font-bold text-slate-600">
-                                                        <Phone className="h-3 w-3 text-slate-400" />
-                                                        {employee.phone}
+                                                </td>
+                                                <td className="px-6 py-5 whitespace-nowrap">
+                                                    <div className={cn(
+                                                        "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border flex items-center gap-2 w-fit",
+                                                        employee.isActive
+                                                            ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                            : "bg-slate-50 text-slate-400 border-slate-100 opacity-60"
+                                                    )}>
+                                                        {employee.isActive && <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
+                                                        {employee.isActive ? "Operational" : "Deactivated"}
                                                     </div>
-                                                    {employee.email && (
-                                                        <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
-                                                            <Mail className="h-3 w-3 text-slate-300" />
-                                                            {employee.email.toUpperCase()}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <div className="flex items-center gap-2 p-2 bg-slate-900 rounded-xl w-fit border border-white/10 group-hover:border-indigo-500/30 transition-colors">
-                                                    <IndianRupee className="h-3 w-3 text-amber-500" />
-                                                    <span className="text-sm font-black text-white font-mono italic tracking-tighter">
-                                                        ₹{employee.baseSalary.toLocaleString()}
-                                                    </span>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-5 whitespace-nowrap">
-                                                <div className={cn(
-                                                    "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border flex items-center gap-2 w-fit",
-                                                    employee.isActive
-                                                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                                                        : "bg-slate-50 text-slate-400 border-slate-100 opacity-60"
-                                                )}>
-                                                    {employee.isActive && <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />}
-                                                    {employee.isActive ? "Operational" : "Deactivated"}
-                                                </div>
-                                            </td>
-                                            <td className="px-8 py-5 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <EditStaffDialog staff={employee} />
-                                                    {isSuperAdmin && (
-                                                        <DeactivateStaffButton
-                                                            staffId={employee.id}
-                                                            name={employee.name}
-                                                            isActive={employee.isActive}
-                                                        />
-                                                    )}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {employee.id === filteredStaff[filteredStaff.length - 1].id && (
-                                            <tr key="footer-note">
-                                                <td colSpan={6} className="px-8 py-4 bg-slate-50/50 dark:bg-slate-900/20 italic">
-                                                    <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                                        <Calendar className="h-3 w-3" />
-                                                        Operational Node Synced: {employee.createdAt ? format(new Date(employee.createdAt), "MMM yyyy") : "N/A"}
+                                                </td>
+                                                <td className="px-8 py-5 whitespace-nowrap text-right">
+                                                    <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <EditStaffDialog staff={employee} />
+                                                        {isSuperAdmin && (
+                                                            <DeactivateStaffButton
+                                                                staffId={employee.id}
+                                                                name={employee.name}
+                                                                isActive={employee.isActive}
+                                                            />
+                                                        )}
                                                     </div>
                                                 </td>
                                             </tr>
-                                        )}
-                                    </React.Fragment>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                            {employee.id === filteredStaff[filteredStaff.length - 1].id && (
+                                                <tr key="footer-note">
+                                                    <td colSpan={6} className="px-8 py-4 bg-slate-50/50 dark:bg-slate-900/20 italic">
+                                                        <div className="flex items-center gap-3 text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                                            <Calendar className="h-3 w-3" />
+                                                            Operational Node Synced: {employee.createdAt ? format(new Date(employee.createdAt), "MMM yyyy") : "N/A"}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            )}
+                                        </React.Fragment>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 )}
             </GlassCard>
 

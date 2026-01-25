@@ -2,8 +2,9 @@
 "use server";
 
 import { db } from "@/db";
-import { families, students, transactions } from "@/db/schema";
-import { and, count, desc, eq, sql, sum } from "drizzle-orm";
+import { families, students, transactions, staff, batches, enrollments, attendance } from "@/db/schema";
+import { and, count, desc, eq, gte, sql, sum } from "drizzle-orm";
+import { auth } from "@/auth";
 
 export async function getDashboardData() {
     // 1. Fetch all families
@@ -13,23 +14,23 @@ export async function getDashboardData() {
     const allStudents = await db.select().from(students);
 
     // 3. Group students by familyId for efficient lookup
-    const studentsByFamilyId = allStudents.reduce((acc, student) => {
+    const studentsByFamilyId = allStudents.reduce((acc: Record<string, any[]>, student: any) => {
         if (!student.familyId) return acc;
         const fid = student.familyId.toString();
         if (!acc[fid]) acc[fid] = [];
         acc[fid].push(student);
         return acc;
-    }, {} as Record<string, typeof allStudents>);
+    }, {} as Record<string, any[]>);
 
     // 4. Map families to the required frontend format
-    const familiesWithChildren = allFamilies.map((f) => {
+    const familiesWithChildren = allFamilies.map((f: any) => {
         const children = studentsByFamilyId[f.id.toString()] || [];
         return {
             id: f.id.toString(),
             father_name: f.fatherName,
             phone: f.phone,
             total_due: f.balance,
-            children: children.map(c => ({
+            children: children.map((c: any) => ({
                 id: c.id.toString(),
                 name: c.name,
                 class: c.class,
@@ -136,14 +137,26 @@ export async function getRecentActivity() {
 
     const recentTransactions = await db.select({
         id: transactions.id,
-        name: sql<string>`'Payment'`, // Placeholder, ideally would join with family
+        name: families.fatherName,
+        studentName: students.name,
         type: sql<string>`'PAYMENT'`,
         amount: transactions.amount,
         createdAt: transactions.createdAt
-    }).from(transactions).orderBy(desc(transactions.createdAt)).limit(5);
+    })
+        .from(transactions)
+        .leftJoin(families, eq(transactions.familyId, families.id))
+        .leftJoin(students, eq(transactions.studentId, students.id))
+        .orderBy(desc(transactions.createdAt))
+        .limit(5);
 
     // Combine and sort
-    const combined = [...recentStudents, ...recentTransactions]
+    const combined = [
+        ...recentStudents.map((s: any) => ({ ...s, studentName: null })),
+        ...recentTransactions.map((t: any) => ({
+            ...t,
+            name: t.studentName ? `${t.studentName} (${t.name})` : t.name
+        }))
+    ]
         .sort((a, b) => {
             const dateA = a.createdAt ? new Date(a.createdAt) : new Date();
             const dateB = b.createdAt ? new Date(b.createdAt) : new Date();
@@ -176,7 +189,7 @@ export async function getAdmissionsChartData() {
         monthCounts[key] = 0;
     }
 
-    allStudents.forEach(s => {
+    allStudents.forEach((s: any) => {
         if (!s.createdAt) return;
         const d = new Date(s.createdAt);
         const key = `${months[d.getMonth()]}`;
@@ -186,4 +199,189 @@ export async function getAdmissionsChartData() {
     });
 
     return Object.entries(monthCounts).map(([name, total]) => ({ name, total }));
+}
+
+export async function getRevenueChartData() {
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+    const allPayments = await db.select({
+        amount: transactions.amount,
+        createdAt: transactions.createdAt
+    }).from(transactions)
+        .where(
+            and(
+                eq(transactions.type, "CREDIT"),
+                eq(transactions.category, "FEE"),
+                sql`${transactions.createdAt} >= ${sixMonthsAgo}`
+            )
+        );
+
+    const monthRevenue: Record<string, number> = {};
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    // Initialize last 6 months
+    for (let i = 5; i >= 0; i--) {
+        const d = new Date();
+        d.setMonth(d.getMonth() - i);
+        const key = `${months[d.getMonth()]}`;
+        monthRevenue[key] = 0;
+    }
+
+    allPayments.forEach((p: any) => {
+        if (!p.createdAt) return;
+        const d = new Date(p.createdAt);
+        const key = `${months[d.getMonth()]}`;
+        if (monthRevenue[key] !== undefined) {
+            monthRevenue[key] += p.amount;
+        }
+    });
+
+    return Object.entries(monthRevenue).map(([name, total]) => ({ name, total }));
+}
+
+export async function getTeacherLoadData() {
+    const session = await auth();
+    if (!session) throw new Error("Unauthorized");
+
+    const result = await db.select({
+        name: staff.name,
+        count: count(batches.id)
+    })
+        .from(staff)
+        .innerJoin(batches, eq(staff.id, batches.teacherId))
+        .where(eq(staff.role, 'TEACHER'))
+        .groupBy(staff.name)
+        .orderBy(desc(count(batches.id)));
+
+    return result.map(r => ({ name: r.name, total: Number(r.count) }));
+}
+
+export async function getBatchActivityData() {
+    const session = await auth();
+    if (!session) throw new Error("Unauthorized");
+
+    const result = await db.select({
+        name: batches.name,
+        count: count(enrollments.studentId)
+    })
+        .from(batches)
+        .leftJoin(enrollments, and(eq(batches.id, enrollments.batchId), eq(enrollments.isActive, true)))
+        .groupBy(batches.id)
+        .orderBy(desc(count(enrollments.studentId)));
+
+    return result.map(r => ({ name: r.name, total: Number(r.count) }));
+}
+
+export async function getSettlementModeData() {
+    const session = await auth();
+    if (!session) throw new Error("Unauthorized");
+
+    const result = await db.select({
+        name: transactions.paymentMode,
+        total: sum(transactions.amount)
+    })
+        .from(transactions)
+        .where(eq(transactions.type, 'CREDIT'))
+        .groupBy(transactions.paymentMode);
+
+    return result.map((r: any) => ({
+        name: r.name || 'OTHER',
+        value: Number(r.total || 0)
+    }));
+}
+
+export async function getTeacherDashboardMetrics() {
+    try {
+        const session = await auth();
+        if (!session?.user?.email) return { success: false, error: "Unauthorized" };
+
+        const email = session.user.email;
+
+        // 1. Get Staff Info
+        const staffInfo = await db
+            .select({ id: staff.id })
+            .from(staff)
+            .where(eq(staff.email, email))
+            .limit(1);
+
+        if (staffInfo.length === 0) return { success: false, error: "Staff record not found" };
+        const staffId = staffInfo[0].id;
+
+        // 2. Assigned Nodes (Students in their batches)
+        const studentsCount = await db
+            .select({ count: count() })
+            .from(enrollments)
+            .innerJoin(batches, eq(enrollments.batchId, batches.id))
+            .where(and(
+                eq(batches.teacherId, staffId),
+                eq(enrollments.isActive, true),
+                eq(batches.isActive, true)
+            ));
+
+        // 3. Active Sessions (Batches they teach)
+        const batchesCount = await db
+            .select({ count: count() })
+            .from(batches)
+            .where(and(
+                eq(batches.teacherId, staffId),
+                eq(batches.isActive, true)
+            ));
+
+        // 4. Performance (Attendance Efficiency - Last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const attendanceData = await db
+            .select({
+                status: attendance.status
+            })
+            .from(attendance)
+            .innerJoin(batches, eq(attendance.batchId, batches.id))
+            .where(and(
+                eq(batches.teacherId, staffId),
+                gte(attendance.createdAt, thirtyDaysAgo)
+            ));
+
+        const totalAttendancePoints = attendanceData.length;
+        const presentCount = attendanceData.filter((a: any) => a.status === 'Present').length;
+        const performance = totalAttendancePoints > 0
+            ? Math.round((presentCount / totalAttendancePoints) * 100)
+            : 100; // Default to 100 if no sessions
+
+        return {
+            success: true,
+            metrics: {
+                assignedNodes: Number(studentsCount[0]?.count ?? 0),
+                activeSessions: Number(batchesCount[0]?.count ?? 0),
+                performance: `${performance}%`,
+                role: session.user.role
+            }
+        };
+
+    } catch (error) {
+        return { success: false, error: "Failed to fetch teacher metrics" };
+    }
+}
+
+export async function getAttendanceLeaderboard() {
+    const session = await auth();
+    if (!session) throw new Error("Unauthorized");
+
+    const result = await db.select({
+        name: students.name,
+        attendanceRate: sql<number>`
+            CASE 
+                WHEN COUNT(${attendance.id}) = 0 THEN 0
+                ELSE ROUND((COUNT(CASE WHEN ${attendance.status} = 'Present' THEN 1 END) * 100.0) / COUNT(${attendance.id})) 
+            END
+        `
+    })
+        .from(students)
+        .innerJoin(attendance, eq(students.id, attendance.studentId))
+        .groupBy(students.name)
+        .orderBy(desc(sql`ROUND((COUNT(CASE WHEN ${attendance.status} = 'Present' THEN 1 END) * 100.0) / COUNT(${attendance.id}))`))
+        .limit(10);
+
+    return result.map((r: any) => ({ name: r.name, total: Number(r.attendanceRate) }));
 }

@@ -1,10 +1,9 @@
 import NextAuth, { type DefaultSession } from "next-auth";
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import bcrypt from "bcryptjs";
 import { db } from "@/db";
-import { users, accounts, sessions, verificationTokens, staff, students, families } from "@/db/schema";
+import { users, staff, students, families } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuthSettingsInternal, isDomainAllowed } from "@/lib/auth-settings-helper";
 import { getAllPermissionsForRole, type FeatureKey, type PermissionCheck } from "@/lib/permissions";
@@ -25,7 +24,7 @@ declare module "next-auth" {
     }
 }
 
-import { type JWT } from "next-auth/jwt";
+import "next-auth/jwt";
 declare module "next-auth/jwt" {
     interface JWT {
         role?: string;
@@ -69,53 +68,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 password: { label: "Password", type: "password" },
             },
             async authorize(credentials) {
-                console.log("[AUTH] Authorize start", { identifier: credentials?.identifier });
-                // Check if credentials login is enabled
-                const settings = await getAuthSettingsInternal();
-                if (!settings.credentialsEnabled) {
-                    console.log("[AUTH] Credentials disabled by settings");
-                    throw new Error("Email/password login is currently disabled");
-                }
+                const identifier = (credentials?.identifier as string || "").trim();
+                console.log(`[AUTH] Authorize session_start // Node: ${identifier}`);
 
-                if (!credentials?.identifier || !credentials?.password) {
-                    console.log("[AUTH] Missing credentials");
-                    throw new Error("Missing credentials");
-                }
+                try {
+                    // Check if credentials login is enabled
+                    const settings = await getAuthSettingsInternal();
+                    if (!settings.credentialsEnabled) {
+                        console.error("[AUTH] FAIL: Credentials status is OFFLINE in system_settings");
+                        throw new Error("Email/password login is currently disabled by system protocol");
+                    }
 
-                const identifier = (credentials.identifier as string).trim();
-                const isPhone = /^\d{10}$/.test(identifier);
-                const isStudentId = /^\d{6}$/.test(identifier);
+                    if (!credentials?.identifier || !credentials?.password) {
+                        throw new Error("Missing tactical credentials");
+                    }
 
-                let user;
+                    const isPhone = /^\d{10}$/.test(identifier);
+                    const isStudentId = /^\d{6}$/.test(identifier);
 
-                if (isStudentId) {
-                    // Student login - look up in students table first
-                    const [studentResult] = await db
-                        .select({
-                            id: users.id,
-                            email: users.email,
-                            name: users.name,
-                            password: users.password,
-                            role: users.role,
-                            isVerified: users.isVerified,
-                        })
-                        .from(students)
-                        .innerJoin(users, eq(students.userId, users.id))
-                        .where(eq(students.studentId, identifier))
-                        .limit(1);
+                    let user;
 
-                    user = studentResult;
-                } else if (isPhone) {
-                    // Phone login - first check users table, then families table
-                    [user] = await db
-                        .select()
-                        .from(users)
-                        .where(eq(users.phone, identifier))
-                        .limit(1);
-
-                    // If not found in users, check families table for parent login
-                    if (!user) {
-                        const [parentResult] = await db
+                    if (isStudentId) {
+                        console.log(`[AUTH] Protocol: Mapping STUDENT_ID node: ${identifier}`);
+                        const [studentResult] = await db
                             .select({
                                 id: users.id,
                                 email: users.email,
@@ -124,58 +99,92 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                                 role: users.role,
                                 isVerified: users.isVerified,
                             })
-                            .from(families)
-                            .innerJoin(users, eq(families.userId, users.id))
-                            .where(eq(families.phone, identifier))
+                            .from(students)
+                            .innerJoin(users, eq(students.userId, users.id))
+                            .where(eq(students.studentId, identifier))
                             .limit(1);
 
-                        user = parentResult;
+                        user = studentResult;
+                    } else if (isPhone) {
+                        console.log(`[AUTH] Protocol: Mapping PHONE_NODE: ${identifier}`);
+                        [user] = await db
+                            .select()
+                            .from(users)
+                            .where(eq(users.phone, identifier))
+                            .limit(1);
+
+                        if (!user) {
+                            console.log(`[AUTH] User node not found for phone, checking FAMILY_NODE mapping`);
+                            const [parentResult] = await db
+                                .select({
+                                    id: users.id,
+                                    email: users.email,
+                                    name: users.name,
+                                    password: users.password,
+                                    role: users.role,
+                                    isVerified: users.isVerified,
+                                })
+                                .from(families)
+                                .innerJoin(users, eq(families.userId, users.id))
+                                .where(eq(families.phone, identifier))
+                                .limit(1);
+
+                            user = parentResult;
+                        }
+                    } else {
+                        console.log(`[AUTH] Protocol: Mapping EMAIL_NODE: ${identifier}`);
+                        [user] = await db
+                            .select()
+                            .from(users)
+                            .where(eq(users.email, identifier.toLowerCase()))
+                            .limit(1);
                     }
-                } else {
-                    // Email login
-                    [user] = await db
-                        .select()
-                        .from(users)
-                        .where(eq(users.email, identifier.toLowerCase()))
-                        .limit(1);
+
+                    if (!user || !user.password) {
+                        console.warn(`[AUTH] FAIL: Identity mapping rejected // Node: ${identifier}`);
+                        throw new Error("Invalid credentials");
+                    }
+
+                    const isValidPassword = await bcrypt.compare(
+                        credentials.password as string,
+                        user.password
+                    );
+
+                    if (!isValidPassword) {
+                        console.warn(`[AUTH] FAIL: Credential verification failed // Node: ${identifier}`);
+                        throw new Error("Invalid credentials");
+                    }
+
+                    // Check verification for admin roles
+                    if ((user.role === 'admin' || user.role === 'super-admin') && !user.isVerified) {
+                        console.warn(`[AUTH] FAIL: Security verification pending // Account: ${user.email}`);
+                        throw new Error("Account not verified. Please contact super-admin.");
+                    }
+
+                    console.log(`[AUTH] SUCCESS: Authorization granted // Node: ${identifier} // Role: ${user.role}`);
+
+                    // Fetch granular permissions
+                    const permissions = await getAllPermissionsForRole(user.role);
+
+                    return {
+                        id: String(user.id),
+                        email: user.email,
+                        name: user.name,
+                        role: user.role,
+                        isVerified: user.isVerified,
+                        permissions,
+                    };
+                } catch (error) {
+                    console.error("[AUTH] CRITICAL_SYSTEM_ERROR:", error);
+                    // Pass the error message to the client
+                    if (error instanceof Error) throw error;
+                    throw new Error("System synchronization failure");
                 }
-
-                if (!user || !user.password) {
-                    throw new Error("Invalid credentials");
-                }
-
-                const isValidPassword = await bcrypt.compare(
-                    credentials.password as string,
-                    user.password
-                );
-
-                if (!isValidPassword) {
-                    throw new Error("Invalid credentials");
-                }
-
-                // Check verification for admin roles
-                if ((user.role === 'admin' || user.role === 'super-admin') && !user.isVerified) {
-                    throw new Error("Account not verified. Please contact super-admin.");
-                }
-
-                console.log(`[AUTH] Login successful: ${user.email} (${user.role})`);
-
-                // Fetch granular permissions
-                const permissions = await getAllPermissionsForRole(user.role);
-
-                return {
-                    id: String(user.id),
-                    email: user.email,
-                    name: user.name,
-                    role: user.role,
-                    isVerified: user.isVerified,
-                    permissions,
-                };
             },
         }),
     ],
     callbacks: {
-        async signIn({ user, account, profile }) {
+        async signIn({ user, account }) {
             console.log("[AUTH] SignIn callback", { provider: account?.provider, email: user.email });
             // Check provider-specific settings
             if (account?.provider === "google") {
@@ -236,6 +245,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         },
         async session({ session, token }) {
             if (token && session.user) {
+                session.user.id = token.id as string;
                 session.user.role = token.role as string;
                 session.user.isVerified = token.isVerified as boolean;
                 session.user.permissions = token.permissions as Record<FeatureKey, PermissionCheck>;

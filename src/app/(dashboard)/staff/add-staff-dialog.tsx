@@ -159,7 +159,7 @@ export function AddStaffDialog() {
                                         value={formData.role}
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
                                     >
-                                        <option value="STAFF">STAFF (NO ACCESS)</option>
+                                        <option value="STAFF">SUPPORT STAFF / OTHER</option>
                                         <option value="TEACHER">TEACHER</option>
                                         <option value="RECEPTIONIST">RECEPTIONIST</option>
                                         <option value="ADMIN">ADMINISTRATOR</option>

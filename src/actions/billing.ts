@@ -130,11 +130,12 @@ export async function calculateTotalDue(familyId: string) {
 
 const paymentSchema = z.object({
     familyId: z.string(),
+    studentId: z.string().optional(),
     amount: z.number().positive(),
     mode: z.enum(['CASH', 'UPI']),
 });
 
-export async function processPayment(data: { familyId: string; amount: number; mode: 'CASH' | 'UPI' }) {
+export async function processPayment(data: { familyId: string; studentId?: string; amount: number; mode: 'CASH' | 'UPI' }) {
     try {
         // Authorization: Admin, Super Admin, or verified user (receptionist)
         const session = await requireAuth();
@@ -145,8 +146,9 @@ export async function processPayment(data: { familyId: string; amount: number; m
             return { error: 'Invalid payment data', details: validation.error.format() };
         }
 
-        const { familyId, amount, mode } = validation.data;
+        const { familyId, studentId, amount, mode } = validation.data;
         const familyIdInt = parseInt(familyId);
+        const studentIdInt = studentId ? parseInt(studentId) : null;
 
         // Generate receipt number
         const { generateReceiptNumber } = await import('@/lib/receipt-generator');
@@ -159,6 +161,7 @@ export async function processPayment(data: { familyId: string; amount: number; m
                 category: 'FEE',
                 amount: amount,
                 familyId: familyIdInt,
+                studentId: studentIdInt,
                 description: `Payment via ${mode}`,
                 isVoid: false,
                 performedBy: session.user.id as string || null,

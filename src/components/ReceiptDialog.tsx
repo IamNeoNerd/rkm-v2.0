@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Printer, X, Download, ImageIcon, Save } from "lucide-react";
+import { Printer, X, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { PrintReceipt } from "./PrintReceipt";

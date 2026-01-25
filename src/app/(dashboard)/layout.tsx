@@ -23,7 +23,7 @@ export default function DashboardLayout({
             <div className="flex flex-1 flex-col transition-all duration-500">
                 <main
                     id="main-content"
-                    className="flex-1 w-full pt-28 lg:pl-32 pr-4 md:pr-8 min-h-screen"
+                    className="flex-1 w-full pt-16 lg:pl-32 pr-4 md:pr-8 min-h-screen"
                     role="main"
                     tabIndex={-1}
                 >

@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/modern/Button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckCircle2, ShieldAlert, Loader2, Trash2, Key, UserCheck, Shield, Users as UsersIcon } from "lucide-react";
+import { Loader2, Trash2, Key, UserCheck, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserRole, deleteUser, verifyUser, resetUserPassword } from "@/actions/users";
 import { useSession } from "next-auth/react";
@@ -39,7 +39,7 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
             await updateUserRole(userId, newRole);
             setUsers(prev => prev.map(u => u.id === userId ? { ...u, role: newRole } : u));
             toast.success("User role updated successfully");
-        } catch (error) {
+        } catch {
             toast.error("Failed to update user role");
         } finally {
             setLoadingId(null);
@@ -52,7 +52,7 @@ export function UsersTable({ initialUsers }: { initialUsers: User[] }) {
             await verifyUser(userId);
             setUsers(prev => prev.map(u => u.id === userId ? { ...u, isVerified: true } : u));
             toast.success("User verified successfully");
-        } catch (error) {
+        } catch {
             toast.error("Failed to verify user");
         } finally {
             setLoadingId(null);

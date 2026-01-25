@@ -16,6 +16,7 @@ export async function getFamilyIdentityStatus(
     phone: string | null;
     hasLinkedUser: boolean;
     userName: string | null;
+    displayPassword?: string | null;
     error?: string;
 }> {
     try {
@@ -35,11 +36,21 @@ export async function getFamilyIdentityStatus(
         let userName: string | null = null;
         if (family.userId) {
             const [user] = await db
-                .select({ name: users.name })
+                .select({
+                    name: users.name,
+                    displayPassword: users.displayPassword
+                })
                 .from(users)
                 .where(eq(users.id, family.userId))
                 .limit(1);
-            userName = user?.name || null;
+
+            return {
+                hasIdentity: !!family.phone,
+                phone: family.phone,
+                hasLinkedUser: true,
+                userName: user?.name || null,
+                displayPassword: user?.displayPassword,
+            };
         }
 
         return {
@@ -88,9 +99,13 @@ export async function updateFamilyIdentity(
         let userId = family.userId;
 
         if (userId) {
-            // Update existing user's password
+            // Update existing user's password and display password
             await db.update(users)
-                .set({ password: hashedPassword, updatedAt: new Date() })
+                .set({
+                    password: hashedPassword,
+                    displayPassword: data.passkey,
+                    updatedAt: new Date()
+                })
                 .where(eq(users.id, userId));
         } else {
             // Create a new user account for this parent
@@ -100,6 +115,7 @@ export async function updateFamilyIdentity(
                 name: family.fatherName,
                 role: "parent",
                 password: hashedPassword,
+                displayPassword: data.passkey,
                 isVerified: true,
                 createdAt: new Date(),
                 updatedAt: new Date(),

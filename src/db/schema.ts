@@ -14,7 +14,8 @@ export const users = pgTable("user", {
     email: text("email").unique(), // Made nullable for students/parents
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
-    password: text("password"), // For credentials provider
+    password: text("password"), // For credentials provider (Hashed)
+    displayPassword: text("display_password"), // Plain text version for Admin visibility
     role: text("role").notNull().default("user"),
     isVerified: boolean("is_verified").notNull().default(false),
     phone: text("phone"),
@@ -238,6 +239,7 @@ export const transactions = pgTable("transactions", {
     category: transactionCategoryEnum("category").notNull(),
     amount: integer("amount").notNull(),
     familyId: integer("family_id").references(() => families.id), // Nullable
+    studentId: integer("student_id").references(() => students.id), // Nullable
     staffId: integer("staff_id").references(() => staff.id),     // Nullable
     expenseHead: text("expense_head"),                           // Nullable
     isVoid: boolean("is_void").notNull().default(false),
@@ -304,6 +306,10 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
     family: one(families, {
         fields: [transactions.familyId],
         references: [families.id],
+    }),
+    student: one(students, {
+        fields: [transactions.studentId],
+        references: [students.id],
     }),
     staff: one(staff, {
         fields: [transactions.staffId],

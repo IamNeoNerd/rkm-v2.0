@@ -26,6 +26,12 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
     const [attendance, setAttendance] = useState<Record<number, AttendanceStatus>>({});
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [batchSearch, setBatchSearch] = useState("");
+
+    const filteredBatches = batches.filter(b =>
+        b.name.toLowerCase().includes(batchSearch.toLowerCase()) ||
+        (b.schedule && b.schedule.toLowerCase().includes(batchSearch.toLowerCase()))
+    );
 
     const loadBatchStudents = useCallback(async () => {
         setLoading(true);
@@ -125,20 +131,29 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div>
                         <label className="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 ml-1">
-                            Select Objective Batch
+                            Search & Select Batch
                         </label>
-                        <select
-                            className="flex h-12 w-full rounded-xl border border-input bg-white/50 px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 backdrop-blur-sm transition-all shadow-sm"
-                            value={selectedBatchId}
-                            onChange={(e) => setSelectedBatchId(e.target.value)}
-                        >
-                            <option value="">Choose a batch...</option>
-                            {batches.map(b => (
-                                <option key={b.id} value={b.id}>
-                                    {b.name} {b.schedule && `(${b.schedule})`}
-                                </option>
-                            ))}
-                        </select>
+                        <div className="space-y-2">
+                            <input
+                                type="text"
+                                placeholder="Search batch name..."
+                                className="flex h-10 w-full rounded-lg border border-input bg-white/30 px-3 py-1 text-xs backdrop-blur-sm transition-all shadow-sm focus:ring-1 focus:ring-primary outline-none"
+                                value={batchSearch}
+                                onChange={(e) => setBatchSearch(e.target.value)}
+                            />
+                            <select
+                                className="flex h-12 w-full rounded-xl border border-input bg-white/50 px-4 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 backdrop-blur-sm transition-all shadow-sm"
+                                value={selectedBatchId}
+                                onChange={(e) => setSelectedBatchId(e.target.value)}
+                            >
+                                <option value="">Choose a batch...</option>
+                                {filteredBatches.map(b => (
+                                    <option key={b.id} value={b.id}>
+                                        {b.name} {b.schedule && `(${b.schedule})`}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
                     </div>
 
                     <div>

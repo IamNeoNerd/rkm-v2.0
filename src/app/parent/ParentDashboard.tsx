@@ -7,7 +7,7 @@ import { GlassCard } from "@/components/modern/Card";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { StudentDetails } from "@/components/parent/StudentDetails";
-import { ReceiptModal } from "@/components/ReceiptModal";
+import { ReceiptModal } from "../../components/ReceiptModal";
 import { signOut } from "next-auth/react";
 
 type Family = {
@@ -47,10 +47,12 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
         receiptNumber: string;
         date: Date;
         familyName: string;
+        familyPhone: string;
         familyId: number;
         amount: number;
         paymentMode: string;
         newBalance: number;
+        transactionId: number;
     } | null>(null);
 
     const handleChildClick = (child: Child) => {
@@ -64,10 +66,12 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
                 receiptNumber: txn.receiptNumber || `PAY-${txn.id}`,
                 date: txn.createdAt,
                 familyName: family.fatherName,
+                familyPhone: family.phone,
                 familyId: family.id,
                 amount: txn.amount,
                 paymentMode: txn.paymentMode || 'CASH',
-                newBalance: family.balance
+                newBalance: family.balance,
+                transactionId: txn.id
             });
         }
     };
@@ -144,22 +148,31 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
                 </GlassCard>
 
                 {/* Performance Analytics Node */}
-                <GlassCard className="p-8 border-white/60 shadow-xl flex flex-col items-center justify-center text-center space-y-4 hover:border-indigo-500/20 transition-all duration-500 hover:scale-[1.01]" intensity="medium">
-                    <div className="relative w-24 h-24">
-                        <svg className="w-full h-full transform -rotate-90">
-                            <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-50" />
-                            <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
-                                strokeDasharray={251} strokeDashoffset={251 * (1 - 0.88)} className="text-indigo-500 animate-pulse" />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-2xl font-black text-slate-900 tracking-tighter italic font-mono">88%</span>
-                        </div>
-                    </div>
-                    <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Guardian Sync Score</p>
-                        <p className="text-[9px] font-bold text-indigo-600 uppercase tracking-tighter mt-1 italic">Optimal Engagement</p>
-                    </div>
-                </GlassCard>
+                {(() => {
+                    const syncScore = family.balance >= 0 ? 100 : Math.max(10, 100 - Math.floor(Math.abs(family.balance) / 100));
+                    const dashOffset = 251 * (1 - syncScore / 100);
+
+                    return (
+                        <GlassCard className="p-8 border-white/60 shadow-xl flex flex-col items-center justify-center text-center space-y-4 hover:border-indigo-500/20 transition-all duration-500 hover:scale-[1.01]" intensity="medium">
+                            <div className="relative w-24 h-24">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-50" />
+                                    <circle cx="48" cy="48" r="40" stroke="currentColor" strokeWidth="8" fill="transparent"
+                                        strokeDasharray={251} strokeDashoffset={dashOffset} className={cn("transition-all duration-1000", syncScore > 50 ? "text-indigo-500" : "text-amber-500")} />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-2xl font-black text-slate-900 tracking-tighter italic font-mono">{syncScore}%</span>
+                                </div>
+                            </div>
+                            <div>
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Guardian Sync Score</p>
+                                <p className={cn("text-[9px] font-bold uppercase tracking-tighter mt-1 italic", syncScore > 50 ? "text-indigo-600" : "text-amber-600")}>
+                                    {syncScore === 100 ? "Optimal Connection" : syncScore > 50 ? "Standard Sync" : "Low Connectivity"}
+                                </p>
+                            </div>
+                        </GlassCard>
+                    );
+                })()}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10">
@@ -224,11 +237,18 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
                     )}
                 </section>
 
-                {/* Neural Transaction Log (Payment History) */}
+                {/* Neural Transaction Vault (Payment History) */}
                 <section className="space-y-8">
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
-                        <Receipt className="h-3 w-3" /> Neural Transaction Log
-                    </h3>
+                    <div className="flex items-center justify-between">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-400 flex items-center gap-3">
+                            <Receipt className="h-3 w-3" /> Digital Receipt Vault
+                        </h3>
+                        {transactions.length > 0 && (
+                            <p className="text-[9px] font-bold text-slate-300 uppercase tracking-widest italic">
+                                Last Sync: {format(new Date(transactions[0].createdAt), "HH:mm")}
+                            </p>
+                        )}
+                    </div>
 
                     {transactions.length === 0 ? (
                         <GlassCard className="p-12 text-center border-slate-100" intensity="low">
@@ -250,13 +270,13 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
                                             <div className="flex items-center gap-4">
                                                 <div className={cn(
                                                     "w-10 h-10 rounded-xl flex items-center justify-center",
-                                                    txn.type === 'CREDIT' ? "bg-emerald-50 text-emerald-600" : "bg-red-50 text-red-600"
+                                                    txn.type === 'CREDIT' ? "bg-emerald-50 text-emerald-600 shadow-sm" : "bg-red-50 text-red-600"
                                                 )}>
                                                     <CreditCard className="h-5 w-5" />
                                                 </div>
                                                 <div>
                                                     <p className="text-[11px] font-black text-slate-900 uppercase tracking-tight">
-                                                        {txn.type === 'CREDIT' ? 'Revenue Node' : 'Charge Vector'}
+                                                        {txn.type === 'CREDIT' ? 'Fee Settlement' : 'Balance Adjust'}
                                                     </p>
                                                     <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">
                                                         <Calendar className="h-3 w-3" />
@@ -271,7 +291,12 @@ export function ParentDashboard({ family, students, transactions }: ParentDashbo
                                                 )}>
                                                     {txn.type === 'CREDIT' ? '+' : '-'}₹{txn.amount}
                                                 </p>
-                                                <p className="text-[9px] text-slate-400 font-black tracking-widest uppercase font-mono">{txn.receiptNumber || 'X-ID-NULL'}</p>
+                                                <div className="flex items-center justify-end gap-1.5">
+                                                    <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest font-mono group-hover:text-emerald-600 transition-colors">
+                                                        {txn.receiptNumber || 'TXN-IDENTIFIED'}
+                                                    </p>
+                                                    {txn.type === 'CREDIT' && <Receipt className="h-2.5 w-2.5 text-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                                                </div>
                                             </div>
                                         </div>
                                     </GlassCard>

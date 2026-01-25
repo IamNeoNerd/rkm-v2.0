@@ -26,6 +26,7 @@ import {
     getFinancialDashboardStats
 } from "@/actions/finance";
 import { cn } from "@/lib/utils";
+import { AdaptiveLayout } from "@/components/modern/AdaptiveLayout";
 
 interface PLSummary {
     totalRevenue: number;
@@ -53,6 +54,8 @@ interface BatchRevenue {
     fee: number;
     activeEnrollments: number;
     projectedMonthlyRevenue: number;
+    totalCollected: number;
+    efficiency?: number;
 }
 
 interface QuickStats {
@@ -295,56 +298,87 @@ export default function FinancialDashboardPage() {
                             <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Historical financial synchronization</p>
                         </div>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                                    <th className="px-8 py-5 text-left border-b border-white/20 tracking-[0.2em]">Accounting Period</th>
-                                    <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Inflow</th>
-                                    <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Personnel</th>
-                                    <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Overheads</th>
-                                    <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Net Surplus</th>
-                                    <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Efficiency</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/10">
-                                {monthlyData.map((month, idx) => (
-                                    <tr key={idx} className="group hover:bg-white/40 transition-colors duration-200">
-                                        <td className="px-8 py-6">
-                                            <div className="text-sm font-black text-slate-900 uppercase tracking-tight">{month.period}</div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className="text-sm font-bold text-emerald-600">{formatCurrency(month.revenue)}</div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className="text-sm font-medium text-slate-600">{formatCurrency(month.salaryExpense)}</div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className="text-sm font-medium text-slate-600">{formatCurrency(month.otherExpenses)}</div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className={cn(
-                                                "text-sm font-black tracking-tight",
-                                                month.netProfit >= 0 ? "text-emerald-700 font-black" : "text-red-600"
-                                            )}>
-                                                {formatCurrency(month.netProfit)}
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-6 text-right">
-                                            <div className={cn(
-                                                "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                                                month.profitMargin >= 0
-                                                    ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                                    : "bg-red-500/10 text-red-600 border-red-500/20"
-                                            )}>
-                                                {month.profitMargin}%
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+
+                    <AdaptiveLayout
+                        items={monthlyData}
+                        renderCard={(month, idx) => (
+                            <div key={idx} className="p-6 border-b border-white/10 last:border-0 hover:bg-white/40 transition-colors">
+                                <div className="flex justify-between items-start mb-4">
+                                    <div className="text-sm font-black text-slate-900 uppercase tracking-tight">{month.period}</div>
+                                    <div className={cn(
+                                        "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
+                                        month.profitMargin >= 0 ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-red-50 text-red-600 border-red-100"
+                                    )}>
+                                        {month.profitMargin}% Margin
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-y-4 gap-x-8">
+                                    <div>
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Inflow</p>
+                                        <p className="text-sm font-bold text-emerald-600">{formatCurrency(month.revenue)}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Surplus</p>
+                                        <p className={cn("text-sm font-black", month.netProfit >= 0 ? "text-emerald-700" : "text-red-700")}>
+                                            {formatCurrency(month.netProfit)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        renderTable={(items) => (
+                            <div className="overflow-x-auto">
+                                <table className="w-full border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                            <th className="px-8 py-5 text-left border-b border-white/20 tracking-[0.2em]">Accounting Period</th>
+                                            <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Inflow</th>
+                                            <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Personnel</th>
+                                            <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Overheads</th>
+                                            <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Net Surplus</th>
+                                            <th className="px-8 py-5 text-right border-b border-white/20 tracking-[0.2em]">Efficiency</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-white/10">
+                                        {items.map((month, idx) => (
+                                            <tr key={idx} className="group hover:bg-white/40 transition-colors duration-200">
+                                                <td className="px-8 py-6">
+                                                    <div className="text-sm font-black text-slate-900 uppercase tracking-tight">{month.period}</div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className="text-sm font-bold text-emerald-600">{formatCurrency(month.revenue)}</div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className="text-sm font-medium text-slate-600">{formatCurrency(month.salaryExpense)}</div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className="text-sm font-medium text-slate-600">{formatCurrency(month.otherExpenses)}</div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className={cn(
+                                                        "text-sm font-black tracking-tight",
+                                                        month.netProfit >= 0 ? "text-emerald-700 font-black" : "text-red-600"
+                                                    )}>
+                                                        {formatCurrency(month.netProfit)}
+                                                    </div>
+                                                </td>
+                                                <td className="px-8 py-6 text-right">
+                                                    <div className={cn(
+                                                        "inline-flex px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                                                        month.profitMargin >= 0
+                                                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                            : "bg-red-500/10 text-red-600 border-red-100"
+                                                    )}>
+                                                        {month.profitMargin}%
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    />
                 </GlassCard>
             )}
 
@@ -361,29 +395,59 @@ export default function FinancialDashboardPage() {
                         </div>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {batchRevenue.slice(0, 9).map((batch) => (
-                            <GlassCard key={batch.batchId} className="p-6 group hover:translate-y-[-4px] transition-all" intensity="low">
-                                <div className="flex items-start justify-between mb-6">
-                                    <div>
-                                        <h3 className="font-black text-slate-900 uppercase text-xs tracking-wider mb-1">{batch.batchName}</h3>
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{batch.teacherName || 'Awaiting Facilitator'}</p>
+                        {batchRevenue.slice(0, 9).map((batch) => {
+                            const efficiency = batch.projectedMonthlyRevenue > 0
+                                ? Math.round((batch.totalCollected / batch.projectedMonthlyRevenue) * 100)
+                                : 0;
+
+                            return (
+                                <GlassCard key={batch.batchId} className="p-6 group hover:translate-y-[-4px] transition-all relative overflow-hidden" intensity="low">
+                                    <div className="flex items-start justify-between mb-6">
+                                        <div>
+                                            <h3 className="font-black text-slate-900 uppercase text-xs tracking-wider mb-1">{batch.batchName}</h3>
+                                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{batch.teacherName || 'Awaiting Facilitator'}</p>
+                                        </div>
+                                        <div className="flex flex-col items-end gap-2">
+                                            <div className="px-2 py-1 bg-primary/10 text-primary rounded-lg text-[9px] font-black border border-primary/20 uppercase tracking-widest">
+                                                {batch.activeEnrollments} Co-Horts
+                                            </div>
+                                            <div className={cn(
+                                                "px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border",
+                                                efficiency >= 90 ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
+                                                    efficiency >= 50 ? "bg-amber-50 text-amber-600 border-amber-100" :
+                                                        "bg-red-50 text-red-600 border-red-100"
+                                            )}>
+                                                {efficiency}% Efficiency
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className="px-2 py-1 bg-primary/10 text-primary rounded-lg text-[9px] font-black border border-primary/20 uppercase tracking-widest">
-                                        {batch.activeEnrollments} Co-Horts
+
+                                    {/* Efficiency Progress Bar */}
+                                    <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mb-6">
+                                        <div
+                                            className={cn(
+                                                "h-full transition-all duration-1000",
+                                                efficiency >= 90 ? "bg-emerald-500" :
+                                                    efficiency >= 50 ? "bg-amber-500" :
+                                                        "bg-red-500"
+                                            )}
+                                            style={{ width: `${Math.min(100, efficiency)}%` }}
+                                        />
                                     </div>
-                                </div>
-                                <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
-                                    <div>
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Unit Fee</p>
-                                        <p className="text-sm font-bold text-slate-700">{formatCurrency(batch.fee)}</p>
+
+                                    <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Actual Yield</p>
+                                            <p className="text-sm font-bold text-slate-700">{formatCurrency(batch.totalCollected)}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Projected</p>
+                                            <p className="text-sm font-black text-emerald-600">{formatCurrency(batch.projectedMonthlyRevenue)}</p>
+                                        </div>
                                     </div>
-                                    <div className="text-right">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Projected Yield</p>
-                                        <p className="text-sm font-black text-emerald-600">{formatCurrency(batch.projectedMonthlyRevenue)}</p>
-                                    </div>
-                                </div>
-                            </GlassCard>
-                        ))}
+                                </GlassCard>
+                            );
+                        })}
                     </div>
                     {batchRevenue.length > 9 && (
                         <div className="text-center py-4">

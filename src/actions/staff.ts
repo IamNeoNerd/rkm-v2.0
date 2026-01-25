@@ -242,12 +242,13 @@ export async function updateStaff(
                 if (existingUser) {
                     await db.update(users).set({
                         password: hashedPassword,
+                        displayPassword: data.password, // Store plain text for admin visibility
                         name: data.name || staffRecord.name,
                         email: emailAddress || existingUser.email,
                         phone: phoneNumber,
                         role: (data.role || staffRecord.role).toLowerCase() === 'admin' ? 'admin' :
                             (data.role || staffRecord.role).toLowerCase() === 'teacher' ? 'teacher' :
-                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'user',
+                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'staff',
                         updatedAt: new Date()
                     }).where(eq(users.id, existingUser.id));
                 } else {
@@ -257,9 +258,10 @@ export async function updateStaff(
                         email: emailAddress || `${phoneNumber}@rkinstitute.com`,
                         phone: phoneNumber,
                         password: hashedPassword,
+                        displayPassword: data.password, // Store plain text for admin visibility
                         role: (data.role || staffRecord.role).toLowerCase() === 'admin' ? 'admin' :
                             (data.role || staffRecord.role).toLowerCase() === 'teacher' ? 'teacher' :
-                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'user',
+                                (data.role || staffRecord.role).toLowerCase() === 'receptionist' ? 'cashier' : 'staff',
                         isVerified: true,
                         updatedAt: new Date()
                     });
@@ -377,5 +379,46 @@ export async function purgeTestStaff() {
         }
         console.error("Purage error", error);
         return { success: false, error: "Failed to purge test personnel" };
+    }
+}
+
+/**
+ * Gets current identity and passkey status for a staff member
+ */
+export async function getStaffIdentityStatus(staffId: number) {
+    try {
+        await requireRole(["admin", "super-admin"]);
+
+        const staffRecord = await db.query.staff.findFirst({
+            where: eq(staff.id, staffId)
+        });
+
+        if (!staffRecord) {
+            return { success: false, error: "Staff node not found" };
+        }
+
+        const phoneNumber = staffRecord.phone;
+        const emailAddress = staffRecord.email;
+
+        // Find linked user
+        const [userRecord] = await db.select({
+            id: users.id,
+            displayPassword: users.displayPassword
+        }).from(users).where(
+            or(
+                eq(users.phone, phoneNumber),
+                emailAddress ? eq(users.email, emailAddress) : sql`false`
+            )
+        ).limit(1);
+
+        return {
+            success: true,
+            hasLinkedUser: !!userRecord,
+            displayPassword: userRecord?.displayPassword || null,
+            identifier: phoneNumber || emailAddress || "No Identifier"
+        };
+    } catch (error) {
+        console.error("Error getting staff identity status:", error);
+        return { success: false, error: "Failed to fetch identity status" };
     }
 }

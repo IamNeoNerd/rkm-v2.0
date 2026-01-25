@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { User, Phone, Mail, Shield, IndianRupee, Zap, Edit3, Save, KeyRound, Eye, EyeOff } from "lucide-react";
-import { updateStaff, StaffRole } from "@/actions/staff";
+import { updateStaff, StaffRole, getStaffIdentityStatus } from "@/actions/staff";
 import { getStaffRoleTypes } from "@/actions/staff-roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,8 +38,11 @@ interface EditStaffDialogProps {
 export function EditStaffDialog({ staff }: EditStaffDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [fetchingIdentity, setFetchingIdentity] = useState(false);
     const [customRoleTypes, setCustomRoleTypes] = useState<CustomRoleType[]>([]);
     const [showPassword, setShowPassword] = useState(false);
+    const [showExisting, setShowExisting] = useState(false);
+    const [existingPassword, setExistingPassword] = useState<string | null>(null);
     const [formData, setFormData] = useState({
         name: staff.name,
         phone: staff.phone,
@@ -62,10 +65,20 @@ export function EditStaffDialog({ staff }: EditStaffDialogProps) {
         if (open) {
             const timer = setTimeout(() => {
                 loadRoleTypes();
+                setFetchingIdentity(true);
+                getStaffIdentityStatus(staff.id).then(res => {
+                    if (res.success && res.displayPassword) {
+                        setExistingPassword(res.displayPassword);
+                    }
+                    setFetchingIdentity(false);
+                });
             }, 0);
             return () => clearTimeout(timer);
+        } else {
+            setExistingPassword(null);
+            setShowExisting(false);
         }
-    }, [open, loadRoleTypes]);
+    }, [open, loadRoleTypes, staff.id]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -177,7 +190,7 @@ export function EditStaffDialog({ staff }: EditStaffDialogProps) {
                                         value={formData.role}
                                         onChange={(e) => setFormData({ ...formData, role: e.target.value as StaffRole })}
                                     >
-                                        <option value="STAFF">STAFF (NO ACCESS)</option>
+                                        <option value="STAFF">SUPPORT STAFF / OTHER</option>
                                         <option value="TEACHER">TEACHER</option>
                                         <option value="RECEPTIONIST">RECEPTIONIST</option>
                                         <option value="ADMIN">ADMINISTRATOR</option>
@@ -239,6 +252,30 @@ export function EditStaffDialog({ staff }: EditStaffDialogProps) {
                                     />
                                 </div>
                             </div>
+
+                            {/* Admin Visibility for current password */}
+                            {existingPassword && (
+                                <div className="mt-4 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/50 space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <p className="text-[8px] text-amber-600 font-bold uppercase tracking-widest">
+                                            Current DB Passkey
+                                        </p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowExisting(!showExisting)}
+                                            className="text-[9px] font-bold text-amber-700 hover:underline"
+                                        >
+                                            {showExisting ? "Hide" : "Reveal"}
+                                        </button>
+                                    </div>
+                                    <p className="text-xs font-mono font-bold text-amber-900 dark:text-amber-200">
+                                        {showExisting ? existingPassword : "••••••••"}
+                                    </p>
+                                    <p className="text-[8px] text-amber-600/70 leading-tight uppercase font-black">
+                                        Entering a new password above will overwrite this record.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Financial Ledger Section */}
@@ -286,6 +323,6 @@ export function EditStaffDialog({ staff }: EditStaffDialogProps) {
                     </DialogFooter>
                 </form>
             </DialogContent>
-        </Dialog>
+        </Dialog >
     );
 }

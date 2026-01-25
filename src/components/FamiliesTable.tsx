@@ -29,6 +29,11 @@ interface Family {
     phone: string | null;
     balance: number;
     studentCount: number;
+    children?: {
+        id: number;
+        name: string;
+        class: string;
+    }[];
 }
 
 interface FamiliesTableProps {
@@ -85,7 +90,7 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
                     <div className="relative w-full md:max-w-lg group">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input
-                            placeholder="Identify family by father's name or contact..."
+                            placeholder="Find by name, phone or children name..."
                             className="pl-11"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -136,9 +141,16 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
                                                 </div>
                                                 <div>
                                                     <p className="text-sm font-bold text-foreground">{family.fatherName || "Anonymous"}</p>
-                                                    <div className="flex items-center gap-1.5 mt-0.5">
-                                                        <Phone className="h-3 w-3 opacity-40" />
-                                                        <span className="text-xs font-bold text-muted-foreground">{family.phone || "-"}</span>
+                                                    <div className="flex flex-wrap gap-1 mt-1">
+                                                        {family.children?.map(child => (
+                                                            <span key={child.id} className="text-[8px] font-black bg-slate-100 dark:bg-slate-700 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 uppercase tracking-tighter">
+                                                                {child.name.split(' ')[0]}
+                                                            </span>
+                                                        ))}
+                                                    </div>
+                                                    <div className="flex items-center gap-1.5 mt-1.5 opacity-60">
+                                                        <Phone className="h-3 w-3" />
+                                                        <span className="text-[10px] font-bold text-muted-foreground">{family.phone || "-"}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -172,15 +184,23 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
                                                 </span>
                                             </div>
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            variant="glass"
-                                            className="text-primary hover:bg-primary hover:text-white border-primary/20"
-                                            onClick={() => handlePayClick(family)}
-                                        >
-                                            <CreditCard className="h-3.5 w-3.5 mr-1" />
-                                            Pay
-                                        </Button>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => toast.info("Reminder system coming in Phase 4")}
+                                                className="p-2 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-white/20"
+                                            >
+                                                <MessageSquare className="h-4 w-4" />
+                                            </button>
+                                            <Button
+                                                size="sm"
+                                                variant="glass"
+                                                className="text-primary hover:bg-primary hover:text-white border-primary/20"
+                                                onClick={() => handlePayClick(family)}
+                                            >
+                                                <CreditCard className="h-3.5 w-3.5 mr-1" />
+                                                Pay
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
@@ -212,7 +232,14 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
                                                         <span className="text-sm font-bold text-foreground group-hover/link:text-primary transition-colors">
                                                             {family.fatherName || "Anonymous"}
                                                         </span>
-                                                        <div className="flex items-center gap-1.5 mt-0.5 text-xs font-bold text-muted-foreground/60 tracking-wider">
+                                                        <div className="flex flex-wrap gap-1 mt-1">
+                                                            {family.children?.map(child => (
+                                                                <span key={child.id} className="text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-500 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700">
+                                                                    {child.name}
+                                                                </span>
+                                                            ))}
+                                                        </div>
+                                                        <div className="flex items-center gap-1.5 mt-1.5 text-xs font-bold text-muted-foreground/60 tracking-wider">
                                                             <Phone className="h-3 w-3 opacity-40" />
                                                             {family.phone || "-"}
                                                         </div>

@@ -2,12 +2,7 @@
 
 import { useState, useEffect } from "react";
 import {
-    Loader2,
-    Shield,
     ShieldCheck,
-    ShieldAlert,
-    Info,
-    Check,
     X,
     Users,
     IndianRupee,
@@ -20,7 +15,6 @@ import {
     Settings,
     Zap,
     Lock,
-    Unlock,
     Eye,
     Scan,
     Activity,
@@ -143,7 +137,7 @@ export default function PermissionsManagerClient() {
         try {
             const perms = await getPermissionsForRole(role);
             setPermissions(perms);
-        } catch (error) {
+        } catch {
             toast.error("Failed to load permissions matrix");
         } finally {
             setLoading(false);
@@ -170,7 +164,7 @@ export default function PermissionsManagerClient() {
             } else {
                 throw new Error(result.error);
             }
-        } catch (error) {
+        } catch {
             setPermissions(prev => ({
                 ...prev,
                 [feature]: { ...prev[feature], [action]: currentValue },

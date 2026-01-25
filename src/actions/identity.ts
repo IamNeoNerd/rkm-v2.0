@@ -98,9 +98,13 @@ export async function updateStudentIdentity(
             const hashedPassword = await bcrypt.hash(data.passkey, 10);
 
             if (userId) {
-                // Update existing user's password
+                // Update existing user's password and display password
                 await db.update(users)
-                    .set({ password: hashedPassword, updatedAt: new Date() })
+                    .set({
+                        password: hashedPassword,
+                        displayPassword: data.passkey,
+                        updatedAt: new Date()
+                    })
                     .where(eq(users.id, userId));
             } else {
                 // Create a new user account for this student
@@ -110,6 +114,7 @@ export async function updateStudentIdentity(
                     name: student.name,
                     role: "student",
                     password: hashedPassword,
+                    displayPassword: data.passkey,
                     isVerified: true,
                     createdAt: new Date(),
                     updatedAt: new Date(),
@@ -146,6 +151,7 @@ export async function getStudentIdentityStatus(
     hasIdentity: boolean;
     studentId: string | null;
     hasLinkedUser: boolean;
+    displayPassword?: string | null;
     error?: string;
 }> {
     try {
@@ -158,14 +164,25 @@ export async function getStudentIdentityStatus(
             .where(eq(students.id, studentDbId))
             .limit(1);
 
-        if (!student) {
-            return { hasIdentity: false, studentId: null, hasLinkedUser: false, error: "Student not found" };
+        if (student.userId) {
+            const [userRecord] = await db
+                .select({ displayPassword: users.displayPassword })
+                .from(users)
+                .where(eq(users.id, student.userId))
+                .limit(1);
+
+            return {
+                hasIdentity: !!student.studentId,
+                studentId: student.studentId,
+                hasLinkedUser: true,
+                displayPassword: userRecord?.displayPassword,
+            };
         }
 
         return {
             hasIdentity: !!student.studentId,
             studentId: student.studentId,
-            hasLinkedUser: !!student.userId,
+            hasLinkedUser: false,
         };
     } catch (error) {
         console.error("Error getting identity status:", error);

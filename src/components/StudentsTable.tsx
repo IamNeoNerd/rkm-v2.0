@@ -241,19 +241,33 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                                         </span>
                                     </div>
                                     <div className="flex items-center justify-between pt-3 border-t border-white/10 dark:border-slate-700/50">
-                                        <div className="space-y-1">
-                                            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-wider">Guardian</p>
-                                            <p className="text-xs font-bold text-muted-foreground">{student.fatherName || "N/A"}</p>
+                                        <div className="flex gap-4">
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Guardian</p>
+                                                <p className="text-xs font-bold text-foreground">{student.fatherName || "N/A"}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Contact</p>
+                                                <p className="text-xs font-bold text-muted-foreground">{student.phone || "---"}</p>
+                                            </div>
                                         </div>
-                                        <Button
-                                            size="sm"
-                                            variant="glass"
-                                            className="text-primary hover:bg-primary hover:text-white border-primary/20"
-                                            onClick={() => handlePayClick(student)}
-                                        >
-                                            <IndianRupee className="h-3.5 w-3.5 mr-1" />
-                                            Pay
-                                        </Button>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => import("sonner").then(m => m.toast.info("Reminder system coming in Phase 4"))}
+                                                className="p-2 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-white/20"
+                                            >
+                                                <MessageSquare className="h-4 w-4" />
+                                            </button>
+                                            <Button
+                                                size="sm"
+                                                variant="glass"
+                                                className="text-primary hover:bg-primary hover:text-white border-primary/20"
+                                                onClick={() => handlePayClick(student)}
+                                            >
+                                                <IndianRupee className="h-3.5 w-3.5 mr-1" />
+                                                Pay
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}

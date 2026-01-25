@@ -388,62 +388,104 @@ export default function FeesPage() {
                         <p className="text-sm font-black uppercase tracking-widest">No Recent Settlements Detected</p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full border-collapse">
-                            <thead>
-                                <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500">
-                                    <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Timestamp</th>
-                                    <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Family Entity</th>
-                                    <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Sync Type</th>
-                                    <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Value (₹)</th>
-                                    <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Metadata</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-white/10">
-                                {transactions.map((txn) => (
-                                    <tr key={txn.id} className="group hover:bg-white/40 transition-colors duration-200">
-                                        <td className="px-8 py-6">
-                                            <div className="text-sm font-bold text-slate-600">
-                                                {format(new Date(txn.createdAt), "MMM dd, yyyy")}
-                                            </div>
-                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-1">
-                                                {format(new Date(txn.createdAt), "HH:mm:ss")}
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className="text-sm font-black text-slate-900 uppercase tracking-tight">{txn.fatherName || "N/A"}</div>
-                                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-1">ID: #{txn.familyId}</div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <span
-                                                className={cn(
-                                                    "px-3 py-1.5 text-[10px] font-black rounded-lg uppercase tracking-widest border",
-                                                    txn.type === "CREDIT"
-                                                        ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
-                                                        : "bg-red-500/10 text-red-600 border-red-500/20"
-                                                )}
-                                            >
-                                                {txn.type}
-                                            </span>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className={cn(
-                                                "text-lg font-black tracking-tight",
-                                                txn.type === "CREDIT" ? "text-emerald-600" : "text-red-600"
-                                            )}>
-                                                {txn.type === "CREDIT" ? "+" : "-"}₹{txn.amount.toLocaleString()}
-                                            </div>
-                                        </td>
-                                        <td className="px-8 py-6">
-                                            <div className="text-xs font-medium text-slate-500 max-w-[200px] truncate">
-                                                {txn.description || "System automatic ledger entry"}
-                                            </div>
-                                        </td>
+                    <>
+                        {/* Mobile Audit Ledger Cards */}
+                        <div className="md:hidden space-y-3 p-4 bg-slate-50/50">
+                            {transactions.map((txn) => (
+                                <GlassCard key={txn.id} className="p-5 border-white/60 shadow-lg relative group overflow-hidden" intensity="medium">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">
+                                                {format(new Date(txn.createdAt), "MMM dd, yyyy")} • {format(new Date(txn.createdAt), "HH:mm")}
+                                            </p>
+                                            <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight truncate max-w-[150px]">{txn.fatherName || "N/A"}</h4>
+                                            <p className="text-[8px] font-black text-slate-400 mt-1 uppercase tracking-widest">Entity: #{txn.familyId}</p>
+                                        </div>
+                                        <span
+                                            className={cn(
+                                                "px-2 py-1 text-[8px] font-black rounded-lg uppercase tracking-widest border",
+                                                txn.type === "CREDIT"
+                                                    ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                                                    : "bg-red-50 text-red-600 border-red-100"
+                                            )}
+                                        >
+                                            {txn.type}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-4 border-t border-white/20">
+                                        <div className={cn(
+                                            "text-lg font-black tracking-tighter",
+                                            txn.type === "CREDIT" ? "text-emerald-600" : "text-red-600"
+                                        )}>
+                                            {txn.type === "CREDIT" ? "+" : "-"}₹{txn.amount.toLocaleString()}
+                                        </div>
+                                        <div className="text-[9px] font-medium text-slate-400 italic max-w-[120px] truncate">
+                                            {txn.description || "System automatic entry"}
+                                        </div>
+                                    </div>
+                                </GlassCard>
+                            ))}
+                        </div>
+
+                        {/* Desktop Table View */}
+                        <div className="hidden md:block overflow-x-auto">
+                            <table className="w-full border-collapse">
+                                <thead>
+                                    <tr className="bg-slate-50/50 text-[10px] font-black uppercase tracking-widest text-slate-500">
+                                        <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Timestamp</th>
+                                        <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Family Entity</th>
+                                        <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Sync Type</th>
+                                        <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Value (₹)</th>
+                                        <th className="px-8 py-5 text-left border-b border-white/20 uppercase tracking-[0.2em]">Metadata</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody className="divide-y divide-white/10">
+                                    {transactions.map((txn) => (
+                                        <tr key={txn.id} className="group hover:bg-white/40 transition-colors duration-200">
+                                            <td className="px-8 py-6">
+                                                <div className="text-sm font-bold text-slate-600">
+                                                    {format(new Date(txn.createdAt), "MMM dd, yyyy")}
+                                                </div>
+                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-1">
+                                                    {format(new Date(txn.createdAt), "HH:mm:ss")}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="text-sm font-black text-slate-900 uppercase tracking-tight">{txn.fatherName || "N/A"}</div>
+                                                <div className="text-[10px] font-black text-slate-400 uppercase tracking-tighter mt-1">ID: #{txn.familyId}</div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <span
+                                                    className={cn(
+                                                        "px-3 py-1.5 text-[10px] font-black rounded-lg uppercase tracking-widest border",
+                                                        txn.type === "CREDIT"
+                                                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+                                                            : "bg-red-500/10 text-red-600 border-red-500/20"
+                                                    )}
+                                                >
+                                                    {txn.type}
+                                                </span>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className={cn(
+                                                    "text-lg font-black tracking-tight",
+                                                    txn.type === "CREDIT" ? "text-emerald-600" : "text-red-600"
+                                                )}>
+                                                    {txn.type === "CREDIT" ? "+" : "-"}₹{txn.amount.toLocaleString()}
+                                                </div>
+                                            </td>
+                                            <td className="px-8 py-6">
+                                                <div className="text-xs font-medium text-slate-500 max-w-[200px] truncate">
+                                                    {txn.description || "System automatic ledger entry"}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </>
                 )}
             </GlassCard>
 

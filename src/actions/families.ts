@@ -20,7 +20,16 @@ export async function getAllFamilies(options: {
 
         if (search) {
             const searchTerm = `%${search.toLowerCase()}%`;
-            whereClause = and(whereClause, sql`(LOWER(${families.fatherName}) LIKE ${searchTerm} OR ${families.phone} LIKE ${searchTerm})`);
+            // Search in father name, phone, OR student names
+            const studentSearchSubquery = db
+                .select({ familyId: students.familyId })
+                .from(students)
+                .where(sql`LOWER(${students.name}) LIKE ${searchTerm}`);
+
+            whereClause = and(
+                whereClause,
+                sql`(LOWER(${families.fatherName}) LIKE ${searchTerm} OR ${families.phone} LIKE ${searchTerm} OR ${families.id} IN (${studentSearchSubquery}))`
+            );
         }
 
         // Subquery for student count
@@ -49,6 +58,24 @@ export async function getAllFamilies(options: {
             .limit(limit)
             .offset(offset);
 
+        // Fetch students for these families to show in the table
+        const familyIds = results.map(f => f.id);
+        const children = familyIds.length > 0
+            ? await db.select({
+                id: students.id,
+                name: students.name,
+                familyId: students.familyId,
+                class: students.class
+            })
+                .from(students)
+                .where(sql`${students.familyId} IN (${sql.join(familyIds, sql`, `)})`)
+            : [];
+
+        const familiesWithChildren = results.map(f => ({
+            ...f,
+            children: children.filter(c => c.familyId === f.id)
+        }));
+
         // Get total count for pagination
         const [totalResult] = await db
             .select({ count: count() })
@@ -58,7 +85,7 @@ export async function getAllFamilies(options: {
         const total = Number(totalResult?.count || 0);
 
         return {
-            families: results,
+            families: familiesWithChildren,
             pagination: {
                 total,
                 page,

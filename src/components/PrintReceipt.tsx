@@ -45,7 +45,7 @@ export const PrintReceipt = forwardRef<HTMLDivElement, PrintReceiptProps>(
                         RK Institute of Learning
                     </h1>
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 mt-1">
-                        "Excellent in Holistic Development"
+                        &quot;Excellent in Holistic Development&quot;
                     </p>
                     <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-3 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
                         <span>Academics</span>
@@ -157,7 +157,7 @@ export const PrintReceipt = forwardRef<HTMLDivElement, PrintReceiptProps>(
                         <div className="h-12 flex items-end justify-center">
                             <div className="w-full border-b border-slate-400" />
                         </div>
-                        <p className="text-[9px] font-black uppercase text-slate-500 mt-2 tracking-widest">Parent's Signature</p>
+                        <p className="text-[9px] font-black uppercase text-slate-500 mt-2 tracking-widest">Parent&apos;s Signature</p>
                     </div>
                     <div>
                         <div className="h-12 flex items-end justify-center">

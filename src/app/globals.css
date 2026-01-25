@@ -210,15 +210,27 @@
 
 /* Improve touch targets on mobile */
 @media (max-width: 640px) {
-
   button,
   [role="button"],
   input[type="checkbox"],
   input[type="radio"],
   select {
-    min-height: 44px;
+    min-height: 48px;
     min-width: 44px;
   }
+
+  /* Typography Scaling for Mobile */
+  h1 { font-size: 2.25rem !important; line-height: 2.5rem !important; }
+  h2 { font-size: 1.5rem !important; line-height: 2rem !important; }
+  h3 { font-size: 1.25rem !important; line-height: 1.75rem !important; }
+  .text-5xl { font-size: 2.5rem !important; }
+  .text-4xl { font-size: 2rem !important; }
+  .text-3xl { font-size: 1.75rem !important; }
+}
+
+/* Mobile Nav Safe Area */
+.mobile-nav-safe {
+  padding-bottom: env(safe-area-inset-bottom, 2rem);
 }
 
 /* Truncate long text in tables */

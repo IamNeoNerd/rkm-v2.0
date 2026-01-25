@@ -38,7 +38,7 @@ export const FEATURE_KEYS: FeatureKey[] = [
 /**
  * User roles in the system
  */
-export type UserRole = "super-admin" | "admin" | "teacher" | "cashier" | "parent" | "user";
+export type UserRole = "super-admin" | "admin" | "teacher" | "cashier" | "parent" | "staff" | "user";
 
 /**
  * Permission action types
@@ -175,6 +175,7 @@ function getDefaultPermissions(role: UserRole, feature: FeatureKey): PermissionC
             students: { canView: true, canCreate: false, canEdit: false, canDelete: false },
             attendance: { canView: true, canCreate: true, canEdit: true, canDelete: false },
             academics: { canView: true, canCreate: false, canEdit: false, canDelete: false },
+            staff: { canView: true, canCreate: false, canEdit: false, canDelete: false },
         },
         "cashier": {
             dashboard: { canView: true, canCreate: false, canEdit: false, canDelete: false },
@@ -183,12 +184,17 @@ function getDefaultPermissions(role: UserRole, feature: FeatureKey): PermissionC
             fees: { canView: true, canCreate: true, canEdit: false, canDelete: false },
             admissions: { canView: true, canCreate: true, canEdit: false, canDelete: false },
             reports: { canView: true, canCreate: false, canEdit: false, canDelete: false },
+            staff: { canView: true, canCreate: false, canEdit: false, canDelete: false },
         },
         "parent": {
             dashboard: { canView: true, canCreate: false, canEdit: false, canDelete: false },
             students: { canView: true, canCreate: false, canEdit: false, canDelete: false },
             fees: { canView: true, canCreate: false, canEdit: false, canDelete: false },
             attendance: { canView: true, canCreate: false, canEdit: false, canDelete: false },
+        },
+        "staff": {
+            dashboard: { canView: true, canCreate: false, canEdit: false, canDelete: false },
+            staff: { canView: true, canCreate: false, canEdit: false, canDelete: false },
         },
         "user": {}, // No access for unverified users
     };

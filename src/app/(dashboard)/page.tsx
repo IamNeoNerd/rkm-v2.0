@@ -2,9 +2,11 @@ import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { IndianRupee, Users, AlertCircle, Plus } from "lucide-react";
-import { getDashboardData, getDashboardMetrics, getRecentActivity, getAdmissionsChartData } from "@/actions/dashboard";
+import { getDashboardData, getDashboardMetrics, getRecentActivity, getAdmissionsChartData, getRevenueChartData, getTeacherLoadData, getBatchActivityData, getSettlementModeData, getAttendanceLeaderboard } from "@/actions/dashboard";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { OverviewChart } from "@/components/dashboard/OverviewChart";
+import { RevenueChart } from "@/components/dashboard/RevenueChart";
+import { TeacherLoadChart, BatchActivityChart, SettlementMaturityChart, EngagementLeaderboard } from "@/components/dashboard/InstitutionalCharts";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
 import { DashboardClient } from "@/components/dashboard/DashboardClient";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
@@ -34,11 +36,16 @@ interface ChartItem {
 
 async function DashboardContent() {
   // Fetch all data in parallel on the server
-  const [families, metricsData, activityData, chartData] = await Promise.all([
+  const [families, metricsData, activityData, admissionChartData, revenueChartData, teacherLoadData, batchActivityData, settlementModeData, leaderboardData] = await Promise.all([
     getDashboardData(),
     getDashboardMetrics(),
     getRecentActivity(),
-    getAdmissionsChartData()
+    getAdmissionsChartData(),
+    getRevenueChartData(),
+    getTeacherLoadData(),
+    getBatchActivityData(),
+    getSettlementModeData(),
+    getAttendanceLeaderboard()
   ]);
 
   const metrics = metricsData as DashboardMetrics;
@@ -59,6 +66,7 @@ async function DashboardContent() {
           icon={<IndianRupee className="h-5 w-5 text-primary" />}
           trend={metrics.revenueTrend}
           trendUp={metrics.revenueTrendUp}
+          href="/reports/transactions"
         />
         <StatCard
           title="Active Students"
@@ -66,6 +74,7 @@ async function DashboardContent() {
           icon={<Users className="h-5 w-5 text-primary" />}
           trend={metrics.studentsTrend}
           trendUp={true}
+          href="/students"
         />
         <StatCard
           title="Pending Fees"
@@ -73,24 +82,34 @@ async function DashboardContent() {
           icon={<AlertCircle className="h-5 w-5 text-cta" />}
           description="Total outstanding from families"
           className="bg-cta/5 border-cta/10"
+          href="/reports/dues"
         />
       </div>
 
       <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-7">
         <div className="lg:col-span-4">
-          <OverviewChart data={chartData as ChartItem[]} />
+          <OverviewChart data={admissionChartData as ChartItem[]} />
         </div>
         <div className="lg:col-span-3">
           <RecentActivity data={formattedActivity} />
         </div>
-      </div>
-
-      <div className="bg-white/30 dark:bg-slate-900/30 backdrop-blur-xl rounded-[2rem] p-8 border border-white/20 shadow-2xl">
-        <div className="mb-6">
-          <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground ml-1"> Manage Operations </h3>
-          <h2 className="text-2xl font-black text-foreground"> Family Database </h2>
+        <div className="lg:col-span-7">
+          <RevenueChart data={revenueChartData as ChartItem[]} />
         </div>
-        <DashboardClient initialFamilies={families} />
+
+        {/* Institutional Intelligence Layer */}
+        <div className="lg:col-span-4">
+          <TeacherLoadChart data={teacherLoadData} />
+        </div>
+        <div className="lg:col-span-3">
+          <SettlementMaturityChart data={settlementModeData} />
+        </div>
+        <div className="lg:col-span-7">
+          <BatchActivityChart data={batchActivityData} />
+        </div>
+        <div className="lg:col-span-7">
+          <EngagementLeaderboard data={leaderboardData} />
+        </div>
       </div>
     </div>
   );
@@ -108,7 +127,12 @@ export default async function DashboardPage() {
     redirect("/student/portal");
   }
 
-  // Redirect staff members to their simplified dashboard
+  if (session.user.role === "parent") {
+    redirect("/parent");
+  }
+
+  // Redirect staff members (teacher, cashier, etc) to their simplified dashboard
+  // Only admin and super-admin see the main command center
   if (session.user.role !== "admin" && session.user.role !== "super-admin") {
     redirect("/staff/dashboard");
   }

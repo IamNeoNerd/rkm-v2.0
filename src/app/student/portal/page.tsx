@@ -38,7 +38,8 @@ export default async function StudentPortal() {
                 with: {
                     batch: true
                 }
-            }
+            },
+            attendance: true
         }
     });
 
@@ -57,8 +58,18 @@ export default async function StudentPortal() {
         );
     }
 
-    const { name, class: className } = studentData;
-    const activeBatches = studentData.enrollments.filter(e => e.isActive).map(e => e.batch);
+    const { name, class: className, attendance: attendanceRecords } = studentData;
+    const activeBatches = studentData.enrollments.filter((e: any) => e.isActive).map((e: any) => e.batch);
+
+    // Calculate real attendance stats
+    const totalAttendance = attendanceRecords.length;
+    const presentAttendance = attendanceRecords.filter((a: any) => a.status === 'Present' || a.status === 'Late').length;
+    const attendancePercentage = totalAttendance > 0
+        ? Math.round((presentAttendance / totalAttendance) * 100)
+        : 100;
+
+    // Get the first active batch as "Next Pulse" (simplified logic for now)
+    const nextPulse = activeBatches[0];
 
     return (
         <div className="flex-1 space-y-10 p-4 md:p-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
@@ -88,9 +99,9 @@ export default async function StudentPortal() {
                 />
                 <StatCard
                     title="Attendance"
-                    value="94%"
+                    value={`${attendancePercentage}%`}
                     icon={<Calendar className="h-5 w-5 text-secondary" />}
-                    description="Protocol adherence"
+                    description={`${totalAttendance} sessions tracked`}
                 />
                 <StatCard
                     title="Performance"
@@ -109,13 +120,42 @@ export default async function StudentPortal() {
             {/* Content Matrix */}
             <div className="grid gap-8 lg:grid-cols-3">
                 {/* Active Instructional Vectors */}
-                <div className="lg:col-span-2 space-y-6">
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Next Pulse Scheduler */}
+                    {nextPulse && (
+                        <GlassCard className="p-8 border-primary/20 shadow-2xl relative overflow-hidden group hover:scale-[1.01] transition-all duration-500" intensity="high">
+                            <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                <Activity className="h-32 w-32 text-primary" />
+                            </div>
+                            <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-8">
+                                <div className="flex items-center gap-6">
+                                    <div className="w-16 h-16 rounded-[2rem] bg-primary text-white flex items-center justify-center shadow-xl shadow-primary/20 animate-pulse">
+                                        <Clock className="h-8 w-8" />
+                                    </div>
+                                    <div>
+                                        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-1">Upcoming Pulse Node</p>
+                                        <h2 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic leading-none">{nextPulse.name}</h2>
+                                        <div className="flex items-center gap-3 mt-3">
+                                            <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-100 text-[10px] font-black text-slate-600 uppercase tracking-widest border border-slate-200">
+                                                <Calendar className="h-3 w-3" />
+                                                Next Class: {nextPulse.schedule || 'ST_TBD'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <Button className="h-12 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest shadow-xl shadow-primary/10">
+                                    JOIN_SESSION
+                                </Button>
+                            </div>
+                        </GlassCard>
+                    )}
+
                     <h2 className="text-[10px] font-black uppercase tracking-[0.4em] text-muted-foreground flex items-center gap-3">
                         <Clock className="h-3 w-3" /> ACTIVE_INSTRUCTION_VECTORS
                     </h2>
 
                     <div className="grid gap-4 sm:grid-cols-2">
-                        {activeBatches.length > 0 ? activeBatches.map((batch) => (
+                        {activeBatches.length > 0 ? activeBatches.map((batch: any) => (
                             <GlassCard key={batch.id} className="p-6 group hover:border-primary/50 transition-all duration-500 relative overflow-hidden" intensity="medium">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors" />
                                 <div className="flex justify-between items-start mb-4">
