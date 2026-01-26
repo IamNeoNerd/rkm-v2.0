@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 
 export const runtime = 'nodejs';
 
+// export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,9 +22,9 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased font-sans min-h-screen bg-background relative">
         <Providers>
-          <Toaster position="top-right" richColors />
           {children}
         </Providers>
+        <Toaster position="top-right" richColors />
       </body>
     </html>
   );

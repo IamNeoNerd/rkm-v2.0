@@ -5,7 +5,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Loader2, Save, Fingerprint, ShieldCheck, Globe, Key, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Save, Shield, ShieldCheck, Globe, Key, AlertCircle, CheckCircle2 } from "lucide-react";
 import { getAuthSettings, updateAuthSettings, AuthSettings } from "@/actions/auth-settings";
 import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
@@ -122,7 +122,7 @@ export default function AuthSettingsPage() {
                     </p>
                 </div>
                 <div className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center gap-2">
-                    <Fingerprint className="h-4 w-4 text-indigo-600" />
+                    <Shield className="h-4 w-4 text-indigo-600" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700">Security Layer Active</span>
                 </div>
             </div>

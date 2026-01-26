@@ -16,6 +16,7 @@ This workflow defines the standard practices to follow when developing and maint
 2. **No temporary output files** - Files like `*_output.txt`, `test_results.txt` should not be committed
 3. **No SQL dumps in root** - SQL files go in `docs/` or `migrations/` only
 4. **Config files only** - Root should only contain: `package.json`, `tsconfig.json`, `*.config.ts/js/mjs`, `.env.example`, `README.md`
+5. **TSConfig Hygiene** - Non-project legacy folders (e.g., `design-system`) MUST be explicitly excluded in `tsconfig.json` to prevent framework logic "leakage."
 
 ### Scripts Directory Structure
 ```
@@ -72,6 +73,12 @@ Or use the diagnostic endpoint: `/api/test-db`
 1. **Never pass Lucide icons** (or any React components/functions) directly from Server Components to Client Components as props. This causes "Error: functions cannot be passed directly to Client Components".
 2. **Correct Pattern:** Pass the icon as a rendered node: `icon={<Settings className="h-4 w-4" />}`.
 3. **Incorrect Pattern:** Passing the component itself: `icon={Settings}`.
+
+### Next.js 15 Framework Purity
+1. **Async Params Compliance**: `params` and `searchParams` are Promises. You MUST `await` them in Server Components/Actions.
+2. **No next/document**: Never import `Html`, `Head`, `Main`, or `NextScript` from `next/document` in the `src/app` directory. Use standard `<html>` and `<body>` tags in `layout.tsx`.
+3. **Implicit Error Handling**: Always maintain `not-found.tsx`, `error.tsx`, and `global-error.tsx` in `src/app` to capture all operational faults and prevent fallback to broken internal legacy paths.
+4. **Build Verification**: Before pushing to Vercel, always run `npm run build` locally to catch pre-render collisions.
 
 ---
 

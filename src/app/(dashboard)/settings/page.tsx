@@ -10,8 +10,7 @@ import {
     Bell,
     ShieldCheck,
     Shield,
-    Cpu,
-    Fingerprint
+    Cpu
 } from "lucide-react";
 import Link from "next/link";
 import { auth } from "@/auth";
@@ -86,7 +85,7 @@ export default async function SettingsPage() {
             title: "Auth Protocol",
             description: "Configure biometric OAuth and neural verification.",
             href: "/settings/auth",
-            icon: Fingerprint,
+            icon: Shield,
             color: "text-indigo-500",
             accent: "bg-indigo-500/10",
             border: "border-indigo-500/20"

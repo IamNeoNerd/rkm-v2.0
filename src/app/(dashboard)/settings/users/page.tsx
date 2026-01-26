@@ -1,7 +1,9 @@
 import { getUsers } from "@/actions/users";
 import { UsersTable } from "@/components/UsersTable";
-import { ShieldCheck, AlertCircle, Fingerprint } from "lucide-react";
+import { ShieldCheck, AlertCircle, Shield } from "lucide-react";
 import { GlassCard } from "@/components/modern/Card";
+
+export const dynamic = "force-dynamic";
 
 export default async function UsersPage() {
     const result = await getUsers();
@@ -19,7 +21,7 @@ export default async function UsersPage() {
                     </p>
                 </div>
                 <div className="px-4 py-2 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center gap-2">
-                    <Fingerprint className="h-4 w-4 text-indigo-600" />
+                    <Shield className="h-4 w-4 text-indigo-600" />
                     <span className="text-[10px] font-black uppercase tracking-widest text-indigo-700">Access Tier: Super-Admin</span>
                 </div>
             </div>

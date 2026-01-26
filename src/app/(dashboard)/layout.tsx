@@ -3,6 +3,8 @@ import { SkipLink } from "@/components/SkipLink"
 import { FloatingNav } from "@/components/modern/FloatingNav";
 import { TopBar } from "@/components/modern/TopBar";
 
+export const dynamic = "force-dynamic";
+
 export default function DashboardLayout({
     children,
 }: {
