@@ -52,7 +52,7 @@ export function RevenueChart({ data }: RevenueChartProps) {
                                 boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                 padding: '12px'
                             }}
-                            formatter={(value: number | string | undefined) => [`₹${Number(value || 0).toLocaleString()}`, "Revenue"]}
+                            formatter={(value: any) => [`₹${Number(value || 0).toLocaleString()}`, "Revenue"]}
                             itemStyle={{ color: 'hsl(var(--primary))', fontWeight: 700 }}
                             labelStyle={{ fontWeight: 800, marginBottom: '4px', color: 'hsl(var(--foreground))' }}
                         />

@@ -7,7 +7,6 @@ import { Input } from "@/components/modern/Input";
 import { GlassCard } from "@/components/modern/Card";
 import { toast } from "sonner";
 import { registerAdmission } from "@/actions/cashier";
-import { cn } from "@/lib/utils";
 
 export default function CashierAdmissionPage() {
     const [loading, setLoading] = useState(false);

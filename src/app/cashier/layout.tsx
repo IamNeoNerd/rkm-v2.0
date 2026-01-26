@@ -8,13 +8,11 @@ import {
     LogOut,
     Wallet,
     Bell,
-    User,
     ChevronRight,
     Sparkles
 } from "lucide-react";
 import { GlassCard } from "@/components/modern/Card";
 import { Button } from "@/components/modern/Button";
-import { cn } from "@/lib/utils";
 
 export default async function CashierLayout({
     children,

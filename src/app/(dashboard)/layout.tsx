@@ -27,11 +27,9 @@ export default function DashboardLayout({
                     role="main"
                     tabIndex={-1}
                 >
-                    <ErrorBoundary>
-                        <div className="max-w-7xl mx-auto">
-                            {children}
-                        </div>
-                    </ErrorBoundary>
+                    <div className="max-w-7xl mx-auto">
+                        {children}
+                    </div>
                 </main>
 
                 {/* Subtle Decorative Footer */}

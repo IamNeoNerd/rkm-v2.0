@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect, useRef, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import {
     Search, Users, GraduationCap, Receipt, Settings, FileText,
     UserPlus, History, ArrowRight, Command
@@ -101,9 +100,9 @@ export function CommandPalette() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogContent className="sm:max-w-xl p-0 overflow-hidden bg-transparent border-none shadow-none">
-                <GlassCard className="border-white/40 shadow-2xl backdrop-blur-3xl overflow-hidden rounded-3xl" intensity="high">
-                    <div className="flex items-center px-6 py-4 border-b border-white/10">
-                        <Search className="h-5 w-5 text-primary mr-3" strokeWidth={2.5} />
+                <GlassCard className="border-white/40 shadow-2xl backdrop-blur-3xl overflow-hidden rounded-[2.5rem]" intensity="high">
+                    <div className="flex items-center px-8 py-6 border-b border-white/10 bg-white/5 mx-2 my-2 rounded-3xl">
+                        <Search className="h-5 w-5 text-primary mr-4 animate-pulse" strokeWidth={3} />
                         <input
                             ref={inputRef}
                             value={search}
@@ -112,8 +111,8 @@ export function CommandPalette() {
                                 setSelectedIndex(0);
                             }}
                             onKeyDown={handleKeyDown}
-                            placeholder="PULSAR COMMAND... (SEARCH NODES)"
-                            className="bg-transparent border-none focus:ring-0 w-full text-xs font-black uppercase tracking-widest placeholder:text-slate-400 outline-none"
+                            placeholder="PULSAR COMMAND... (CONNECTING TO NODES)"
+                            className="bg-transparent border-none focus:ring-0 w-full text-[10px] font-black uppercase tracking-[0.2em] placeholder:text-slate-500 outline-none"
                         />
                     </div>
 
@@ -137,9 +136,9 @@ export function CommandPalette() {
                                                     key={item.href}
                                                     onClick={() => handleSelect(item.href)}
                                                     className={cn(
-                                                        "w-full flex items-center justify-between px-4 py-3 rounded-2xl transition-all duration-300",
+                                                        "w-full flex items-center justify-between px-6 py-4 rounded-3xl transition-all duration-300",
                                                         isActive
-                                                            ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                                            ? "bg-primary text-white shadow-xl shadow-primary/30 scale-[1.02] border border-white/20"
                                                             : "text-slate-600 hover:bg-white/40"
                                                     )}
                                                 >

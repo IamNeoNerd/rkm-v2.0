@@ -1,0 +1,32 @@
+
+> rk-institute-erp@0.1.0 build
+> next build
+
+ ⚠ You are using a non-standard "NODE_ENV" value in your environment. This creates inconsistencies in the project and is strongly advised against. Read more: https://nextjs.org/docs/messages/non-standard-node-env
+   ▲ Next.js 15.1.0
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Skipping validation of types
+   Skipping linting
+   Collecting page data ...
+   Generating static pages (0/37) ...
+Error: <Html> should not be imported outside of pages/_document.
+Read more: https://nextjs.org/docs/messages/no-document-import-in-page
+    at y (D:\RKM3.0\.next\server\chunks\7627.js:6:1263)
+Error occurred prerendering page "/404". Read more: https://nextjs.org/docs/messages/prerender-error
+Error: <Html> should not be imported outside of pages/_document.
+Read more: https://nextjs.org/docs/messages/no-document-import-in-page
+    at Y (D:\RKM3.0\node_modules\next\dist\compiled\next-server\pages.runtime.prod.js:16:5469)
+    at y (D:\RKM3.0\.next\server\chunks\7627.js:6:1263)
+    at react-stack-bottom-frame (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:8798:18)
+    at renderWithHooks (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:4722:19)
+    at renderElement (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5157:23)
+    at retryNode (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5805:22)
+    at renderNodeDestructive (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5631:11)
+    at renderElement (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5143:11)
+    at retryNode (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5805:22)
+    at renderNodeDestructive (D:\RKM3.0\node_modules\react-dom\cjs\react-dom-server.edge.development.js:5631:11)
+Export encountered an error on /_error: /404, exiting the build.
+ ⨯ Static worker exited with code: 1 and signal: null

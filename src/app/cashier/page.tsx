@@ -226,7 +226,7 @@ export default async function CashierDashboard() {
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-white/10">
-                                        {recentTransactions.map((tx: any) => (
+                                        {recentTransactions.map((tx: { id: number; receiptNumber?: string | null; createdAt: Date | null; amount: number }) => (
                                             <tr key={tx.id} className="group hover:bg-white/40 transition-all duration-300">
                                                 <td className="px-6 py-5">
                                                     <div className="flex items-center gap-3">

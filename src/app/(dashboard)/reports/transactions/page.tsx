@@ -19,19 +19,20 @@ interface Transaction {
 }
 
 interface TransactionPageProps {
-    searchParams: {
+    searchParams: Promise<{
         page?: string;
         search?: string;
         type?: string;
         mode?: string;
-    };
+    }>;
 }
 
 async function TransactionContent({ searchParams }: TransactionPageProps) {
-    const page = parseInt(searchParams.page || "1");
-    const search = searchParams.search || "";
-    const type = searchParams.type || "all";
-    const mode = searchParams.mode || "all";
+    const params = await searchParams;
+    const page = parseInt(params.page || "1");
+    const search = params.search || "";
+    const type = params.type || "all";
+    const mode = params.mode || "all";
 
     const { transactions, pagination } = await getRecentTransactions({
         page,

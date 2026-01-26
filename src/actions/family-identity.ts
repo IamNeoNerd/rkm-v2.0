@@ -33,7 +33,7 @@ export async function getFamilyIdentityStatus(
             return { hasIdentity: false, phone: null, hasLinkedUser: false, userName: null, error: "Family not found" };
         }
 
-        let userName: string | null = null;
+        const userName: string | null = null;
         if (family.userId) {
             const [user] = await db
                 .select({

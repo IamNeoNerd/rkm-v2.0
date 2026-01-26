@@ -6,9 +6,8 @@ import {
     SheetContent,
     SheetHeader,
     SheetTitle,
-    SheetDescription
 } from "@/components/ui/sheet";
-import { GraduationCap, Calendar, Clock, User, AlertCircle, Activity, Sparkles, ChevronRight } from "lucide-react";
+import { GraduationCap, Clock, AlertCircle, Activity, User } from "lucide-react";
 import { AttendanceCalendar } from "./AttendanceCalendar";
 import { getStudentAttendance, getStudentBatches } from "@/actions/parent";
 import { Skeleton } from "@/components/ui/skeleton";

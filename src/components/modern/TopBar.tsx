@@ -5,7 +5,6 @@ import { GlassCard } from "./Card";
 import { NotificationBell } from "@/components/NotificationBell";
 import { UserNav } from "@/components/layout/UserNav";
 import { CommandPalette } from "@/components/CommandPalette";
-import { cn } from "@/lib/utils";
 
 export function TopBar() {
     return (

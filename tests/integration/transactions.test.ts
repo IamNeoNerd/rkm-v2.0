@@ -38,7 +38,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 import { db } from '@/db';
 import { families, students, transactions, academicSessions, enrollments, feeStructures, batches, staff } from '@/db/schema';
-import { eq, count } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { processAdmission } from '@/actions/admission';
 import { processPayment } from '@/actions/billing';
 import { transitionToNewSession } from '@/actions/session';
@@ -78,14 +78,10 @@ describe('Database Transaction Integration', () => {
         expect(res.familyId).toBeDefined();
 
         // Verify DB records exist
-        const family = await db.query.families.findFirst({
-            where: eq(families.id, res.familyId)
-        });
+        const [family] = await db.select().from(families).where(eq(families.id, res.familyId)).limit(1);
         expect(family).toBeDefined();
 
-        const student = await db.query.students.findFirst({
-            where: eq(students.id, res.studentId)
-        });
+        const [student] = await db.select().from(students).where(eq(students.id, res.studentId)).limit(1);
         expect(student).toBeDefined();
     });
 
@@ -114,10 +110,7 @@ describe('Database Transaction Integration', () => {
         });
         expect(updatedFamily?.balance).toBe(initialBalance + paymentAmount);
 
-        const txn = await db.query.transactions.findFirst({
-            where: eq(transactions.familyId, familyRecord.id),
-            orderBy: (transactions: any, { desc }: any) => [desc(transactions.createdAt)]
-        });
+        const [txn] = await db.select().from(transactions).where(eq(transactions.familyId, familyRecord.id)).orderBy(desc(transactions.createdAt)).limit(1);
         expect(txn?.amount).toBe(paymentAmount);
     });
 
@@ -208,33 +201,23 @@ describe('Database Transaction Integration', () => {
             expect(res.success).toBe(true);
 
             // 6. Verify Promotions
-            const updatedStudent = await db.query.students.findFirst({
-                where: eq(students.id, testStudentId)
-            });
+            const [updatedStudent] = await db.select().from(students).where(eq(students.id, testStudentId)).limit(1);
             expect(updatedStudent?.class).toBe("Class 6");
             expect(updatedStudent?.baseFeeOverride).toBeNull();
 
             // 7. Verify Enrollments Reset
-            const enrollment = await db.query.enrollments.findFirst({
-                where: eq(enrollments.studentId, testStudentId)
-            });
+            const [enrollment] = await db.select().from(enrollments).where(eq(enrollments.studentId, testStudentId)).limit(1);
             expect(enrollment?.isActive).toBe(false);
 
             // 8. Verify Fee Structures Copied
-            const newFees = await db.query.feeStructures.findFirst({
-                where: eq(feeStructures.sessionId, nextSessionId)
-            });
+            const [newFees] = await db.select().from(feeStructures).where(eq(feeStructures.sessionId, nextSessionId)).limit(1);
             expect(newFees?.className).toBe("Class 5");
 
             // 9. Verify Session Activation
-            const sessionActive = await db.query.academicSessions.findFirst({
-                where: eq(academicSessions.id, nextSessionId)
-            });
+            const [sessionActive] = await db.select().from(academicSessions).where(eq(academicSessions.id, nextSessionId)).limit(1);
             expect(sessionActive?.isCurrent).toBe(true);
 
-            const sessionOld = await db.query.academicSessions.findFirst({
-                where: eq(academicSessions.id, currentSessionId)
-            });
+            const [sessionOld] = await db.select().from(academicSessions).where(eq(academicSessions.id, currentSessionId)).limit(1);
             expect(sessionOld?.isCurrent).toBe(false);
         }, 30000);
     });

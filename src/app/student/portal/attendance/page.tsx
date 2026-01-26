@@ -20,22 +20,32 @@ export default async function AttendancePage() {
         redirect("/");
     }
 
-    const studentData = await db.query.students.findFirst({
+    interface StudentAttendanceData {
+        id: number;
+        attendance: Array<{
+            id: number;
+            status: string;
+            date: string | Date;
+        }>;
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const studentData = (await (db as any).query.students.findFirst({
         where: eq(students.userId, session.user.id as string),
         with: {
             attendance: {
                 orderBy: [desc(attendance.date)]
             }
         }
-    });
+    })) as StudentAttendanceData | undefined;
 
     if (!studentData) {
         redirect("/student/portal");
     }
 
     // Adapt attendance records for the calendar
-    const attendanceRecords = studentData.attendance.map((a: any) => ({
-        date: a.date,
+    const attendanceRecords = studentData.attendance.map((a: { date: string | Date; status: string }) => ({
+        date: typeof a.date === 'string' ? a.date : a.date.toISOString().split('T')[0],
         status: a.status
     }));
 

@@ -184,7 +184,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                                 Active Batch Matrix
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {enrollments.map((enrollment: any) => (
+                                {enrollments.map((enrollment: { id: number; isActive: boolean; batchName: string; fee: number; schedule: string | null }) => (
                                     <GlassCard
                                         key={enrollment.id}
                                         className={cn(
@@ -227,7 +227,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                                     </div>
                                 ) : (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-1 p-2">
-                                        {attendance.map((record: any) => (
+                                        {attendance.map((record: { id: number; date: string; status: string; batchName: string }) => (
                                             <div key={record.id} className="flex items-center justify-between p-4 bg-white/20 dark:bg-slate-900/20 rounded-xl border border-white/10 dark:border-slate-800/50">
                                                 <div>
                                                     <p className="text-xs font-bold text-foreground">{format(new Date(record.date), "MMM dd, yyyy")}</p>
@@ -272,7 +272,7 @@ export default async function StudentDetailPage({ params }: { params: Promise<{ 
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-white/5 dark:divide-slate-800/50">
-                                                {transactions.slice(0, 10).map((txn: any) => (
+                                                {transactions.slice(0, 10).map((txn: { id: number; createdAt: Date; type: "CREDIT" | "DEBIT"; paymentMode: string | null; amount: number }) => (
                                                     <tr key={txn.id} className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300">
                                                         <td className="px-6 py-4 whitespace-nowrap">
                                                             <div className="flex items-center gap-2 text-xs font-bold text-foreground">

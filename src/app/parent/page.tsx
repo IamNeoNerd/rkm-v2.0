@@ -78,7 +78,7 @@ export default async function ParentPortal() {
                 balance: family.balance,
             }}
             students={childrenData}
-            transactions={transactionsData.map((t: any) => ({
+            transactions={transactionsData.map((t: { id: number; type: "CREDIT" | "DEBIT"; amount: number; description: string | null; createdAt: Date; receiptNumber: string | null; paymentMode: string | null }) => ({
                 ...t,
                 createdAt: t.createdAt!,
             }))}

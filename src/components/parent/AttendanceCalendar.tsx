@@ -38,7 +38,6 @@ export function AttendanceCalendar({ attendance }: AttendanceCalendarProps) {
     const endDate = endOfWeek(monthEnd);
 
     const dateFormat = "MMMM yyyy";
-    const rows = [];
 
     const days = eachDayOfInterval({
         start: startDate,

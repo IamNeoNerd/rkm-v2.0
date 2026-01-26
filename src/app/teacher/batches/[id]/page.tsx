@@ -1,5 +1,5 @@
 import { getTeacherBatchDetails, getBatchStudents } from "@/actions/teacher";
-import { BookOpen, AlertCircle, Users, ArrowLeft, Activity, Sparkles, GraduationCap, ChevronRight, Calculator } from "lucide-react";
+import { BookOpen, AlertCircle, Users, ArrowLeft, Activity, Sparkles, GraduationCap, Calculator } from "lucide-react";
 import Link from "next/link";
 import { GlassCard } from "@/components/modern/Card";
 import { cn } from "@/lib/utils";

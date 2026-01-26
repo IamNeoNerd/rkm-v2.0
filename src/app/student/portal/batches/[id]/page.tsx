@@ -8,9 +8,10 @@ import { BookOpen, Clock, User, Activity, ChevronLeft, MapPin, Calendar } from "
 import Link from "next/link";
 import { Button } from "@/components/modern/Button";
 
-export default async function BatchDetailPage({ params }: { params: { id: string } }) {
+export default async function BatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = await params;
     const session = await auth();
-    const batchId = parseInt(params.id);
+    const batchId = parseInt(id);
 
     if (!session?.user) {
         redirect("/login");

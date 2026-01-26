@@ -8,7 +8,6 @@ import {
     LogOut,
     GraduationCap,
     Bell,
-    User,
     ChevronRight,
     Sparkles
 } from "lucide-react";

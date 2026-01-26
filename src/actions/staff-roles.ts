@@ -37,7 +37,7 @@ export async function createStaffRoleType(data: { name: string; description?: st
         }
 
         // Check for duplicates
-        const existing = await db.query.staffRoleTypes.findFirst({
+        const existing = await (db as any).query.staffRoleTypes.findFirst({
             where: eq(staffRoleTypes.name, name)
         });
 

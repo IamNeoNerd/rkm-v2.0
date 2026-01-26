@@ -1,5 +1,5 @@
 import { getTeacherBatches } from "@/actions/teacher";
-import { BookOpen, AlertCircle, Users, Clock, ChevronRight, Activity, Sparkles } from "lucide-react";
+import { BookOpen, AlertCircle, Users, Clock, Activity } from "lucide-react";
 import Link from "next/link";
 import { GlassCard } from "@/components/modern/Card";
 import { Button } from "@/components/modern/Button";

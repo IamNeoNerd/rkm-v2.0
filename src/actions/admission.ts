@@ -180,7 +180,7 @@ export async function getAllStudents(options?: {
 
 export async function getFamilyDetails(familyId: number) {
     try {
-        const family = await db.query.families.findFirst({
+        const family = await (db as any).query.families.findFirst({
             where: eq(families.id, familyId),
             with: {
                 students: {

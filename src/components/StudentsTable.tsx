@@ -37,9 +37,9 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
     const searchParams = useSearchParams();
 
     // Get filters from URL
-    const currentSearch = searchParams.get("search") || "";
-    const classFilter = searchParams.get("class") || "all";
-    const statusFilter = searchParams.get("status") || "all";
+    const currentSearch = searchParams?.get("search") || "";
+    const classFilter = searchParams?.get("class") || "all";
+    const statusFilter = searchParams?.get("status") || "all";
 
     const [searchTerm, setSearchTerm] = useState(currentSearch);
 
@@ -54,7 +54,7 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
     useEffect(() => {
         const handler = setTimeout(() => {
             if (searchTerm !== currentSearch) {
-                const params = new URLSearchParams(searchParams.toString());
+                const params = new URLSearchParams(searchParams?.toString() || "");
                 if (searchTerm) {
                     params.set("search", searchTerm);
                 } else {
@@ -69,7 +69,7 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
     }, [searchTerm, currentSearch, router, searchParams]);
 
     const handleClassChange = (newClass: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams?.toString() || "");
         if (newClass === 'all') {
             params.delete('class');
         } else {
@@ -80,7 +80,7 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
     };
 
     const handleStatusChange = (newStatus: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(searchParams?.toString() || "");
         if (newStatus === 'all') {
             params.delete('status');
         } else {

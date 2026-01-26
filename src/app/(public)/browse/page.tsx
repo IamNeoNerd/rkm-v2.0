@@ -94,7 +94,7 @@ export default async function BrowsePage() {
                     </div>
                 ) : (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {batches.map((batch: any) => (
+                        {batches.map((batch: { id: number; name: string; fee: number; teacherName: string; schedule?: string | null }) => (
                             <div
                                 key={batch.id}
                                 className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-5 hover:border-indigo-500/50 transition-colors"
@@ -138,7 +138,7 @@ export default async function BrowsePage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-700">
-                                {feeStructures.map((fee: any) => (
+                                {feeStructures.map((fee: { id: number; className: string; monthlyFee: number; admissionFee: number }) => (
                                     <tr key={fee.id} className="hover:bg-slate-700/30">
                                         <td className="px-6 py-4 text-white font-medium">{fee.className}</td>
                                         <td className="px-6 py-4 text-right text-emerald-400 font-semibold">
@@ -167,7 +167,7 @@ export default async function BrowsePage() {
                     </div>
                 ) : (
                     <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {teachers.map((teacher: any) => (
+                        {teachers.map((teacher: { id: number; name: string }) => (
                             <div
                                 key={teacher.id}
                                 className="bg-slate-800/50 backdrop-blur border border-slate-700 rounded-xl p-4 text-center"

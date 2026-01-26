@@ -6,9 +6,7 @@ import {
     Search,
     Phone,
     CreditCard,
-    ChevronRight,
     Filter,
-    ArrowUpRight,
     MessageSquare,
     Wallet
 } from "lucide-react";
@@ -50,7 +48,7 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
-    const [searchTerm, setSearchTerm] = useState(searchParams.get("search") || "");
+    const [searchTerm, setSearchTerm] = useState(searchParams?.get("search") || "");
     const debouncedSearch = useDebounce(searchTerm, 300);
 
     // Payment Dialog State
@@ -68,8 +66,8 @@ export function FamiliesTable({ families, pagination }: FamiliesTableProps) {
 
     // Update URL when debounced search changes
     useEffect(() => {
-        const params = new URLSearchParams(searchParams.toString());
-        const currentSearch = searchParams.get("search") || "";
+        const params = new URLSearchParams(searchParams?.toString() || "");
+        const currentSearch = searchParams?.get("search") || "";
 
         if (debouncedSearch !== currentSearch) {
             if (debouncedSearch) {

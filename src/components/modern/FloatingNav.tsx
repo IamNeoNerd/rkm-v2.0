@@ -143,7 +143,7 @@ export function FloatingNav() {
                     {/* Nav Items - Scrollable Area */}
                     <nav className="flex-1 w-full px-3 space-y-2 overflow-y-auto custom-scrollbar pr-1">
                         {filteredItems.map((item) => {
-                            const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                            const isActive = pathname ? (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))) : false;
                             return (
                                 <Link
                                     key={item.href}
@@ -195,17 +195,17 @@ export function FloatingNav() {
             </div>
 
             {/* Mobile Bottom Bar: Wide Integrated Tactical Dock */}
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[95%] max-w-lg">
-                <GlassCard className="flex items-center justify-between py-2 sm:py-3 px-2 sm:px-3 border-white/20 shadow-2xl backdrop-blur-[32px] rounded-[2.5rem]" intensity="high">
+            <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[96%] max-w-2xl">
+                <GlassCard className="flex items-center justify-between py-3 sm:py-5 px-3 sm:px-8 border-white/20 shadow-2xl backdrop-blur-[40px] rounded-[3rem] sm:rounded-[3.5rem]" intensity="high">
                     {/* Back Button (Tactical End Node) */}
                     <button
                         onClick={() => router.back()}
-                        className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl sm:rounded-2xl border border-white/10 active:scale-90 transition-all group"
+                        className="p-2.5 sm:p-4 bg-white/5 hover:bg-white/10 text-primary rounded-2xl sm:rounded-3xl border border-white/10 active:scale-90 transition-all group shrink-0"
                     >
-                        <ChevronLeft strokeWidth={3} className="h-4 sm:h-5 w-4 sm:w-5 group-hover:-translate-x-0.5 transition-transform" />
+                        <ChevronLeft strokeWidth={3} className="h-4.5 sm:h-6 w-4.5 sm:w-6 group-hover:-translate-x-0.5 transition-transform" />
                     </button>
 
-                    <div className="flex items-center justify-center flex-1 mx-1 sm:mx-2 gap-1 md:gap-4">
+                    <div className="flex items-center justify-around flex-1 mx-1 sm:mx-6">
                         {filteredItems.slice(0, 4).map((item) => {
                             const isActive = pathname === item.href;
                             return (
@@ -213,13 +213,13 @@ export function FloatingNav() {
                                     key={item.href}
                                     href={item.href}
                                     className={cn(
-                                        "p-2 sm:p-3 rounded-xl sm:rounded-2xl transition-all duration-300",
+                                        "p-2.5 sm:p-4 rounded-full transition-all duration-500 relative",
                                         isActive
-                                            ? "bg-primary text-white shadow-lg shadow-primary/20 scale-110"
+                                            ? "text-primary bg-primary/20 shadow-[0_0_20px_rgba(59,130,246,0.3)] scale-110"
                                             : "text-slate-400 hover:bg-white/10 active:scale-90"
                                     )}
                                 >
-                                    <item.icon strokeWidth={2.5} className="h-4.5 sm:h-5 w-4.5 sm:w-5" />
+                                    <item.icon strokeWidth={2.5} className="h-4.5 min-[375px]:h-5 sm:h-6 w-4.5 min-[375px]:w-5 sm:w-6" />
                                 </Link>
                             );
                         })}
@@ -227,8 +227,8 @@ export function FloatingNav() {
                         {/* Mobile Menu Sheet Trigger */}
                         <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
                             <SheetTrigger asChild>
-                                <button className="p-3 text-slate-400 rounded-2xl hover:bg-white/10 active:scale-90 transition-all cursor-pointer">
-                                    <Menu strokeWidth={2.5} className="h-5 w-5" />
+                                <button className="p-2.5 sm:p-4 text-slate-400 rounded-full hover:bg-white/10 active:scale-90 transition-all cursor-pointer">
+                                    <Menu strokeWidth={2.5} className="h-4.5 min-[375px]:h-5 sm:h-6 w-4.5 min-[375px]:w-5 sm:w-6" />
                                 </button>
                             </SheetTrigger>
                             <SheetContent side="bottom" className="h-[70vh] rounded-t-[3rem] bg-background/80 backdrop-blur-[40px] border-t border-white/20 p-0 overflow-hidden">
@@ -243,7 +243,7 @@ export function FloatingNav() {
                                 {/* Mobile Navigation Grid */}
                                 <nav className="grid grid-cols-3 gap-4 p-8 overflow-y-auto max-h-[calc(70vh-160px)] custom-scrollbar">
                                     {filteredItems.map((item) => {
-                                        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+                                        const isActive = pathname ? (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))) : false;
                                         return (
                                             <Link
                                                 key={item.href}
@@ -287,9 +287,9 @@ export function FloatingNav() {
                     {/* Forward Button (Tactical End Node) */}
                     <button
                         onClick={() => router.forward()}
-                        className="p-2 sm:p-3 bg-white/5 hover:bg-white/10 text-primary rounded-xl sm:rounded-2xl border border-white/10 active:scale-90 transition-all group"
+                        className="p-2.5 sm:p-4 bg-white/5 hover:bg-white/10 text-primary rounded-2xl sm:rounded-3xl border border-white/10 active:scale-90 transition-all group shrink-0"
                     >
-                        <ChevronRight strokeWidth={3} className="h-4 sm:h-5 w-4 sm:w-5 group-hover:translate-x-0.5 transition-transform" />
+                        <ChevronRight strokeWidth={3} className="h-4.5 sm:h-6 w-4.5 sm:w-6 group-hover:translate-x-0.5 transition-transform" />
                     </button>
                 </GlassCard>
             </div>

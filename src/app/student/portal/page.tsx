@@ -30,8 +30,31 @@ export default async function StudentPortal() {
         redirect("/");
     }
 
+    interface StudentPortalData {
+        id: number;
+        name: string | null;
+        class: string;
+        enrollments: Array<{
+            isActive: boolean;
+            batch: {
+                id: number;
+                name: string;
+                schedule: string | null;
+                fee: number;
+                teacherId: number | null;
+                isActive: boolean;
+            } | null;
+        }>;
+        attendance: Array<{
+            id: number;
+            status: string;
+            date: string | Date;
+        }>;
+    }
+
     // Fetch student specific data
-    const studentData = await db.query.students.findFirst({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const studentData = (await (db as any).query.students.findFirst({
         where: eq(students.userId, session.user.id as string),
         with: {
             enrollments: {
@@ -41,7 +64,7 @@ export default async function StudentPortal() {
             },
             attendance: true
         }
-    });
+    })) as StudentPortalData | undefined;
 
     if (!studentData) {
         return (
@@ -59,11 +82,14 @@ export default async function StudentPortal() {
     }
 
     const { name, class: className, attendance: attendanceRecords } = studentData;
-    const activeBatches = studentData.enrollments.filter((e: any) => e.isActive).map((e: any) => e.batch);
+    const activeBatches = studentData.enrollments
+        .filter((e: { isActive: boolean }) => e.isActive)
+        .map((e: { batch: { id: number; name: string; schedule: string | null; fee: number; teacherId: number | null; isActive: boolean } | null }) => e.batch)
+        .filter((b: { id: number; name: string; schedule: string | null; fee: number; teacherId: number | null; isActive: boolean } | null): b is NonNullable<typeof b> => b !== null);
 
     // Calculate real attendance stats
     const totalAttendance = attendanceRecords.length;
-    const presentAttendance = attendanceRecords.filter((a: any) => a.status === 'Present' || a.status === 'Late').length;
+    const presentAttendance = attendanceRecords.filter((a: { status: string }) => a.status === 'Present' || a.status === 'Late').length;
     const attendancePercentage = totalAttendance > 0
         ? Math.round((presentAttendance / totalAttendance) * 100)
         : 100;
@@ -155,7 +181,7 @@ export default async function StudentPortal() {
                     </h2>
 
                     <div className="grid gap-4 sm:grid-cols-2">
-                        {activeBatches.length > 0 ? activeBatches.map((batch: any) => (
+                        {activeBatches.length > 0 ? activeBatches.map((batch: { id: number; name: string; schedule?: string | null }) => (
                             <GlassCard key={batch.id} className="p-6 group hover:border-primary/50 transition-all duration-500 relative overflow-hidden" intensity="medium">
                                 <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors" />
                                 <div className="flex justify-between items-start mb-4">

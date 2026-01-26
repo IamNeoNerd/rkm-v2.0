@@ -21,7 +21,7 @@ type AttendanceRecord = {
 
 export default function AttendanceMarkingPage() {
     const params = useParams();
-    const batchId = parseInt(params.id as string);
+    const batchId = parseInt((params?.id as string) || "0");
 
     const [batchName, setBatchName] = useState("");
     const [students, setStudents] = useState<Student[]>([]);
@@ -218,10 +218,10 @@ export default function AttendanceMarkingPage() {
                                 <button
                                     onClick={() => toggleStatus(student.id)}
                                     className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-colors ${status === "Present"
-                                            ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
-                                            : status === "Absent"
-                                                ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
-                                                : "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
+                                        ? "bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30"
+                                        : status === "Absent"
+                                            ? "bg-red-500/20 text-red-400 hover:bg-red-500/30"
+                                            : "bg-amber-500/20 text-amber-400 hover:bg-amber-500/30"
                                         }`}
                                 >
                                     {status === "Present" && <Check className="h-4 w-4" />}

@@ -21,7 +21,6 @@ import {
     TrendingUp,
     Shield,
     Bell,
-    Key,
     User
 } from "lucide-react"
 import { signOut, useSession } from "next-auth/react"
@@ -217,9 +216,9 @@ export function Sidebar({ className }: SidebarProps) {
     const renderNavItem = (item: SidebarNavItem, isChild = false) => {
         const hasChildren = item.children && item.children.length > 0
         const isExpanded = expandedGroups.includes(item.title)
-        const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+        const isActive = pathname ? (pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))) : false
         const isChildActive = hasChildren && item.children?.some(
-            child => pathname === child.href || (child.href !== '/' && pathname.startsWith(child.href))
+            child => pathname ? (pathname === child.href || (child.href !== '/' && pathname.startsWith(child.href))) : false
         )
 
         if (hasChildren) {

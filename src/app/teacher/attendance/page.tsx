@@ -60,7 +60,7 @@ export default async function TeacherAttendancePage() {
                     </GlassCard>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {batches.filter((b: any) => b.isActive).map((batch: any) => (
+                        {batches.filter((b: { isActive: boolean }) => b.isActive).map((batch: { id: number; name: string; schedule?: string | null }) => (
                             <Link
                                 key={batch.id}
                                 href={`/teacher/batches/${batch.id}/attendance`}

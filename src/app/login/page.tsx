@@ -16,8 +16,8 @@ type LoginTab = "admin" | "parent" | "staff" | "student";
 function LoginFormContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
-    const callbackUrl = searchParams.get("callbackUrl") || "/";
-    const error = searchParams.get("error");
+    const callbackUrl = searchParams?.get("callbackUrl") || "/";
+    const error = searchParams?.get("error");
 
     const [activeTab, setActiveTab] = useState<LoginTab>("admin");
 

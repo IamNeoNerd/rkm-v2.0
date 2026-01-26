@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, use } from "react"
 import { Calendar, User, BookOpen, Clock, AlertCircle, CheckCircle2 } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -37,7 +37,8 @@ const MOCK_STUDENT = {
     ]
 }
 
-export default function StudentProfilePage({ params: _params }: { params: { id: string } }) {
+export default function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     // Unwrapping params is not strictly needed for this mock implementation but good practice in Next 15+
     // mocked anyway
 

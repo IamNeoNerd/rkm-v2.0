@@ -5,13 +5,14 @@ import { NotificationSettings } from "@/components/notifications/NotificationSet
 import { TableSkeleton } from "@/components/ui/skeletons";
 
 interface NotificationPageProps {
-    searchParams: {
+    searchParams: Promise<{
         page?: string;
-    };
+    }>;
 }
 
 async function NotificationContent({ searchParams }: NotificationPageProps) {
-    const page = parseInt(searchParams.page || "1");
+    const params = await searchParams;
+    const page = parseInt(params.page || "1");
 
     const res = await getUserNotifications({
         page,

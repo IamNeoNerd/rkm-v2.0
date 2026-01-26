@@ -12,7 +12,6 @@ import {
     CreditCard,
     CheckCircle2,
     ExternalLink,
-    Filter,
     ArrowRight
 } from "lucide-react";
 import { format } from "date-fns";
@@ -66,7 +65,7 @@ export function NotificationSettings({ notifications, pagination, unreadCount }:
             } else {
                 toast.error(res.error || "Failed to update notifications");
             }
-        } catch (error) {
+        } catch {
             toast.error("An error occurred");
         } finally {
             setIsUpdating(false);
@@ -108,7 +107,7 @@ export function NotificationSettings({ notifications, pagination, unreadCount }:
             } else {
                 toast.error(res.error || "Failed to clear history");
             }
-        } catch (error) {
+        } catch {
             toast.error("An error occurred");
         } finally {
             setIsUpdating(false);
