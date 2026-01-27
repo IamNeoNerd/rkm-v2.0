@@ -53,3 +53,6 @@ yarn-error.log*
 
 # === Agent Knowledge (Local Only) ===
 .agent/knowledge/
+
+# === Credentials ===
+credentials.md
