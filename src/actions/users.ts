@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq, ne, sql } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { audit, AuditAction } from "@/lib/logger";
 import { auth } from "@/auth";
 import { safeRevalidatePath } from "@/lib/server-utils";
@@ -25,7 +25,8 @@ export async function getUsers() {
         }).from(users);
 
         // Serialize dates for SSR compatibility
-        const serializedUsers = userList.map((u: any) => ({
+        type UserRow = typeof userList[number];
+        const serializedUsers = userList.map((u: UserRow) => ({
             ...u,
             createdAt: u.createdAt?.toISOString() || null,
         }));

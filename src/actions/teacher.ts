@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { users, staff, batches, enrollments, students, attendance } from "@/db/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { auth } from "@/auth";
 import { audit, AuditAction } from "@/lib/logger";
 import { safeRevalidatePath } from "@/lib/server-utils";

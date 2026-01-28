@@ -37,6 +37,7 @@ export async function createStaffRoleType(data: { name: string; description?: st
         }
 
         // Check for duplicates
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const existing = await (db as any).query.staffRoleTypes.findFirst({
             where: eq(staffRoleTypes.name, name)
         });

@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { systemSettings } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { inArray } from "drizzle-orm";
 import { requireRole, AuthorizationError } from "@/lib/auth-guard";
 import { safeRevalidatePath } from "@/lib/server-utils";
 
@@ -36,8 +36,9 @@ export async function getAuthSettings(): Promise<{ success: true; settings: Auth
             .from(systemSettings)
             .where(inArray(systemSettings.key, keys));
 
+        type SettingRow = typeof results[number];
         const settingsMap = new Map();
-        results.forEach((row: any) => settingsMap.set(row.key, row.value));
+        results.forEach((row: SettingRow) => settingsMap.set(row.key, row.value));
 
         const settings: AuthSettings = {
             googleEnabled: settingsMap.has("auth_google_enabled") ? settingsMap.get("auth_google_enabled") === "true" : DEFAULT_SETTINGS.googleEnabled,
@@ -69,7 +70,7 @@ export async function updateAuthSettings(settings: AuthSettings): Promise<{ succ
         ];
 
         // Drizzle doesn't support bulk upsert nicely across all drivers, doing one by one or transaction
-        await db.transaction(async (tx: any) => {
+        await db.transaction(async (tx) => {
             for (const item of valuesToUpsert) {
                 await tx
                     .insert(systemSettings)

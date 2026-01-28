@@ -19,7 +19,8 @@ export default async function StaffPage() {
     const { staff } = await getAllStaff();
 
     // Map staff to the component's expected format
-    const formattedStaff = (staff || []).map((s: any) => ({
+    type StaffMember = NonNullable<typeof staff>[number];
+    const formattedStaff = (staff || []).map((s: StaffMember) => ({
         ...s,
         createdAt: s.createdAt || null
     }));

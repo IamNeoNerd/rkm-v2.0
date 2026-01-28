@@ -96,7 +96,8 @@ export async function getStudentAttendance(studentId: number, month?: number, ye
         const records = await query;
 
         // Basic filtering if month/year are provided
-        const filtered = records.filter((r: any) => {
+        type RecordRow = typeof records[number];
+        const filtered = records.filter((r: RecordRow) => {
             const d = new Date(r.date);
             if (month !== undefined && d.getMonth() !== month) return false;
             if (year !== undefined && d.getFullYear() !== year) return false;

@@ -1,10 +1,10 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { batches, staff, enrollments, students } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { batches, enrollments, students } from "@/db/schema";
+import { eq } from "drizzle-orm";
 import { GlassCard } from "@/components/modern/Card";
-import { BookOpen, Clock, User, Activity, ChevronLeft, MapPin, Calendar } from "lucide-react";
+import { Clock, User, Activity, ChevronLeft, MapPin, Calendar } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/modern/Button";
 

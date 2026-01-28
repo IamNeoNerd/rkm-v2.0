@@ -90,7 +90,7 @@ export function NotificationSettings({ notifications, pagination, unreadCount }:
                 toast.success("Notification deleted");
                 router.refresh();
             }
-        } catch (error) {
+        } catch {
             toast.error("Failed to delete notification");
         }
     };

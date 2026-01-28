@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Plus, User, Phone, Mail, Shield, UserCog, IndianRupee, Zap, X } from "lucide-react";
+import { Plus, User, Shield, IndianRupee, Zap } from "lucide-react";
 import { createStaff, StaffRole } from "@/actions/staff";
 import { getStaffRoleTypes } from "@/actions/staff-roles";
 import { Button } from "@/components/ui/button";
@@ -16,8 +16,6 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { GlassCard } from "@/components/modern/Card";
-import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 
 interface CustomRoleType {

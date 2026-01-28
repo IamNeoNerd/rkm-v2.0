@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Bell, Check, CheckCheck, X, Loader2 } from "lucide-react";
+import { Bell, CheckCheck, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     getUserNotifications,

@@ -15,7 +15,6 @@ import { Loader2, Trash2, Key, UserCheck, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { updateUserRole, deleteUser, verifyUser, resetUserPassword } from "@/actions/users";
 import { useSession } from "next-auth/react";
-import { cn } from "@/lib/utils";
 
 interface User {
     id: string;

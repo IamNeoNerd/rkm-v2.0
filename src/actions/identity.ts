@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { students, users } from "@/db/schema";
-import { eq, sql, and, isNull } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 

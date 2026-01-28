@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getStudentById, getFamilyFeeHistory, getStudentEnrollments, getStudentAttendance } from "@/actions/student";
-import { Users, Phone, GraduationCap, Home, ArrowLeft, Receipt, Calendar, CreditCard, Wallet, Clock, Activity } from "lucide-react";
+import { Users, GraduationCap, ArrowLeft, Receipt, Calendar, Wallet, Clock, Activity } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/modern/Button";
 import { GlassCard } from "@/components/modern/Card";

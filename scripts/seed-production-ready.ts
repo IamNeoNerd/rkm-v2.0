@@ -16,14 +16,15 @@ import { db } from "../src/db";
 import {
     families, students, staff, batches, enrollments,
     transactions, attendance, academicSessions, feeStructures,
-    auditLogs, systemSettings, users, staffRoleTypes, notifications
+    auditLogs, systemSettings, staffRoleTypes, notifications
 } from "../src/db/schema";
 import { eq, sql } from "drizzle-orm";
-import { subDays, format, startOfMonth, endOfMonth, differenceInDays, addDays, subMonths } from "date-fns";
+import { subDays, format, startOfMonth, endOfMonth, differenceInDays, addDays } from "date-fns";
 
 const log = (msg: string) => console.log(`[SEED] ${msg}`);
 const success = (msg: string) => console.log(`[✅] ${msg}`);
-const warn = (msg: string) => console.log(`[⚠️] ${msg}`);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const _warn = (msg: string) => console.log(`[⚠️] ${msg}`);
 
 // =====================
 // REALISTIC DATA - EXPANDED
@@ -100,7 +101,7 @@ async function main() {
         });
 
         // ACADEMIC SESSIONS
-        const [prevSession, currentSession] = await db.insert(academicSessions).values([
+        const [, currentSession] = await db.insert(academicSessions).values([
             { name: "2024-25", startDate: "2024-04-01", endDate: "2025-03-31", isCurrent: false },
             { name: "2025-26", startDate: "2025-04-01", endDate: "2026-03-31", isCurrent: true },
         ]).returning();

@@ -4,7 +4,7 @@
  * Custom device configurations for mobile and tablet testing in Chrome.
  */
 
-import { Page, BrowserContext } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 /**
  * Common viewport sizes for responsive testing

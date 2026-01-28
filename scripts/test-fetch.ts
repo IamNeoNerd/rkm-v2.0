@@ -18,7 +18,8 @@ async function testFetch() {
 
     try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _timeoutId = setTimeout(() => controller.abort(), 5000);
 
         const response = await fetch(httpsUrl, {
             method: 'HEAD',

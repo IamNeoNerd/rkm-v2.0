@@ -54,11 +54,12 @@ export async function getPublicBrowseInfo() {
             .from(feeStructures)
             .where(eq(feeStructures.isActive, true));
 
+        type BatchRow = typeof batchList[number];
         return {
             success: true,
             data: {
                 currentSession: currentSession?.name || "Not Set",
-                batches: batchList.map((b: any) => ({
+                batches: batchList.map((b: BatchRow) => ({
                     id: b.id,
                     name: b.name,
                     schedule: b.schedule,

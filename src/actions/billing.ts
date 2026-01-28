@@ -46,8 +46,9 @@ async function getStandardFeeForClass(className: string): Promise<number> {
             .where(eq(feeStructures.isActive, true));
 
         // Build cache
+        type StructureRow = typeof structures[number];
         feeStructureCache = new Map();
-        structures.forEach((s: any) => {
+        structures.forEach((s: StructureRow) => {
             feeStructureCache!.set(s.className, s.monthlyFee);
         });
 
@@ -70,16 +71,18 @@ export async function calculateTotalDue(familyId: string) {
         .from(students)
         .where(eq(students.familyId, parseInt(familyId))); // Assuming familyId is string but needs int parshing or schema uses serial which is int
 
-    const activeStudents = familyStudents.filter((s: any) => s.isActive);
+    type StudentRow = typeof familyStudents[number];
+    const activeStudents = familyStudents.filter((s: StudentRow) => s.isActive);
 
     if (activeStudents.length === 0) {
         return 0;
     }
 
-    const studentIds = activeStudents.map((s: any) => s.id);
+    const studentIds = activeStudents.map((s: StudentRow) => s.id);
 
     // 2. Fetch all active batch enrollments for these students
-    const studentEnrollments = await db
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _studentEnrollments = await db
         .select({
             studentId: enrollments.studentId,
             batchFee: batches.fee,
@@ -118,9 +121,10 @@ export async function calculateTotalDue(familyId: string) {
         }
 
         // Batch Fees for this student
+        type EnrollmentRow = typeof activeEnrollments[number];
         const studentBatchFees = activeEnrollments
-            .filter((e: any) => e.studentId === student.id)
-            .reduce((sum: number, e: any) => sum + e.batchFee, 0);
+            .filter((e: EnrollmentRow) => e.studentId === student.id)
+            .reduce((sum: number, e: EnrollmentRow) => sum + e.batchFee, 0);
 
         totalDue += baseFee + studentBatchFees;
     }
@@ -154,7 +158,7 @@ export async function processPayment(data: { familyId: string; studentId?: strin
         const { generateReceiptNumber } = await import('@/lib/receipt-generator');
         const receiptNumber = await generateReceiptNumber();
 
-        const result = await db.transaction(async (tx: any) => {
+        const result = await db.transaction(async (tx) => {
             // Step A: Insert transaction with audit trail
             await tx.insert(transactions).values({
                 type: 'CREDIT',
@@ -342,11 +346,13 @@ export async function searchFamilies(query: string) {
         // Combine and deduplicate
         const familyMap = new Map();
 
-        matchingFamilies.forEach((f: any) => {
+        type MatchingFamilyRow = typeof matchingFamilies[number];
+        matchingFamilies.forEach((f: MatchingFamilyRow) => {
             familyMap.set(f.id, { ...f, matchedBy: 'family' });
         });
 
-        matchingByStudent.forEach((f: any) => {
+        type MatchingByStudentRow = typeof matchingByStudent[number];
+        matchingByStudent.forEach((f: MatchingByStudentRow) => {
             if (!familyMap.has(f.id)) {
                 familyMap.set(f.id, {
                     id: f.id,

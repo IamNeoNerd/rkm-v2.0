@@ -39,7 +39,6 @@ export function EditFamilyDialog({
 
     // Status flags
     const [hasLinkedUser, setHasLinkedUser] = useState(false);
-    const [userName, setUserName] = useState<string | null>(null);
 
     // Fetch current identity status on open
     useEffect(() => {
@@ -49,7 +48,6 @@ export function EditFamilyDialog({
                 setPasskey("");
                 getFamilyIdentityStatus(familyId).then((status) => {
                     setHasLinkedUser(status.hasLinkedUser);
-                    setUserName(status.userName);
                     if (status.displayPassword) {
                         setExistingPassword(status.displayPassword);
                     }

@@ -8,7 +8,6 @@ import { OverviewChart } from "@/components/dashboard/OverviewChart";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { TeacherLoadChart, BatchActivityChart, SettlementMaturityChart, EngagementLeaderboard } from "@/components/dashboard/InstitutionalCharts";
 import { RecentActivity } from "@/components/dashboard/RecentActivity";
-import { DashboardClient } from "@/components/dashboard/DashboardClient";
 import { DashboardSkeleton } from "@/components/ui/skeletons";
 import { Button } from "@/components/modern/Button";
 
@@ -36,7 +35,7 @@ interface ChartItem {
 
 async function DashboardContent() {
   // Fetch all data in parallel on the server
-  const [families, metricsData, activityData, admissionChartData, revenueChartData, teacherLoadData, batchActivityData, settlementModeData, leaderboardData] = await Promise.all([
+  const [, metricsData, activityData, admissionChartData, revenueChartData, teacherLoadData, batchActivityData, settlementModeData, leaderboardData] = await Promise.all([
     getDashboardData(),
     getDashboardMetrics(),
     getRecentActivity(),

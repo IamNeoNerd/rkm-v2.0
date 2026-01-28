@@ -28,7 +28,7 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
     const [submitting, setSubmitting] = useState(false);
     const [batchSearch, setBatchSearch] = useState("");
 
-    const filteredBatches = batches.filter((b: any) =>
+    const filteredBatches = batches.filter((b: Batch) =>
         b.name.toLowerCase().includes(batchSearch.toLowerCase()) ||
         (b.schedule && b.schedule.toLowerCase().includes(batchSearch.toLowerCase()))
     );
@@ -39,7 +39,7 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
         setStudents(enrolled);
         // Initialize all as Present by default
         const initial: Record<number, AttendanceStatus> = {};
-        enrolled.forEach((s: any) => {
+        enrolled.forEach((s: Student) => {
             initial[s.studentId] = "Present";
         });
         setAttendance(initial);
@@ -53,7 +53,8 @@ export default function AttendanceClient({ batches }: { batches: Batch[] }) {
         );
         if (existing.length > 0) {
             const attendanceMap: Record<number, AttendanceStatus> = {};
-            existing.forEach((a: any) => {
+            type ExistingRecord = typeof existing[number];
+            existing.forEach((a: ExistingRecord) => {
                 attendanceMap[a.studentId] = a.status as AttendanceStatus;
             });
             setAttendance(prev => ({ ...prev, ...attendanceMap }));

@@ -59,7 +59,8 @@ export async function getAllFamilies(options: {
             .offset(offset);
 
         // Fetch students for these families to show in the table
-        const familyIds = results.map((f: any) => f.id);
+        type ResultRow = typeof results[number];
+        const familyIds = results.map((f: ResultRow) => f.id);
         const children = familyIds.length > 0
             ? await db.select({
                 id: students.id,
@@ -71,9 +72,10 @@ export async function getAllFamilies(options: {
                 .where(sql`${students.familyId} IN (${sql.join(familyIds, sql`, `)})`)
             : [];
 
-        const familiesWithChildren = results.map((f: any) => ({
+        type ChildRow = typeof children[number];
+        const familiesWithChildren = results.map((f: ResultRow) => ({
             ...f,
-            children: children.filter((c: any) => c.familyId === f.id)
+            children: children.filter((c: ChildRow) => c.familyId === f.id)
         }));
 
         // Get total count for pagination

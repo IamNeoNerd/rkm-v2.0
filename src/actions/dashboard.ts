@@ -14,23 +14,25 @@ export async function getDashboardData() {
     const allStudents = await db.select().from(students);
 
     // 3. Group students by familyId for efficient lookup
-    const studentsByFamilyId = allStudents.reduce((acc: Record<string, any[]>, student: any) => {
+    type StudentRow = typeof allStudents[number];
+    const studentsByFamilyId = allStudents.reduce((acc, student) => {
         if (!student.familyId) return acc;
         const fid = student.familyId.toString();
         if (!acc[fid]) acc[fid] = [];
         acc[fid].push(student);
         return acc;
-    }, {} as Record<string, any[]>);
+    }, {} as Record<string, StudentRow[]>);
 
     // 4. Map families to the required frontend format
-    const familiesWithChildren = allFamilies.map((f: any) => {
+    type FamilyRow = typeof allFamilies[number];
+    const familiesWithChildren = allFamilies.map((f: FamilyRow) => {
         const children = studentsByFamilyId[f.id.toString()] || [];
         return {
             id: f.id.toString(),
             father_name: f.fatherName,
             phone: f.phone,
             total_due: f.balance,
-            children: children.map((c: any) => ({
+            children: children.map((c) => ({
                 id: c.id.toString(),
                 name: c.name,
                 class: c.class,
@@ -150,9 +152,11 @@ export async function getRecentActivity() {
         .limit(5);
 
     // Combine and sort
+    type RecentStudentRow = typeof recentStudents[number];
+    type RecentTransactionRow = typeof recentTransactions[number];
     const combined = [
-        ...recentStudents.map((s: any) => ({ ...s, studentName: null })),
-        ...recentTransactions.map((t: any) => ({
+        ...recentStudents.map((s: RecentStudentRow) => ({ ...s, studentName: null })),
+        ...recentTransactions.map((t: RecentTransactionRow) => ({
             ...t,
             name: t.studentName ? `${t.studentName} (${t.name})` : t.name
         }))
@@ -189,7 +193,8 @@ export async function getAdmissionsChartData() {
         monthCounts[key] = 0;
     }
 
-    allStudents.forEach((s: any) => {
+    type StudentCreatedRow = typeof allStudents[number];
+    allStudents.forEach((s: StudentCreatedRow) => {
         if (!s.createdAt) return;
         const d = new Date(s.createdAt);
         const key = `${months[d.getMonth()]}`;
@@ -228,7 +233,8 @@ export async function getRevenueChartData() {
         monthRevenue[key] = 0;
     }
 
-    allPayments.forEach((p: any) => {
+    type PaymentRow = typeof allPayments[number];
+    allPayments.forEach((p: PaymentRow) => {
         if (!p.createdAt) return;
         const d = new Date(p.createdAt);
         const key = `${months[d.getMonth()]}`;
@@ -254,7 +260,8 @@ export async function getTeacherLoadData() {
         .groupBy(staff.name)
         .orderBy(desc(count(batches.id)));
 
-    return result.map((r: any) => ({ name: r.name, total: Number(r.count) }));
+    type TeacherLoadRow = typeof result[number];
+    return result.map((r: TeacherLoadRow) => ({ name: r.name, total: Number(r.count) }));
 }
 
 export async function getBatchActivityData() {
@@ -270,7 +277,8 @@ export async function getBatchActivityData() {
         .groupBy(batches.id)
         .orderBy(desc(count(enrollments.studentId)));
 
-    return result.map((r: any) => ({ name: r.name, total: Number(r.count) }));
+    type BatchActivityRow = typeof result[number];
+    return result.map((r: BatchActivityRow) => ({ name: r.name, total: Number(r.count) }));
 }
 
 export async function getSettlementModeData() {
@@ -285,7 +293,8 @@ export async function getSettlementModeData() {
         .where(eq(transactions.type, 'CREDIT'))
         .groupBy(transactions.paymentMode);
 
-    return result.map((r: any) => ({
+    type SettlementRow = typeof result[number];
+    return result.map((r: SettlementRow) => ({
         name: r.name || 'OTHER',
         value: Number(r.total || 0)
     }));
@@ -343,8 +352,9 @@ export async function getTeacherDashboardMetrics() {
                 gte(attendance.createdAt, thirtyDaysAgo)
             ));
 
+        type AttendanceRow = typeof attendanceData[number];
         const totalAttendancePoints = attendanceData.length;
-        const presentCount = attendanceData.filter((a: any) => a.status === 'Present').length;
+        const presentCount = attendanceData.filter((a: AttendanceRow) => a.status === 'Present').length;
         const performance = totalAttendancePoints > 0
             ? Math.round((presentCount / totalAttendancePoints) * 100)
             : 100; // Default to 100 if no sessions
@@ -359,7 +369,7 @@ export async function getTeacherDashboardMetrics() {
             }
         };
 
-    } catch (error) {
+    } catch {
         return { success: false, error: "Failed to fetch teacher metrics" };
     }
 }
@@ -383,5 +393,6 @@ export async function getAttendanceLeaderboard() {
         .orderBy(desc(sql`ROUND((COUNT(CASE WHEN ${attendance.status} = 'Present' THEN 1 END) * 100.0) / COUNT(${attendance.id}))`))
         .limit(10);
 
-    return result.map((r: any) => ({ name: r.name, total: Number(r.attendanceRate) }));
+    type LeaderboardRow = typeof result[number];
+    return result.map((r: LeaderboardRow) => ({ name: r.name, total: Number(r.attendanceRate) }));
 }

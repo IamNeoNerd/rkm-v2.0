@@ -5,9 +5,8 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { toast } from "sonner";
-import { Loader2, Save, Shield, ShieldCheck, Globe, Key, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Loader2, Shield, ShieldCheck, Globe, AlertCircle, CheckCircle2 } from "lucide-react";
 import { getAuthSettings, updateAuthSettings, AuthSettings } from "@/actions/auth-settings";
-import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 
 import { Button } from "@/components/modern/Button";
 import { Input } from "@/components/modern/Input";
@@ -22,7 +21,6 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Switch } from "@/components/ui/switch";
-import { cn } from "@/lib/utils";
 
 const authFormSchema = z.object({
     googleEnabled: z.boolean(),

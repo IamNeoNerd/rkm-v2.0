@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/modern/Button";
 import { GlassCard } from "@/components/modern/Card";
 import {
@@ -76,9 +76,10 @@ export default function FinancialDashboardPage() {
 
     useEffect(() => {
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    async function loadData() {
+    const loadData = useCallback(async () => {
         setLoading(true);
         try {
             const [plResult, batchResult, statsResult] = await Promise.all([
@@ -101,20 +102,20 @@ export default function FinancialDashboardPage() {
             if (statsResult.success && statsResult.stats) {
                 setQuickStats(statsResult.stats);
             }
-        } catch (error) {
+        } catch {
             toast.error("Failed to load financial data");
         } finally {
             setLoading(false);
         }
-    }
+    }, []);
 
-    const formatCurrency = (amount: number) => {
+    const formatCurrency = useCallback((amount: number) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
             maximumFractionDigits: 0,
         }).format(amount);
-    };
+    }, []);
 
     if (loading) {
         return (

@@ -20,12 +20,11 @@ import {
     GraduationCap,
     Settings,
     AlertCircle,
-    Zap,
     Cpu,
     ArrowRight,
     type LucideIcon
 } from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format } from "date-fns";
 import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
 import { GlassCard } from "@/components/modern/Card";
 import { cn } from "@/lib/utils";

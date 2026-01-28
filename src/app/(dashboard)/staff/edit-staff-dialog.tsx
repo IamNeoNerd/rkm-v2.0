@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { User, Phone, Mail, Shield, IndianRupee, Zap, Edit3, Save, KeyRound, Eye, EyeOff } from "lucide-react";
+import { User, Shield, IndianRupee, Zap, Edit3, Save, KeyRound, Eye, EyeOff } from "lucide-react";
 import { updateStaff, StaffRole, getStaffIdentityStatus } from "@/actions/staff";
 import { getStaffRoleTypes } from "@/actions/staff-roles";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,6 @@ interface EditStaffDialogProps {
 export function EditStaffDialog({ staff }: EditStaffDialogProps) {
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [fetchingIdentity, setFetchingIdentity] = useState(false);
     const [customRoleTypes, setCustomRoleTypes] = useState<CustomRoleType[]>([]);
     const [showPassword, setShowPassword] = useState(false);
     const [showExisting, setShowExisting] = useState(false);
@@ -65,12 +64,10 @@ export function EditStaffDialog({ staff }: EditStaffDialogProps) {
         if (open) {
             const timer = setTimeout(() => {
                 loadRoleTypes();
-                setFetchingIdentity(true);
                 getStaffIdentityStatus(staff.id).then(res => {
                     if (res.success && res.displayPassword) {
                         setExistingPassword(res.displayPassword);
                     }
-                    setFetchingIdentity(false);
                 });
             }, 0);
             return () => clearTimeout(timer);

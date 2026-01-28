@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { IndianRupee, Search, Users, Wallet, Receipt, Loader2, ArrowRight, User, Phone, Activity, Sparkles, Smartphone, CheckCircle2 } from "lucide-react";
+import { IndianRupee, Users, Wallet, Loader2, ArrowRight, User, Phone, Activity, Smartphone, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/modern/Button";
 import { Input } from "@/components/modern/Input";
 import { GlassCard } from "@/components/modern/Card";

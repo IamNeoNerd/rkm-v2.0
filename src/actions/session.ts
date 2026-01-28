@@ -1,10 +1,10 @@
 'use server';
 
 import { db } from "@/db";
-import { academicSessions, enrollments, students, feeStructures, families, transactions } from "@/db/schema";
+import { academicSessions, enrollments, students, feeStructures } from "@/db/schema";
 import { eq, sql, and, desc, count } from "drizzle-orm";
 import { safeRevalidatePath } from "@/lib/server-utils";
-import { requireRole, AuthorizationError, requireAuth } from "@/lib/auth-guard";
+import { requireRole, AuthorizationError } from "@/lib/auth-guard";
 import { audit, AuditAction, logger } from "@/lib/logger";
 
 // ============================================
@@ -42,7 +42,7 @@ export async function createSession(data: CreateSessionData) {
             return { success: false, error: `Session "${name}" already exists` };
         }
 
-        const newSession = await db.transaction(async (tx: any) => {
+        const newSession = await db.transaction(async (tx) => {
             if (isCurrent) {
                 await tx.update(academicSessions).set({ isCurrent: false });
             }
@@ -134,7 +134,7 @@ export async function activateSession(sessionId: number) {
         }
 
         // Deactivate all sessions and activate the selected one
-        await db.transaction(async (tx: any) => {
+        await db.transaction(async (tx) => {
             // Deactivate all
             await tx
                 .update(academicSessions)
@@ -174,7 +174,8 @@ export interface TransitionOptions {
     copyFeeStructures: boolean;  // Copy fee structures to new session
 }
 
-export async function getTransitionPreview(newSessionId: number) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function getTransitionPreview(_newSessionId: number) {
     try {
         await requireRole(['super-admin']);
 
@@ -261,7 +262,7 @@ export async function transitionToNewSession(
             changes: {},
         };
 
-        await db.transaction(async (tx: any) => {
+        await db.transaction(async (tx) => {
             // 1. Promote students to next class
             if (options.promoteStudents) {
                 const classProgression: Record<string, string> = {
@@ -314,7 +315,7 @@ export async function transitionToNewSession(
 
             // 2. Reset batch enrollments
             if (options.resetEnrollments) {
-                const result = await tx
+                await tx
                     .update(enrollments)
                     .set({ isActive: false });
                 transitionReport.changes.enrollmentsReset = true;

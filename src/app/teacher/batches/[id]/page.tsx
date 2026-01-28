@@ -107,6 +107,7 @@ export default async function TeacherBatchDetailPage({
                     </GlassCard>
                 ) : (
                     <div className="grid gap-4">
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {students.map((student: any) => (
                             <GlassCard
                                 key={student.id}

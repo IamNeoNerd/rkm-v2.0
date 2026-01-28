@@ -5,7 +5,7 @@ import { getDuesAgingReport } from "@/actions/reports";
 import { AlertTriangle, Clock, TrendingDown, Users, Download, Phone, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { exportToCSV, formatDateForExport } from "@/lib/export-utils";
+import { exportToCSV } from "@/lib/export-utils";
 
 type AgingBucket = '0-30' | '31-60' | '61-90' | '90+';
 

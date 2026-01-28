@@ -7,9 +7,8 @@ import { Input } from "@/components/modern/Input";
 import { Label } from "@/components/ui/label";
 import { GlassCard } from "@/components/modern/Card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, IndianRupee, GraduationCap, Coins, Settings2, Save, Trash, X } from "lucide-react";
+import { Plus, Pencil, Trash2, GraduationCap, Coins, Settings2 } from "lucide-react";
 import { toast } from "sonner";
-import { cn } from "@/lib/utils";
 
 interface FeeStructure {
     id: number;

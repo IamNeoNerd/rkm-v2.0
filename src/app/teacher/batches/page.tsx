@@ -54,6 +54,7 @@ export default async function TeacherBatchesPage() {
                 </GlassCard>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                     {batches.map((batch: any) => (
                         <GlassCard
                             key={batch.id}

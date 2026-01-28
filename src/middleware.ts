@@ -1,6 +1,10 @@
-import { auth } from "@/auth";
+import NextAuth from "next-auth";
+import authConfig from "@/auth.config";
 import { NextResponse } from "next/server";
 import { type FeatureKey } from "@/lib/permissions";
+
+// Use edge-compatible auth config (without bcrypt/adapter)
+const { auth } = NextAuth(authConfig);
 
 export default auth((req) => {
     const { nextUrl } = req;

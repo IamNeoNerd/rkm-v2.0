@@ -1,7 +1,5 @@
-import { GraduationCap, Bell, User, LogOut, Sparkles } from "lucide-react";
+import { GraduationCap, Bell, LogOut } from "lucide-react";
 import { GlassCard } from "@/components/modern/Card";
-import { Button } from "@/components/modern/Button";
-import { cn } from "@/lib/utils";
 
 /**
  * Guardian Portal - Premium Layout

@@ -15,7 +15,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { GlassCard } from "@/components/modern/Card";
-import { cn } from "@/lib/utils";
 
 export default async function CashierDashboard() {
     // Get today's date range

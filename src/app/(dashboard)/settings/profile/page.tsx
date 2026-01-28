@@ -5,11 +5,10 @@ import { changePassword } from "@/actions/user";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { KeyRound, Eye, EyeOff, ShieldCheck, Zap, Lock, Unlock } from "lucide-react";
+import { KeyRound, Eye, EyeOff, ShieldCheck, Zap, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/modern/Card";
 import { SettingsPageLayout } from "@/components/settings/SettingsPageLayout";
-import { cn } from "@/lib/utils";
 
 export default function ProfileSettingsPage() {
     const [loading, setLoading] = useState(false);

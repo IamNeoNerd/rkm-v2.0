@@ -33,6 +33,7 @@ export default function AttendanceMarkingPage() {
 
     useEffect(() => {
         loadData();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [batchId, date]);
 
     async function loadData() {
@@ -74,7 +75,7 @@ export default function AttendanceMarkingPage() {
 
                 setAttendance(existingAttendance);
             }
-        } catch (err) {
+        } catch {
             setError("Failed to load data");
         } finally {
             setLoading(false);

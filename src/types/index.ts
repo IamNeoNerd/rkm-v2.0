@@ -1,15 +1,11 @@
-export type Student = {
-    id: string;
-    name: string;
-    class: string;
-    status: 'ACTIVE' | 'ARCHIVED';
-    balance_status: 'CLEAR' | 'DUE';
-};
+/**
+ * Re-export all types for convenient importing
+ * 
+ * Usage: import { Student, Family, Transaction } from '@/types';
+ */
 
-export type Family = {
-    id: string;
-    father_name: string;
-    phone: string;
-    total_due: number; // Negative means they owe money
-    children: Student[];
-};
+// Export all database types
+export * from '@/db/types';
+
+// Legacy types (kept for backward compatibility)
+// These were the original manual types - now replaced by Drizzle-inferred types

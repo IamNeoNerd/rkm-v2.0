@@ -121,13 +121,15 @@ export const ariaProps = {
         tabIndex: -1,
     }),
 
-    dialog: (title: string) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    dialog: (_title: string) => ({
         role: 'dialog' as const,
         'aria-modal': true,
         'aria-labelledby': `dialog-title-${generateId()}`,
     }),
 
-    alert: (message: string) => ({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    alert: (_message: string) => ({
         role: 'alert' as const,
         'aria-live': 'assertive' as const,
         'aria-atomic': true,

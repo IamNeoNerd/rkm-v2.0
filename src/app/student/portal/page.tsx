@@ -1,7 +1,6 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import {
-    GraduationCap,
     Calendar,
     Clock,
     BookOpen,
@@ -16,7 +15,7 @@ import { GlassCard } from "@/components/modern/Card";
 import { Button } from "@/components/modern/Button";
 import Link from "next/link";
 import { db } from "@/db";
-import { students, enrollments, batches } from "@/db/schema";
+import { students } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export default async function StudentPortal() {

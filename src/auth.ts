@@ -7,6 +7,7 @@ import { users, staff, students, families } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getAuthSettingsInternal, isDomainAllowed } from "@/lib/auth-settings-helper";
 import { getAllPermissionsForRole, type FeatureKey, type PermissionCheck } from "@/lib/permissions";
+import { logger } from "@/lib/logger";
 
 declare module "next-auth" {
     interface Session {
@@ -69,7 +70,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             },
             async authorize(credentials) {
                 const identifier = (credentials?.identifier as string || "").trim();
-                console.log(`[AUTH] Authorize session_start // Node: ${identifier}`);
+                logger.debug('auth.authorize.start', { identifier });
 
                 try {
                     // Check if credentials login is enabled
@@ -89,7 +90,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     let user;
 
                     if (isStudentId) {
-                        console.log(`[AUTH] Protocol: Mapping STUDENT_ID node: ${identifier}`);
+                        logger.debug('auth.mapping', { type: 'STUDENT_ID', identifier });
                         const [studentResult] = await db
                             .select({
                                 id: users.id,
@@ -106,7 +107,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
                         user = studentResult;
                     } else if (isPhone) {
-                        console.log(`[AUTH] Protocol: Mapping PHONE_NODE: ${identifier}`);
+                        logger.debug('auth.mapping', { type: 'PHONE', identifier });
                         [user] = await db
                             .select()
                             .from(users)
@@ -114,7 +115,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             .limit(1);
 
                         if (!user) {
-                            console.log(`[AUTH] User node not found for phone, checking FAMILY_NODE mapping`);
+                            logger.debug('auth.mapping', { type: 'FAMILY_FALLBACK', identifier });
                             const [parentResult] = await db
                                 .select({
                                     id: users.id,
@@ -132,7 +133,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             user = parentResult;
                         }
                     } else {
-                        console.log(`[AUTH] Protocol: Mapping EMAIL_NODE: ${identifier}`);
+                        logger.debug('auth.mapping', { type: 'EMAIL', identifier });
                         [user] = await db
                             .select()
                             .from(users)
@@ -161,7 +162,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                         throw new Error("Account not verified. Please contact super-admin.");
                     }
 
-                    console.log(`[AUTH] SUCCESS: Authorization granted // Node: ${identifier} // Role: ${user.role}`);
+                    logger.debug('auth.success', { identifier, role: user.role });
 
                     // Fetch granular permissions
                     const permissions = await getAllPermissionsForRole(user.role);
@@ -185,7 +186,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     ],
     callbacks: {
         async signIn({ user, account }) {
-            console.log("[AUTH] SignIn callback", { provider: account?.provider, email: user.email });
+            logger.debug('auth.signIn', { provider: account?.provider, email: user.email });
             // Check provider-specific settings
             if (account?.provider === "google") {
                 const settings = await getAuthSettingsInternal();
@@ -229,7 +230,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         async jwt({ token, user, trigger, session }) {
             // Log only on significant events to keep logs clean
             if (user) {
-                console.log("[AUTH] JWT callback (initial login)", { email: user.email, role: user.role });
+                logger.debug('auth.jwt.login', { email: user.email, role: user.role });
                 token.id = user.id;
                 token.role = user.role;
                 token.isVerified = user.isVerified;
@@ -237,7 +238,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             }
 
             if (trigger === "update" && session) {
-                console.log("[AUTH] JWT callback (manual update)", { newRole: session.user?.role });
+                logger.debug('auth.jwt.update', { newRole: session.user?.role });
                 return { ...token, ...session.user };
             }
 

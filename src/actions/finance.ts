@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { transactions, batches, enrollments, students, families, staff, feeStructures } from "@/db/schema";
-import { eq, sql, sum, count, and, desc, gte, lte } from "drizzle-orm";
+import { eq, sql, sum, count, and, gte, lte } from "drizzle-orm";
 import { requireAuth, requireRole, AuthorizationError } from "@/lib/auth-guard";
 import { logger } from "@/lib/logger";
 
@@ -81,7 +81,9 @@ export async function getBatchWiseRevenue() {
         const familyStudents = new Map<number, number[]>();
 
         // Initialize profiles
-        allEnrollments.forEach((e: any) => {
+        type EnrollmentRow = typeof allEnrollments[number];
+        type BatchRow = typeof allBatches[number];
+        allEnrollments.forEach((e: EnrollmentRow) => {
             if (!studentFeeProfile.has(e.studentId)) {
                 const classFee = e.baseFeeOverride !== null ? e.baseFeeOverride : (baseFeeMap.get(e.className) || 0);
                 studentFeeProfile.set(e.studentId, {
@@ -96,7 +98,7 @@ export async function getBatchWiseRevenue() {
             }
 
             const profile = studentFeeProfile.get(e.studentId)!;
-            const batch = allBatches.find((b: any) => b.id === e.batchId);
+            const batch = allBatches.find((b: BatchRow) => b.id === e.batchId);
             if (batch) {
                 profile.batches.set(batch.id, batch.fee);
                 profile.total += batch.fee;
@@ -105,9 +107,10 @@ export async function getBatchWiseRevenue() {
 
         // 6. Distribute revenue
         const batchCollections = new Map<number, number>();
-        allBatches.forEach((b: any) => batchCollections.set(b.id, 0));
+        allBatches.forEach((b: BatchRow) => batchCollections.set(b.id, 0));
 
-        feeTransactions.forEach((txn: any) => {
+        type TransactionRow = typeof feeTransactions[number];
+        feeTransactions.forEach((txn: TransactionRow) => {
             const amount = Number(txn.amount);
 
             if (txn.studentId && studentFeeProfile.has(txn.studentId)) {
@@ -140,8 +143,8 @@ export async function getBatchWiseRevenue() {
         });
 
         // 7. Compile results
-        const results: BatchRevenueData[] = allBatches.map((batch: any) => {
-            const activeEnrollments = allEnrollments.filter((e: any) => e.batchId === batch.id).length;
+        const results: BatchRevenueData[] = allBatches.map((batch: BatchRow) => {
+            const activeEnrollments = allEnrollments.filter((e: EnrollmentRow) => e.batchId === batch.id).length;
             const collected = Math.round(batchCollections.get(batch.id) || 0);
             return {
                 batchId: batch.id,
@@ -236,16 +239,19 @@ export async function getStaffSalaryReport(options?: {
             .where(and(...conditions))
             .groupBy(transactions.staffId);
 
+        type SalaryPaymentRow = typeof salaryPayments[number];
         const paymentMap = new Map(
-            salaryPayments.map((p: any) => [p.staffId, {
+            salaryPayments.map((p: SalaryPaymentRow) => [p.staffId, {
                 totalPaid: Number(p.totalPaid) || 0,
                 paymentCount: p.paymentCount,
                 lastPayment: p.lastPayment ? new Date(p.lastPayment) : null,
             }])
         );
 
-        const results: StaffSalaryData[] = staffList.map((s: any) => {
-            const payments: any = paymentMap.get(s.id) || { totalPaid: 0, paymentCount: 0, lastPayment: null };
+        type StaffRow = typeof staffList[number];
+        type PaymentInfo = { totalPaid: number; paymentCount: number; lastPayment: Date | null };
+        const results: StaffSalaryData[] = staffList.map((s: StaffRow) => {
+            const payments: PaymentInfo = paymentMap.get(s.id) || { totalPaid: 0, paymentCount: 0, lastPayment: null };
             return {
                 staffId: s.id,
                 name: s.name,
@@ -324,9 +330,10 @@ export async function getExpenseReport(options?: {
             .where(and(...conditions))
             .groupBy(transactions.category);
 
-        const totalExpenses = expenses.reduce((sum: number, e: any) => sum + (Number(e.totalAmount) || 0), 0);
+        type ExpenseRow = typeof expenses[number];
+        const totalExpenses = expenses.reduce((sum: number, e: ExpenseRow) => sum + (Number(e.totalAmount) || 0), 0);
 
-        const results: ExpenseCategory[] = expenses.map((e: any) => ({
+        const results: ExpenseCategory[] = expenses.map((e: ExpenseRow) => ({
             category: e.category,
             totalAmount: Number(e.totalAmount) || 0,
             transactionCount: e.transactionCount,
@@ -351,10 +358,12 @@ export async function getExpenseReport(options?: {
             ))
             .groupBy(transactions.expenseHead);
 
+        type ExpenseHeadRow = typeof expenseHeads[number];
+
         return {
             success: true,
             categories: results.sort((a, b) => b.totalAmount - a.totalAmount),
-            expenseHeads: expenseHeads.map((e: any) => ({
+            expenseHeads: expenseHeads.map((e: ExpenseHeadRow) => ({
                 head: e.expenseHead || 'Uncategorized',
                 amount: Number(e.totalAmount) || 0,
                 count: e.transactionCount,
@@ -500,7 +509,9 @@ export async function getProfitLossSummary(options?: {
             }
         }
 
-        const monthlyBreakdown = Array.from(monthlyPL.entries()).map(([month, data]: [string, any]) => ({
+        interface MonthlyPLData { name: string; revenue: number; salary: number; expenses: number }
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const monthlyBreakdown = Array.from(monthlyPL.entries()).map(([_month, data]: [string, MonthlyPLData]) => ({
             period: data.name,
             revenue: data.revenue,
             salaryExpense: data.salary,

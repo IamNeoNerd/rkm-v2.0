@@ -4,7 +4,7 @@
  * Validates complex business logic and metrics using the realistic dataset.
  */
 
-import { test, expect, waitForPageLoad, navigateTo } from './fixtures';
+import { test, expect, navigateTo } from './fixtures';
 
 test.describe('Dashboard Operations', () => {
     test('should display meaningful revenue and student metrics', async ({ authenticatedPage: page }) => {

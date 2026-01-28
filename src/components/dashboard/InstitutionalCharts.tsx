@@ -11,9 +11,7 @@ import {
     ResponsiveContainer,
     Cell,
     PieChart,
-    Pie,
-    AreaChart,
-    Area
+    Pie
 } from "recharts";
 import { cn } from "@/lib/utils";
 

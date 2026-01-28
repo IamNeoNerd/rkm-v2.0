@@ -38,7 +38,8 @@ async function verify() {
     try {
         console.log("Connecting via HTTPS...");
         const sql = neon(url);
-        const db = drizzle(sql);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const _db = drizzle(sql);
 
         // Simple query
         const result = await sql`SELECT 1 as connection_test`;

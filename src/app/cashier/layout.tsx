@@ -12,7 +12,6 @@ import {
     Sparkles
 } from "lucide-react";
 import { GlassCard } from "@/components/modern/Card";
-import { Button } from "@/components/modern/Button";
 
 export default async function CashierLayout({
     children,

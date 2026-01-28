@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, use } from "react"
-import { Calendar, User, BookOpen, Clock, AlertCircle, CheckCircle2 } from "lucide-react"
+import { use } from "react"
+import { Calendar, User, BookOpen } from "lucide-react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -38,8 +38,8 @@ const MOCK_STUDENT = {
 }
 
 export default function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = use(params);
-    // Unwrapping params is not strictly needed for this mock implementation but good practice in Next 15+
+    // Unwrap params using React.use(), id is used for future API calls
+    use(params);
     // mocked anyway
 
     return (

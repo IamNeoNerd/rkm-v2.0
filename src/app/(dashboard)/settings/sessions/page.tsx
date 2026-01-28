@@ -7,5 +7,6 @@ export default async function SessionsSettingsPage() {
     const result = await getAllSessions();
     const sessions = result.success && result.sessions ? result.sessions : [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return <SessionsClient initialSessions={sessions as any} />;
 }

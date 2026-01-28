@@ -1,14 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { GraduationCap, Users, Clock, DollarSign, Plus, ArrowRight, ExternalLink } from "lucide-react";
+import { GraduationCap, Users, Clock, DollarSign, Plus, ExternalLink } from "lucide-react";
 import { Button } from "@/components/modern/Button";
 import { Input } from "@/components/modern/Input";
 import { GlassCard } from "@/components/modern/Card";
 import { createBatch, enrollStudentInBatch } from "@/actions/academics";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import { cn } from "@/lib/utils";
 import Link from "next/link";
 
 type Teacher = { id: number; name: string; role: string };

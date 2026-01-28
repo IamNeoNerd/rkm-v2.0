@@ -6,9 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/modern/Button";
 import { Input } from "@/components/modern/Input";
 import { GlassCard } from "@/components/modern/Card";
-import { LogIn, Loader2, Phone, User, Shield, GraduationCap, ArrowRight, Github } from "lucide-react";
+import { LogIn, Loader2, Phone, User, Shield, GraduationCap, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
-import { lookupFamilyByPhone } from "@/actions/parent";
 import { cn } from "@/lib/utils";
 
 type LoginTab = "admin" | "parent" | "staff" | "student";
@@ -25,12 +24,6 @@ function LoginFormContent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
-
-    // Parent login state
-    const [phone, setPhone] = useState("");
-
-    // Student login state
-    const [studentId, setStudentId] = useState("");
 
     // Handle auth errors
     useEffect(() => {
@@ -67,31 +60,6 @@ function LoginFormContent() {
             console.error("Login error:", error);
             toast.error("An unexpected error occurred");
             setIsLoading(false);
-        }
-    };
-
-    const handleParentSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        if (phone.length !== 10) {
-            toast.error("Please enter a valid 10-digit phone number");
-            return;
-        }
-
-        setIsLoading(true);
-        const result = await lookupFamilyByPhone(phone);
-        setIsLoading(false);
-
-        if (result.error) {
-            toast.error(result.error);
-            return;
-        }
-
-        if (result.family) {
-            sessionStorage.setItem("parentFamilyId", result.family.id.toString());
-            sessionStorage.setItem("parentFamilyName", result.family.fatherName);
-            toast.success(`Welcome back, ${result.family.fatherName}!`);
-            router.push(`/parent?phone=${phone}`);
         }
     };
 

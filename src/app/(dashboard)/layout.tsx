@@ -1,4 +1,3 @@
-import { ErrorBoundary } from "@/components/ErrorBoundary"
 import { SkipLink } from "@/components/SkipLink"
 import { FloatingNav } from "@/components/modern/FloatingNav";
 import { TopBar } from "@/components/modern/TopBar";

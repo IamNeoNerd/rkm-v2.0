@@ -11,7 +11,8 @@ export const metadata: Metadata = {
 
 export const runtime = 'nodejs';
 
-// export const dynamic = "force-dynamic";
+// Force dynamic rendering to prevent static generation issues with SessionProvider
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import { Users, Phone, GraduationCap, Filter, X, IndianRupee, Search, MessageSquare } from "lucide-react";
 import { PaginationControls } from "@/components/PaginationControls";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { Input } from "@/components/modern/Input";
 import { QuickPaymentDialog } from "@/components/QuickPaymentDialog";
 import { useRouter, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 type Student = {
     id: number;
@@ -31,6 +32,148 @@ interface StudentsTableProps {
         totalPages: number;
     };
 }
+
+// Memoized Mobile Card Component - only re-renders when student data changes
+const StudentMobileCard = memo(function StudentMobileCard({
+    student,
+    onPayClick
+}: {
+    student: Student;
+    onPayClick: (student: Student) => void;
+}) {
+    return (
+        <div className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/20 dark:border-slate-700/50">
+            <div className="flex items-start justify-between mb-3">
+                <Link href={`/students/${student.id}`} className="flex items-center gap-3 flex-1">
+                    <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm border border-primary/20">
+                        {student.name.substring(0, 2).toUpperCase()}
+                    </div>
+                    <div>
+                        <p className="text-sm font-bold text-foreground">{student.name}</p>
+                        <div className="flex items-center gap-2 mt-0.5">
+                            <GraduationCap className="h-3 w-3 text-primary opacity-60" />
+                            <span className="text-xs font-bold text-muted-foreground">{student.class}</span>
+                        </div>
+                    </div>
+                </Link>
+                <span
+                    className={cn(
+                        "px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full border",
+                        student.isActive
+                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                            : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                    )}
+                >
+                    {student.isActive ? "Active" : "Dormant"}
+                </span>
+            </div>
+            <div className="flex items-center justify-between pt-3 border-t border-white/10 dark:border-slate-700/50">
+                <div className="flex gap-4">
+                    <div className="space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Guardian</p>
+                        <p className="text-xs font-bold text-foreground">{student.fatherName || "N/A"}</p>
+                    </div>
+                    <div className="space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Contact</p>
+                        <p className="text-xs font-bold text-muted-foreground">{student.phone || "---"}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => toast.info("Reminder system coming soon")}
+                        className="p-2 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-white/20"
+                    >
+                        <MessageSquare className="h-4 w-4" />
+                    </button>
+                    <Button
+                        size="sm"
+                        variant="glass"
+                        className="text-primary hover:bg-primary hover:text-white border-primary/20"
+                        onClick={() => onPayClick(student)}
+                    >
+                        <IndianRupee className="h-3.5 w-3.5 mr-1" />
+                        Pay
+                    </Button>
+                </div>
+            </div>
+        </div>
+    );
+});
+
+// Memoized Desktop Table Row Component - only re-renders when student data changes
+const StudentTableRow = memo(function StudentTableRow({
+    student,
+    onPayClick
+}: {
+    student: Student;
+    onPayClick: (student: Student) => void;
+}) {
+    return (
+        <tr className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 group">
+            <td className="px-6 py-4 whitespace-nowrap">
+                <Link href={`/students/${student.id}`} className="block">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20 group-hover:scale-110 transition-transform">
+                            {student.name.substring(0, 2).toUpperCase()}
+                        </div>
+                        <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
+                            {student.name}
+                        </div>
+                    </div>
+                </Link>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                    <GraduationCap className="h-4 w-4 text-primary opacity-60" />
+                    {student.class}
+                </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
+                {student.fatherName || "N/A"}
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+                    <Phone className="h-3.5 w-3.5 opacity-40" />
+                    {student.phone || "N/A"}
+                </div>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap">
+                <span
+                    className={cn(
+                        "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border",
+                        student.isActive
+                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
+                            : "bg-slate-500/10 text-slate-500 border-slate-500/20"
+                    )}
+                >
+                    {student.isActive ? "Active" : "Dormant"}
+                </span>
+            </td>
+            <td className="px-6 py-4 whitespace-nowrap text-right">
+                <div className="flex items-center justify-end gap-2">
+                    <button
+                        onClick={() => toast.info("Reminder system coming soon")}
+                        className="p-2.5 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-transparent hover:border-white/40"
+                        title="Push Notification"
+                    >
+                        <MessageSquare className="h-4 w-4" />
+                    </button>
+                    <Button
+                        size="sm"
+                        variant="glass"
+                        className="text-primary hover:bg-primary hover:text-white border-primary/20"
+                        onClick={() => onPayClick(student)}
+                    >
+                        <IndianRupee className="h-3.5 w-3.5 mr-2" />
+                        Collect
+                    </Button>
+                </div>
+            </td>
+        </tr>
+    );
+});
+
+
 
 export function StudentsTable({ students, pagination }: StudentsTableProps) {
     const router = useRouter();
@@ -98,10 +241,11 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
         router.push(window.location.pathname);
     };
 
-    const handlePayClick = (student: Student) => {
+    // Memoized handler for payment dialog - stable reference for memoized children
+    const handlePayClick = useCallback((student: Student) => {
         setSelectedStudent(student);
         setPaymentOpen(true);
-    };
+    }, []);
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -212,64 +356,11 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                         {/* Mobile Card Layout */}
                         <div className="md:hidden space-y-3 p-4">
                             {filteredStudents.map((student) => (
-                                <div
+                                <StudentMobileCard
                                     key={student.id}
-                                    className="bg-white/40 dark:bg-slate-800/40 rounded-2xl p-4 border border-white/20 dark:border-slate-700/50"
-                                >
-                                    <div className="flex items-start justify-between mb-3">
-                                        <Link href={`/students/${student.id}`} className="flex items-center gap-3 flex-1">
-                                            <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-sm border border-primary/20">
-                                                {student.name.substring(0, 2).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <p className="text-sm font-bold text-foreground">{student.name}</p>
-                                                <div className="flex items-center gap-2 mt-0.5">
-                                                    <GraduationCap className="h-3 w-3 text-primary opacity-60" />
-                                                    <span className="text-xs font-bold text-muted-foreground">{student.class}</span>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                        <span
-                                            className={cn(
-                                                "px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-full border",
-                                                student.isActive
-                                                    ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                                    : "bg-slate-500/10 text-slate-500 border-slate-500/20"
-                                            )}
-                                        >
-                                            {student.isActive ? "Active" : "Dormant"}
-                                        </span>
-                                    </div>
-                                    <div className="flex items-center justify-between pt-3 border-t border-white/10 dark:border-slate-700/50">
-                                        <div className="flex gap-4">
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Guardian</p>
-                                                <p className="text-xs font-bold text-foreground">{student.fatherName || "N/A"}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-[0.2em]">Contact</p>
-                                                <p className="text-xs font-bold text-muted-foreground">{student.phone || "---"}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                onClick={() => import("sonner").then(m => m.toast.info("Reminder system coming in Phase 4"))}
-                                                className="p-2 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-white/20"
-                                            >
-                                                <MessageSquare className="h-4 w-4" />
-                                            </button>
-                                            <Button
-                                                size="sm"
-                                                variant="glass"
-                                                className="text-primary hover:bg-primary hover:text-white border-primary/20"
-                                                onClick={() => handlePayClick(student)}
-                                            >
-                                                <IndianRupee className="h-3.5 w-3.5 mr-1" />
-                                                Pay
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
+                                    student={student}
+                                    onPayClick={handlePayClick}
+                                />
                             ))}
                         </div>
 
@@ -288,67 +379,11 @@ export function StudentsTable({ students, pagination }: StudentsTableProps) {
                                 </thead>
                                 <tbody className="divide-y divide-white/5 dark:divide-slate-800/50">
                                     {filteredStudents.map((student) => (
-                                        <tr key={student.id} className="hover:bg-white/40 dark:hover:bg-slate-800/40 transition-all duration-300 group">
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <Link href={`/students/${student.id}`} className="block">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black text-xs border border-primary/20 group-hover:scale-110 transition-transform">
-                                                            {student.name.substring(0, 2).toUpperCase()}
-                                                        </div>
-                                                        <div className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                                                            {student.name}
-                                                        </div>
-                                                    </div>
-                                                </Link>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-                                                    <GraduationCap className="h-4 w-4 text-primary opacity-60" />
-                                                    {student.class}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-xs font-bold text-muted-foreground">
-                                                {student.fatherName || "N/A"}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-                                                    <Phone className="h-3.5 w-3.5 opacity-40" />
-                                                    {student.phone || "N/A"}
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span
-                                                    className={cn(
-                                                        "px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-full border",
-                                                        student.isActive
-                                                            ? "bg-emerald-500/10 text-emerald-500 border-emerald-500/20"
-                                                            : "bg-slate-500/10 text-slate-500 border-slate-500/20"
-                                                    )}
-                                                >
-                                                    {student.isActive ? "Active" : "Dormant"}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-right">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <button
-                                                        onClick={() => import("sonner").then(m => m.toast.info("Reminder system coming in Phase 4"))}
-                                                        className="p-2.5 text-muted-foreground hover:text-primary hover:bg-white/60 dark:hover:bg-slate-800/60 rounded-xl transition-all border border-transparent hover:border-white/40"
-                                                        title="Push Notification"
-                                                    >
-                                                        <MessageSquare className="h-4 w-4" />
-                                                    </button>
-                                                    <Button
-                                                        size="sm"
-                                                        variant="glass"
-                                                        className="text-primary hover:bg-primary hover:text-white border-primary/20"
-                                                        onClick={() => handlePayClick(student)}
-                                                    >
-                                                        <IndianRupee className="h-3.5 w-3.5 mr-2" />
-                                                        Collect
-                                                    </Button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                        <StudentTableRow
+                                            key={student.id}
+                                            student={student}
+                                            onPayClick={handlePayClick}
+                                        />
                                     ))}
                                 </tbody>
                             </table>

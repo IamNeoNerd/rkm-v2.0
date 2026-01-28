@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import { notifications, users, families, students } from "@/db/schema";
-import { eq, desc, and, count, sql, lte } from "drizzle-orm";
+import { notifications, users, families } from "@/db/schema";
+import { eq, desc, and, count, sql } from "drizzle-orm";
 import { auth } from "@/auth";
 import { logger } from "@/lib/logger";
 
@@ -147,7 +147,8 @@ export async function getUserNotifications(options?: {
 
         const total = Number(totalResult?.count || 0);
 
-        const parsedNotifications: Notification[] = results.map((n: any) => ({
+        type NotificationRow = typeof results[number];
+        const parsedNotifications: Notification[] = results.map((n: NotificationRow) => ({
             ...n,
             data: n.data ? JSON.parse(n.data) : null,
         }));
@@ -254,13 +255,15 @@ export async function sendFeeReminders() {
             .from(users)
             .where(eq(users.role, 'admin'));
 
+        type FamilyDueRow = typeof familiesWithDue[number];
         if (admins.length > 0) {
-            const adminIds = admins.map((a: any) => a.id);
+            type AdminRow = typeof admins[number];
+            const adminIds = admins.map((a: AdminRow) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "FEE_REMINDER",
                 "Outstanding Dues Report",
-                `${familiesWithDue.length} families have outstanding fees totaling ₹${Math.abs(familiesWithDue.reduce((sum: number, f: any) => sum + f.balance, 0))
+                `${familiesWithDue.length} families have outstanding fees totaling ₹${Math.abs(familiesWithDue.reduce((sum: number, f: FamilyDueRow) => sum + f.balance, 0))
                 }`,
                 { familyCount: familiesWithDue.length }
             );
@@ -269,7 +272,7 @@ export async function sendFeeReminders() {
         return {
             success: true,
             familiesNotified: familiesWithDue.length,
-            totalDue: Math.abs(familiesWithDue.reduce((sum: number, f: any) => sum + f.balance, 0))
+            totalDue: Math.abs(familiesWithDue.reduce((sum: number, f: FamilyDueRow) => sum + f.balance, 0))
         };
     } catch (error) {
         logger.error("Failed to send fee reminders", error);
@@ -293,7 +296,8 @@ export async function notifyPaymentReceived(
             .where(sql`${users.role} IN ('admin', 'super-admin')`);
 
         if (admins.length > 0) {
-            const adminIds = admins.map((a: any) => a.id);
+            type AdminRow = typeof admins[number];
+            const adminIds = admins.map((a: AdminRow) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "PAYMENT_RECEIVED",
@@ -326,7 +330,8 @@ export async function notifyAttendanceAlert(
             .where(sql`${users.role} IN ('admin', 'super-admin')`);
 
         if (admins.length > 0) {
-            const adminIds = admins.map((a: any) => a.id);
+            type AdminRow = typeof admins[number];
+            const adminIds = admins.map((a: AdminRow) => a.id);
             await createBulkNotifications(
                 adminIds,
                 "ATTENDANCE_ALERT",
@@ -359,7 +364,8 @@ export async function sendSystemNotification(
             .where(eq(users.isVerified, true));
 
         if (allUsers.length > 0) {
-            const userIds = allUsers.map((u: any) => u.id);
+            type UserRow = typeof allUsers[number];
+            const userIds = allUsers.map((u: UserRow) => u.id);
             await createBulkNotifications(
                 userIds,
                 "SYSTEM_ALERT",

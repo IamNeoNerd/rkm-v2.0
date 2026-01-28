@@ -1,8 +1,7 @@
 import { getTeacherBatches } from "@/actions/teacher";
-import { Calendar, AlertCircle, BookOpen, Clock, Activity, ArrowRight, Sparkles } from "lucide-react";
+import { AlertCircle, BookOpen, Activity, ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { GlassCard } from "@/components/modern/Card";
-import { cn } from "@/lib/utils";
 
 export default async function TeacherAttendancePage() {
     const result = await getTeacherBatches();

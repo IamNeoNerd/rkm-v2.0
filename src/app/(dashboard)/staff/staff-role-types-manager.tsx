@@ -4,10 +4,9 @@ import { useState, useEffect, useCallback } from "react";
 import { getStaffRoleTypes, createStaffRoleType, deleteStaffRoleType } from "@/actions/staff-roles";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, X, Shield, Cpu, Tag, Trash2, Zap, Hash } from "lucide-react";
+import { Plus, X, Shield, Cpu, Tag, Trash2, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { GlassCard } from "@/components/modern/Card";
-import { cn } from "@/lib/utils";
 
 interface RoleType {
     id: number;

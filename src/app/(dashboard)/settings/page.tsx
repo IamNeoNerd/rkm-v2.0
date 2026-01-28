@@ -1,7 +1,5 @@
 import {
     Users,
-    Settings as SettingsIcon,
-    Database,
     Key,
     ChevronRight,
     IndianRupee,

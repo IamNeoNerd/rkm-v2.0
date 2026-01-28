@@ -34,7 +34,7 @@ export async function processAdmission(data: AdmissionData) {
             initialPayment: data.initialPayment,
         };
 
-        const result = await db.transaction(async (tx: any) => {
+        const result = await db.transaction(async (tx) => {
             // 1. Check or Create Family
             let familyId: number;
             const existingFamily = await tx.query.families.findFirst({
@@ -180,6 +180,7 @@ export async function getAllStudents(options?: {
 
 export async function getFamilyDetails(familyId: number) {
     try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const family = await (db as any).query.families.findFirst({
             where: eq(families.id, familyId),
             with: {

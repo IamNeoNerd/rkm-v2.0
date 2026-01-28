@@ -2,7 +2,7 @@
 
 import { db } from "@/db";
 import { students, families, transactions, enrollments, batches, attendance } from "@/db/schema";
-import { eq, sql, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 
 // Get student by ID with family info
 export async function getStudentById(id: number) {

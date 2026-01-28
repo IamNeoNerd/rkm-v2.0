@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { families, students, transactions } from "@/db/schema";
+import { families, transactions } from "@/db/schema";
 import { eq, sum, and, sql, desc, count } from "drizzle-orm";
 import { auth } from "@/auth";
 
@@ -18,17 +18,20 @@ export async function getPendingDues() {
         status: families.status,
     }).from(families);
 
-    const duesReport = allFamilies.map((f: any) => ({
+    type FamilyRow = typeof allFamilies[number];
+    const duesReport = allFamilies.map((f: FamilyRow) => ({
         ...f,
         outstanding: f.balance < 0 ? Math.abs(f.balance) : 0
-    })).filter((f: any) => f.outstanding > 0);
+    }));
+    type DuesReportRow = typeof duesReport[number];
+    const filteredReport = duesReport.filter((f: DuesReportRow) => f.outstanding > 0);
 
-    const totalOutstanding = duesReport.reduce((acc: number, curr: any) => acc + curr.outstanding, 0);
+    const totalOutstanding = filteredReport.reduce((acc: number, curr: DuesReportRow) => acc + curr.outstanding, 0);
 
     return {
-        duesReport,
+        duesReport: filteredReport,
         totalOutstanding,
-        familyCount: duesReport.length
+        familyCount: filteredReport.length
     };
 }
 
@@ -85,13 +88,15 @@ export async function getDuesAgingReport() {
         .where(eq(transactions.type, 'CREDIT'))
         .groupBy(transactions.familyId);
 
+    type LastPaymentRow = typeof lastPayments[number];
     const lastPaymentMap = new Map(
-        lastPayments.map((p: any) => [p.familyId, p.lastPayment])
+        lastPayments.map((p: LastPaymentRow) => [p.familyId, p.lastPayment])
     );
 
     const now = new Date();
 
-    const report = familiesWithDue.map((family: any) => {
+    type FamilyWithDueRow = typeof familiesWithDue[number];
+    const report = familiesWithDue.map((family: FamilyWithDueRow) => {
         const lastPaymentDate = lastPaymentMap.get(family.id);
         const lastPayment = lastPaymentDate ? new Date(lastPaymentDate as string) : null;
 
@@ -127,7 +132,8 @@ export async function getDuesAgingReport() {
         '90+': { count: 0, total: 0 },
     };
 
-    report.forEach((r: any) => {
+    type ReportRow = typeof report[number];
+    report.forEach((r: ReportRow) => {
         const bucket = r.agingBucket as string;
         if (summary[bucket]) {
             summary[bucket].count++;
@@ -135,11 +141,12 @@ export async function getDuesAgingReport() {
         }
     });
 
+    type AgingSummary = Record<'0-30' | '31-60' | '61-90' | '90+', { count: number, total: number }>;
     return {
         success: true,
         report,
-        summary: summary as any,
-        totalDue: report.reduce((sum: number, r: any) => sum + r.dueAmount, 0),
+        summary: summary as AgingSummary,
+        totalDue: report.reduce((sum: number, r: ReportRow) => sum + r.dueAmount, 0),
         totalFamilies: report.length,
     };
 }

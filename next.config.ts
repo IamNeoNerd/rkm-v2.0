@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  // Use standalone output to avoid static generation issues with client providers
+  output: 'standalone',
 
   // Security headers for production
   async headers() {

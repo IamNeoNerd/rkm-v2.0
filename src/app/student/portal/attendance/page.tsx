@@ -7,7 +7,6 @@ import { AttendanceCalendar } from "@/components/parent/AttendanceCalendar";
 import { GlassCard } from "@/components/modern/Card";
 import { Activity, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/modern/Button";
 
 export default async function AttendancePage() {
     const session = await auth();

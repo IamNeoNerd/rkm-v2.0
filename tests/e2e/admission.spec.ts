@@ -4,7 +4,7 @@
  * Tests the complete student admission process
  */
 
-import { test, expect, waitForPageLoad, waitForToast } from './fixtures';
+import { test, expect, waitForPageLoad } from './fixtures';
 
 test.describe('Admission Flow', () => {
     test('should complete a full admission', async ({ authenticatedPage: page }) => {

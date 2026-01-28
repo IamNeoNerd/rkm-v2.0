@@ -97,7 +97,7 @@ export function SessionTransitionDialog({
             } else {
                 toast.error(result.error || "Failed to generate preview");
             }
-        } catch (error) {
+        } catch {
             toast.error("Failed to generate preview");
         } finally {
             setLoading(false);
@@ -117,7 +117,7 @@ export function SessionTransitionDialog({
             } else {
                 toast.error(result.error || "Transition failed");
             }
-        } catch (error) {
+        } catch {
             toast.error("Transition failed");
         } finally {
             setTransitioning(false);
